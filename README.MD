@@ -1,12 +1,12 @@
-======================================================================================================
-> SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
-======================================================================================================
+=================================================================================
+SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
+=================================================================================
 
 Input Data is : MLC_FOLDER (mlc01 folder)
 
 03/03/2021 V1 : (fork of the code of BatchFw V22-3)
-    > Use the scripts of BatchFw and remove all the dependencies to the project.
-    > 3 entry points 
+    Use the scripts of BatchFw and remove all the dependencies to the project.
+    3 entry points 
         - getOnlineFiles.bat : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
           (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
         - importWiiuSaves.bat : get saves from the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
@@ -23,7 +23,7 @@ Input Data is : MLC_FOLDER (mlc01 folder)
       
       
       
-    > save the last configuration in ./lastConfiguration.txt (MLC_FOLDER path for now)
-    > shortcut creation for the 3 main scrits?
-    > exe encapsulation of batch code (create binary files of this project) with the script buildExe.bat
+    Save the last configuration in ./lastConfiguration.txt (MLC_FOLDER path for now)
+    Shortcut creation for the 3 main scrits?
+    Exe encapsulation of batch code (create binary files of this project) with the script buildExe.bat ?
 
