@@ -13,7 +13,7 @@ And i dont want to do this since :
 - it's done in BatchFw,
 - and the mlc folder given could an external one (not included in CEMU's install)
 
-**The last time played is computed using the current time. It means that games stats will be upated with the current time even if you do not play the game since you dump-it from your Wii-U. It results in false last time played when running the game on the WiiU.**
+**The last time played is computed using the current time. It means that games stats will be upated with the current time even if you do not play the game since you dumped it from your Wii-U. It results in false last time played when running the game on the WiiU.**
 
 This limitation does not exist in BatchFw that get the game's stats from the settings.xml of CEMU. 
 
