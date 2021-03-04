@@ -33,8 +33,8 @@ This limitation does not exist in BatchFw that get the game's stats from the set
 
 TODO : 
 
-Commit missing files when checked.
-Create an install.bat script to create shortcuts on the desktop fo the 4 scripts externalised
+- Commit missing files when checked.
+- Create an install.bat script to create shortcuts on the desktop fo the 4 scripts externalised
 
 # 
 **IMPORTANT : if you get the files from the repository : use the script ./fixBatFiles.bat (used to produce a release) to force the ANSI encoding and remove trailing spaces in all files (this script also put files in read only) because GitHub will format all files from ANSI to UTF-8 and it might break silentlty some scripts.**
