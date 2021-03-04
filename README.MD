@@ -27,7 +27,7 @@ This limitation does not exist in BatchFw that get the game's stats from the set
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
 
 (Not commited yet)
-- **changeAccount.bat** : change the account (800000X) used (remane folders in a MLC_PATH). So you can rename your existing CEMU accounts to match your Wii-U ones before synchronizing or bypass the CEMU version limitation with using only the 8000001 account (the only one supported on CEMU < 1.15.19) or .
+- **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). So you can rename your existing CEMU accounts to match your Wii-U ones before synchronizing or bypass the CEMU version limitation with using only the 80000001 account (the only one supported on CEMU < 1.15.19) or .
 - **importWiiuSaves.bat** : get saves from the Wii-U for games that also exist in MLC_FOLDER (backup existing CEMU saves before overwrite files)
 - **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U filesystem (backup existing Wii-U saves before overwrite files)
 
