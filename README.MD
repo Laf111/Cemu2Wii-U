@@ -1,9 +1,10 @@
-# SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
+# SyncSaves_Cemu-WiiU
+
+**SyncSaves_Cemu-WiiU** is an automated FTP interface to sync saves between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
 
 
-Use the scripts of "[BatchFw](https://github.com/Laf111/CEMU-Batch-Framework)" and remove all the dependencies to the project.
 
-**ATTENTION : contrary to BatchFw that allows multiple saves per user, only syncrhonize mode is implemented. You cannot keep both saves (CEMU and Wii-U ones)**
+It uses scripts adapted from "[BatchFw](https://github.com/Laf111/CEMU-Batch-Framework)" with more restrictions. Contrary to BatchFw that allows multiple saves per user, only syncrhonize mode is implemented here. **You cannot keep both saves (CEMU and Wii-U ones)**
 
 
 4 main scripts (3 adapted from BatchFw):
