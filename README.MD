@@ -3,13 +3,14 @@
 
 Use the scripts of BatchFw and remove all the dependencies to the project.
 
-3 entry points :
+4 entry points :
 
-- getOnlineFiles.bat : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
+- **changeAccount.bat** : change the account (800000X) used 
+- **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
-- importWiiuSaves.bat : get saves from the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
+- **importWiiuSaves.bat** : get saves from the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
   Backup existing save then replace files
-- exportSavesToWiiu.bat : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
+- **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
   Backup existing save then replace files  
   Use powershell instead of Rar.exe to compress files (backups)
   Remove the first column in the files created by scanWiiU.bat (game's title in BatchFw)
