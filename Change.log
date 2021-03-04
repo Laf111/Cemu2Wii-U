@@ -1,0 +1,25 @@
+======================================================================================================
+> SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
+======================================================================================================
+
+03/03/2021 V1 : (fork of the code of BatchFw V22-3)
+    > Use the scripts of BatchFw and remove all the dependencies to the project.
+    > 4 entry points 
+	- changeAccount.bat : change the account (800000X) used
+        - getOnlineFiles.bat : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
+          (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
+        - importWiiuSaves.bat : get saves from the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
+          Backup existing save then replace files
+        - exportSavesToWiiu.bat : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
+          Backup existing save then replace files      
+      Remove the first column in the files created by scanWiiU.bat (game's title in BatchFw)
+      
+      In import/export scripts : 
+        - remove the playing time support (for now CEMU does not use saveinfo.xml to save this information)
+        - remove wiiuSaveMode = BOTH case, choices left to define Wii-U accounts to treat : "all", "select"
+        - Get game's title from the <longname_en> node in meta/meta.xml (to remove Batch Wii-U title database dependency)
+      
+      
+TODO:       
+    > save the last configuration in ./lastConfiguration.txt (MLC_FOLDER path for now)
+    > shortcuts creation for the 4 main scrits in a install.bat
