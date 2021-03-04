@@ -4,7 +4,7 @@
 
 
 
-It uses scripts adapted from "[BatchFw](https://github.com/Laf111/CEMU-Batch-Framework)" with more restrictions. Contrary to BatchFw that allows multiple saves per user, only syncrhonize mode is implemented here. **You cannot keep both saves (CEMU and Wii-U ones)**
+It uses scripts adapted from "[BatchFw](https://github.com/Laf111/CEMU-Batch-Framework)" with more restrictions. Contrary to BatchFw that allows multiple saves per user, only syncrhonize mode is implemented here. **You'll not be able to play using both saves (CEMU and Wii-U ones) on CEMU**
 
 
 4 main scripts (3 adapted from BatchFw):
