@@ -17,8 +17,8 @@ And i dont want to do this since :
 
 This limitation does not exist in BatchFw that get the game's stats from the settings.xml of CEMU. 
 
-**Version of CEMU supported >= 1.15.19 (supporting Wii-U account handling)**
-
+#
+**Version of CEMU supported >= 1.15.19 (supporting Wii-U account handling) !**
 #
 4 main scripts (3 adapted from BatchFw):
 
