@@ -23,7 +23,7 @@ This limitation does not exist in BatchFw that get the game's stats from the set
 
 4 main scripts (3 adapted from BatchFw):
 
-- **changeAccount.bat** : change the account (800000X) used (remane folders) in a MLC_PATH
+- **changeAccount.bat** : change the account (800000X) used (remane folders in a MLC_PATH)
 - **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
 
