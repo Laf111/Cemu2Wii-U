@@ -32,8 +32,8 @@ This limitation does not exist in BatchFw that get the game's stats from the set
 - **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U filesystem (backup existing Wii-U saves before overwrite files)
 
 TODO : 
-Commit missing files when checked.
 
+Commit missing files when checked.
 Create an install.bat script to create shortcuts on the desktop fo the 4 scripts externalised
 
 # 
