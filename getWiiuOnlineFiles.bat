@@ -248,48 +248,6 @@ REM : main
 REM : ------------------------------------------------------------------
 REM : functions
 
-    REM : remove DOS forbiden character from a string
-   :secureUserName
-        set "str=%~1"
-
-        REM : DOS reserved characters
-        set "str=!str:&=!"
-        set "str=!str:^!=!"
-        set "str=!str:%%=!"
-
-        REM : add . and ~
-        set "str=!str:.=!"
-        echo !str! | find "~" > NUL 2>&1 && (
-            echo Please remove ~ ^(unsupported charcater^) from !str!
-            exit /b 50
-        )
-        
-        REM : Forbidden characters for files in WINDOWS
-        set "str=!str:?=!"
-        set "str=!str:\=!"
-        set "str=!str:/=!"
-        set "str=!str::=!"
-        set "str=!str:"=!"
-        set "str=!str:>=!"
-        set "str=!str:<=!"
-        set "str=!str:|=!"
-        set "str=!str:^=!"
-
-        echo !str! | find "*" > NUL 2>&1 && (
-            echo Please remove * ^(unsupported charcater^) from !str!
-            exit /b 50
-        )
-        echo !str! | find "=" > NUL 2>&1 && (
-            echo Please remove = ^(unsupported charcater^) from !str!
-            exit /b 50
-        )
-
-        set "%2=!str!"
-        exit /b 0
-
-    goto:eof
-    REM : ------------------------------------------------------------------
-
 
     :setUsersFromWiiu
 
