@@ -1,6 +1,5 @@
-=================================================================================
-SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
-=================================================================================
+# SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
+
 
 Use the scripts of BatchFw and remove all the dependencies to the project.
 3 entry points 
