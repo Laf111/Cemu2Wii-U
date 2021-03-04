@@ -1,6 +1,6 @@
 # SyncSaves_Cemu-WiiU
 
-**SyncSaves_Cemu-WiiU** is an automated FTP interface to sync saves between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
+SyncSaves_Cemu-WiiU is an **automated FTP interface to sync saves** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
 
 
 
