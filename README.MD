@@ -3,7 +3,10 @@
 
 Use the scripts of BatchFw and remove all the dependencies to the project.
 
-4 entry points :
+**ATTENTION : contrary to BatchFw, only syncrhonize mode is implemented. You cannot keep both saves (CEMU and Wii-U ones)**
+
+
+4 main scripts :
 
 - **changeAccount.bat** : change the account (800000X) used 
 - **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
