@@ -6,6 +6,16 @@
 
 It uses scripts adapted from "[BatchFw](https://github.com/Laf111/CEMU-Batch-Framework)" with more restrictions. Contrary to BatchFw that allows multiple saves per user, only syncrhonize mode is implemented here. **You'll not be able to play using both saves (CEMU and Wii-U ones) on CEMU**
 
+There's another limitation : 
+
+With SyncSaves_Cemu-WiiU as it does not have access to the settings.xml file of CEMU install.
+And i dont want to do this since :
+- it's done in BatchFw,
+- and the mlc folder given could an external one (not included in CEMU's install)
+
+**the last time played is computed using the current time. It means that games stats will be upated with the current time even if you do not play the game since you dump-it from your Wii-U**
+
+This limitation does not exist in BatchFw that get the game's stats from the settings.xml , converts epochs 1970-2000 and update the meta/saveInfo.xml file 
 
 4 main scripts (3 adapted from BatchFw):
 
