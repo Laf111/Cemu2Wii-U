@@ -1,12 +1,12 @@
 # SyncSaves_Cemu-WiiU : automated FTP interface to sync saves between WiiU and CEMU
 
 
-Use the scripts of BatchFw and remove all the dependencies to the project.
+Use the scripts of "[BatchFw](https://github.com/Laf111/CEMU-Batch-Framework)" and remove all the dependencies to the project.
 
-**ATTENTION : contrary to BatchFw, only syncrhonize mode is implemented. You cannot keep both saves (CEMU and Wii-U ones)**
+**ATTENTION : contrary to BatchFw that allows multiple saves per user, only syncrhonize mode is implemented. You cannot keep both saves (CEMU and Wii-U ones)**
 
 
-4 main scripts :
+4 main scripts (3 adapted from BatchFw):
 
 - **changeAccount.bat** : change the account (800000X) used 
 - **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
@@ -18,14 +18,4 @@ Use the scripts of BatchFw and remove all the dependencies to the project.
   Use powershell instead of Rar.exe to compress files (backups)
   Remove the first column in the files created by scanWiiU.bat (game's title in BatchFw)
 
-In import/export scripts : 
-- remove the playing time support (for now CEMU does not use saveinfo.xml to save this information)
-- remove wiiuSaveMode = BOTH case, choices left to define Wii-U accounts to treat : "all", "select"
-- Get game's title from the <longname_en> node in meta/meta.xml (to remove Batch Wii-U title database dependency)
-
-
-
-Save the last configuration in ./lastConfiguration.txt (MLC_FOLDER path for now)
-Shortcut creation for the 3 main scrits?
-Exe encapsulation of batch code (create binary files of this project) with the script buildExe.bat ?
 
