@@ -8,7 +8,7 @@ It uses scripts adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Fram
 
 But there's another limitation (while waiting for CEMU to handle saves files as the wii-u does) : 
 
-With SyncSaves_Cemu-WiiU as it does not have access to the settings.xml file of CEMU install.
+SyncSaves_Cemu-WiiU does not have access to the settings.xml file of CEMU install (where CEMU save game's stats).
 And i dont want to do this since :
 - it's done in BatchFw,
 - and the mlc folder given could an external one (not included in CEMU's install)
