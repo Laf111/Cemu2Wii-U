@@ -14,15 +14,16 @@ REM : main
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
     pushd !HERE!
-    set "syncFolder="!HERE:"=!\ftpSyncFolders.bat""
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
-    set "StartMinimizedWait="!RESOURCES_PATH:"=!\vbs\StartMinimizedWait.vbs""
+    set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
 
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
+    set "syncFolder="!HERE:"=!\ftpSyncFolders.bat""
+    
     REM : set current char codeset
     call:setCharSet
 
@@ -51,6 +52,8 @@ REM : main
         echo !savesFolder! not found ^?
         goto:askMlc01Folder
     )
+echo OK
+pause    
     echo.    
     echo ---------------------------------------------------------
     set "userSavesToImport="select""    

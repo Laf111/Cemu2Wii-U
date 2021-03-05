@@ -16,14 +16,11 @@ REM : main
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
+    set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
 
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
-    
-    set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
-    set "rarExe="!RESOURCES_PATH:"=!\rar.exe""
-    set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
 
     set "ftpSyncFolders="!HERE:"=!\ftpSyncFolders.bat""
 
