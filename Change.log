@@ -15,10 +15,8 @@
       Remove the first column in the files created by scanWiiU.bat (game's title in BatchFw)
       
       In import/export scripts : 
-        - remove the playing time support (for now CEMU does not use saveinfo.xml to save this information)
         - remove wiiuSaveMode = BOTH case, choices left to define Wii-U accounts to treat : "all", "select"
-        - Get game's title from the <longname_en> node in meta/meta.xml (to remove Batch Wii-U title database dependency)
-      
+        - Get game's title from the <longname_en> node in meta/meta.xml (to remove Batch Wii-U title database dependency)      
       
 TODO:       
     > save the last configuration in ./lastConfiguration.txt (MLC_FOLDER path for now)

@@ -195,8 +195,10 @@ REM : main
 
     echo.
     echo ---------------------------------------------------------
-    echo - Identify Wii-U users
+    echo - Identify Wii-U users and their accounts
     echo ---------------------------------------------------------
+    set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
+
     call:setUsersFromWiiu
 
     REM : ask to install them in a mlc01 folder
@@ -251,10 +253,6 @@ REM : functions
 
     :setUsersFromWiiu
 
-        set "usersFolderAccount="!ONLINE_FOLDER:"=!\usersAccounts""
-        if  exist !usersFolderAccount! rmdir /Q /S !usersFolderAccount!
-        mkdir !usersFolderAccount! > NUL 2>&1
-
         REM : loop on all 800000XX folders found
         pushd !ACCOUNTS_FOLDER!
         for /F "delims=~" %%d in ('dir /B /A:D 80000* 2^>NUL') do (
@@ -275,16 +273,13 @@ REM : functions
                 pause
             )
 
-            REM : copy the file
-            set "userFolder="!usersFolderAccount:"=!\!accId!@%%d""
-            mkdir !userFolder! > NUL 2>&1
-            set "uf="!userFolder:"=!\account.dat""
-
-            copy /Y !af! !uf! > NUL 2>&1
-            echo Saving %%d\account.dat to !uf!
+            echo Found %%d\account.dat for %accId%
             echo ---------------------------------------------------------
+            
+            REM : fill/complete the wiiuUsersLog
+            type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo %accId%=%%d >> !wiiuUsersLog!            
         )
-
+        pushd !HERE!
 
     goto:eof
     REM : ------------------------------------------------------------------
