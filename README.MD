@@ -33,6 +33,7 @@ TODO :
 
 - Check import/export scripts.
 - Create an install.bat script to create shortcuts on the desktop fo the 4 scripts externalised
+- Add optional arg (MLC PATH) to import/export scripts
 - Remember last configuration (to avoid browsing to the MLC folder systematically)
 - add Wii-U scripts from BatchFw : createWiiuSDcard.bat + ftpSetWiiuFirmwareUpdateMode.bat 
 
