@@ -21,8 +21,10 @@ This limitation does not exist in BatchFw that get the game's stats from the set
 **Version of CEMU supported >= 1.15.19 (supporting Wii-U account handling) !**
 #
 
-4 main scripts (3 adapted from BatchFw):
+6 main scripts (3 adapted from BatchFw):
 
+- **createWiiuSDcard.bat** : format an prepare a SD card for the Wii-U containing HBL and app
+- **ftpSetWiiuFirmwareUpdateMode.bat** : en/disable remotely the firmware auto-update feature on the Wii-U
 - **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). So you can rename your existing CEMU accounts to match your Wii-U ones before synchronizing or bypass the CEMU version limitation with using only the 80000001 account (the only one supported on CEMU < 1.15.19) or .
 - **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
