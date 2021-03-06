@@ -35,7 +35,7 @@ TODO :
 - Create an install.bat script to create shortcuts on the desktop fo the 4 scripts externalised
 - Add optional arg (MLC PATH) to import/export scripts
 - Remember last configuration (to avoid browsing to the MLC folder systematically)
-- add Wii-U scripts from BatchFw : createWiiuSDcard.bat + ftpSetWiiuFirmwareUpdateMode.bat 
+
 
 # 
 **IMPORTANT : if you get the files from the repository : use the script ./fixBatFiles.bat (used to produce a release) to force the ANSI encoding and remove trailing spaces in all files (this script also put files in read only) because GitHub will format all files from ANSI to UTF-8 and it might break silentlty some scripts.**
