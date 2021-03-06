@@ -21,7 +21,7 @@ This limitation does not exist in BatchFw that get the game's stats from the set
 **Version of CEMU supported >= 1.15.19 (supporting Wii-U account handling) !**
 #
 
-6 main scripts (3 adapted from BatchFw):
+6 main scripts :
 
 - **createWiiuSDcard.bat** : format an prepare a SD card for the Wii-U containing HBL and app
 - **ftpSetWiiuFirmwareUpdateMode.bat** : en/disable remotely the firmware auto-update feature on the Wii-U
