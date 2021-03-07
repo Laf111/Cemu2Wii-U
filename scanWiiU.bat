@@ -114,7 +114,7 @@ REM : main
     if !state! EQU 0 (
         echo ERROR^: !wiiuIp! was not found on your network ^!
         pause
-        exit 2
+        exit /b 2
     )
 
     set "ftplogFile="!LOGS:"=!\ftpCheck_sw.log""
@@ -147,16 +147,6 @@ REM : main
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "SITENAME=FTP2WIIU"
-
-    set "WIIU_ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\wiiuAccounts\usr\save\system\act""
-    if not exist !WIIU_ACCOUNTS_FOLDER! (
-
-        mkdir !WIIU_ACCOUNTS_FOLDER! > NUL 2>&1
-
-        echo Get WII-U accounts^.^.^.
-
-        !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!WIIU_ACCOUNTS_FOLDER!" /storage_mlc/usr/save/system/act" "exit"
-    )
 
     REM : lists of games and their endTitleId
     set /A "nbGames=0"

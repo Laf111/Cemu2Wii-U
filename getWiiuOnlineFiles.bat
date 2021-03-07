@@ -136,7 +136,7 @@ REM : main
 
     REM : run ftp transferts ^:
     echo.
-    echo ---------------------------------------------------------
+    echo =========================================================
     echo - CCERTS
     echo ---------------------------------------------------------
     !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!CCERTS_FOLDER!" /storage_mlc/sys/title/0005001b/10054000/content/ccerts" "exit"
@@ -201,9 +201,12 @@ REM : main
 
     call:setUsersFromWiiu
 
-    REM : ask to install them in a mlc01 folder
+    REM : TODO compress online files ? 
+    REM : TODO ask to install them in a mlc01 folder
+    REM : TODO ask if all accounts above are defined in CEMU
+    REM : TODO read lastConfig.ini ask for MLC01PATH otherwise
     echo.
-    echo ---------------------------------------------------------
+    echo =========================================================
 
     choice /C yn /N /M "Do you want to install the files in a mlc01 folder (y, n)? : "
     if !ERRORLEVEL! EQU 2 goto:endMain
@@ -228,16 +231,17 @@ REM : main
     set "srcFolder="!ONLINE_FOLDER:"=!\mlc01""
     robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
     
+    :endMain
     echo.
-    echo. Done
+    echo Done
     echo.
     
     echo Don^'t foget to add opt^.bin and seeprom^.bin ^(dumped from
     echo your Wii-U using NANDDUMPER)^ close to cemu^.exe to play
     echo online^.
-    echo ---------------------------------------------------------
+    echo =========================================================
     
-    :endMain
+
     pause
     if !ERRORLEVEL! NEQ 0 exit /b !ERRORLEVEL!
     exit /b 0
@@ -258,7 +262,6 @@ REM : functions
         for /F "delims=~" %%d in ('dir /B /A:D 80000* 2^>NUL') do (
 
             set "af="!ACCOUNTS_FOLDER:"=!\%%d\account.dat""
-
             for /F "delims=~= tokens=2" %%n in ('type !af! ^| find /I "IsPasswordCacheEnabled=0"') do (
                 echo WARNING^: this account seems to not have "Save password" option checked ^(auto login^) ^!
                 echo it might be unusable with CEMU
@@ -273,11 +276,15 @@ REM : functions
                 pause
             )
 
-            echo Found %%d\account.dat for %accId%
-            echo ---------------------------------------------------------
+            echo Found %%d\account.dat for !accId!            
             
             REM : fill/complete the wiiuUsersLog
-            type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo %accId%=%%d >> !wiiuUsersLog!            
+            if exist !wiiuUsersLog! (
+                type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo !accId!=%%d >> !wiiuUsersLog!
+            ) else (
+                echo !accId!=%%d > !wiiuUsersLog!
+            )
+            
         )
         pushd !HERE!
 

@@ -11,7 +11,6 @@ REM : main
 
     REM : directory of this script
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
-
     pushd !HERE!
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
@@ -40,6 +39,10 @@ REM : main
     echo  Change accountId recursively in a MLC PATH^.
     echo =========================================================
     echo.
+    
+    echo First create the new accountId in CEMU ^!
+    echo ^(in General settings ^/ Account tab^)
+    echo.
 
     if %nbArgs% EQU 0 goto:getInputs
     
@@ -53,7 +56,7 @@ REM : main
     )
 
     REM : get and check wiiuIp
-    set "MLC01_FOLDER_PATH=!args[0]!"
+    set "MLC01_FOLDER_PATH=!args[0]!"    
     
     if not exist !MLC01_FOLDER_PATH! (
         echo ERROR^: "!MLC01_FOLDER_PATH!" not found
@@ -89,8 +92,17 @@ REM : main
     :getInputs
     REM : when called with no args
     
-    echo Please select a MLC path folder ^(mlc01^)
+    set "config="!LOGS:"=!\lastConfig.ini""    
+    if exist !config! (
+        for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
+        set "folder=!MLC01_FOLDER_PATH:"=!"
+
+        choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
+        if !ERRORLEVEL! EQU 1 goto:getSavesMode
+    )
+    echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
+
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
     if [!MLC01_FOLDER_PATH!] == ["NONE"] (
@@ -103,6 +115,8 @@ REM : main
         echo ERROR^: !savesFolder! not found ^?
         goto:askMlc01Folder
     )
+    REM : update last configuration
+    echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
     
     :getSrcAcc
     echo.
@@ -124,7 +138,7 @@ REM : main
     
     :inputsAvailable
 
-    title Change accountId recursively in !MLC01_FOLDER_PATH!    
+    title Change accountId recursively in !MLC01_FOLDER_PATH!
     cls
     echo =========================================================
     if %nbArgs% NEQ 0 goto:rename
@@ -145,7 +159,17 @@ REM : main
     echo =========================================================
     echo Done
     echo log file = !changeAccountLog!
-     if %nbArgs% EQU 0 pause
+    echo.
+
+    echo.
+    echo Create the account !TARGET_ACCOUNT! in all versions of CEMU 
+    echo that point to !MLC01_FOLDER_PATH!
+    echo ^(in General settings ^/ Account tab^)
+    echo
+    echo Otherwise saves won^' show up ^!
+    pause
+        
+    if %nbArgs% EQU 0 pause
     exit /b 0
 
     goto:eof

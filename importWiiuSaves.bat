@@ -31,6 +31,16 @@ REM : main
     REM : J2000 unix timestamp (/ J1970)
     set /A "j2000=946684800"
 
+    REM : search if CEMU is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 1 (
+        echo ERROR^: CEMU is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+    
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
@@ -41,8 +51,16 @@ REM : main
     echo =========================================================
     echo.
 
-    echo Please select a MLC path folder ^(mlc01^)
+    set "config="!LOGS:"=!\lastConfig.ini""    
+    if exist !config! (
+        for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
+        set "folder=!MLC01_FOLDER_PATH:"=!"
+        choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
+        if !ERRORLEVEL! EQU 1 goto:getSavesMode
+    )
+    echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
+
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
     if [!MLC01_FOLDER_PATH!] == ["NONE"] (
@@ -57,7 +75,10 @@ REM : main
         echo !savesFolder! not found ^?
         goto:askMlc01Folder
     )
+    REM : update last configuration
+    echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
     
+    :getSavesMode    
     echo.    
     echo ---------------------------------------------------------
     set "userSavesToImport="select""    

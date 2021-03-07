@@ -12,7 +12,7 @@ REM : main
     REM : directory of this script
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
-    pushd !HERE!
+    pushd !HERE!        
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
@@ -37,13 +37,35 @@ REM : main
     REM : J2000 unix timestamp (/ J1970)
     set /A "j2000=946684800"
         
+    REM : search if CEMU is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 1 (
+        echo ERROR^: CEMU is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+
+    REM : get current date
+    for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
+    set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
+    set "DATE=%ldt%"
+    
     cls
     echo =========================================================
     echo  Export CEMU saves to the Wii-U^.
     echo =========================================================
     echo.
     
-    echo Please select a MLC path folder ^(mlc01^)
+    set "config="!LOGS:"=!\lastConfig.ini""    
+    if exist !config! (
+        for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
+        set "folder=!MLC01_FOLDER_PATH:"=!"
+        choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
+        if !ERRORLEVEL! EQU 1 goto:getSavesMode
+    )
+    echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -54,11 +76,15 @@ REM : main
     )
 
     REM : check if a usr/save exist
-    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
+    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
     if not exist !savesFolder! (
         echo !savesFolder! not found ^?
         goto:askMlc01Folder
     )
+    REM : update last configuration
+    echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
+    
+    :getSavesMode
     echo.    
     echo ---------------------------------------------------------
     set "userSavesToExport="select""    
@@ -190,13 +216,13 @@ REM : main
         REM : meta.xml
         set "META_FILE="%%i""
         
-        call:getFromMetaXml longname_en title
-        call:getFromMetaXml title_id titlelId
+        push !RESOURCES-PATH!
+        
+        call:getValueInXml "//longname_en" !META_FILE! title
+        call:getValueInXml "//title_id" !META_FILE! titleId
 
-        if not ["!titlelId!"] == ["NOT_FOUND"] ( 
-            set /A "NB_GAMES+=1"
-            echo !titleId!;!title! >> !localTid!
-        )
+        if not ["!title!"] == ["NOT_FOUND"] if not ["!titleId!"] == ["NOT_FOUND"] echo !titleId!;!title! >> !localTid!
+        pushd !savesFolder!
     )
 
     :getList
@@ -216,7 +242,7 @@ REM : main
         type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
         
             REM : get the title from !localTid!
-            for /F "delims=~; tokens=2" %%n in ('type !localTid! | find /I "!endTitleId!"') set "title=%%n"
+            for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
             set "titles[!nbGames!]=!title!"
             set "endTitlesId[!nbGames!]=%%i"
             set "titlesSrc[!nbGames!]=%%k"
