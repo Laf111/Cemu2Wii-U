@@ -17,6 +17,8 @@ And i dont want to do this since :
 
 This limitation does not exist in BatchFw that get the game's stats from the settings.xml of CEMU. 
 
+Also, Wii-U accounts must already exist in CEMU configuration (define then in General Settings / account tab).
+
 #
 **Version of CEMU supported >= 1.15.19 (supporting Wii-U account handling) !**
 #
@@ -25,7 +27,7 @@ This limitation does not exist in BatchFw that get the game's stats from the set
 
 - **createWiiuSDcard.bat** : format (using Fat32Format.exe) an prepare a SD card for the Wii-U containing HBL and essentials apps
 - **ftpSetWiiuFirmwareUpdateMode.bat** : en/disable remotely the firmware auto-update feature on the Wii-U
-- **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). So you can rename your existing CEMU accounts to match your Wii-U ones before synchronizing or bypass the CEMU version limitation with using only the 80000001 account (the only one supported on CEMU < 1.15.19) or .
+- **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). So you can rename your existing CEMU accounts to match your Wii-U ones before synchronizing or bypass the CEMU version limitation with using only the 80000001 account (the only one supported on CEMU < 1.15.19). BUT you'll need to manually define the account in CEMU after the process.
 - **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
 - **importWiiuSaves.bat** : get saves from the Wii-U for games that also exist in MLC_FOLDER (backup existing CEMU saves before overwrite files)
