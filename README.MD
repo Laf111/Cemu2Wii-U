@@ -17,7 +17,7 @@ And i dont want to do this since :
 
 This limitation does not exist in BatchFw that get the game's stats from the settings.xml of CEMU. 
 
-Also, Wii-U accounts must already exist in CEMU configuration (define then in General Settings / account tab).
+Also, Wii-U accounts must already exist in CEMU configuration (define them in General Settings / account tab).
 
 #
 **Version of CEMU supported >= 1.15.19 (supporting Wii-U account handling) !**
