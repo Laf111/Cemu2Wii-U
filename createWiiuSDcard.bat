@@ -4,6 +4,7 @@ REM : ------------------------------------------------------------------
 REM : main
 
     setlocal EnableDelayedExpansion
+    title Format large SDCard and install HBL and requiered app
 
     color 4F
 

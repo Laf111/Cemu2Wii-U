@@ -4,7 +4,7 @@ REM : ------------------------------------------------------------------
 REM : main
 
     setlocal EnableDelayedExpansion
-
+    title Dump all the files need to play online with CEMU
     color 4F
 
     set "THIS_SCRIPT=%~0"
