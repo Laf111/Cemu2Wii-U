@@ -18,6 +18,9 @@ REM : main
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
 
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
+    !cmdOw! @ /MAX > NUL 2>&1
+    
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
@@ -201,32 +204,44 @@ REM : main
 
     call:setUsersFromWiiu
 
-    REM : TODO compress online files ? 
-    REM : TODO ask to install them in a mlc01 folder
-    REM : TODO ask if all accounts above are defined in CEMU
-    REM : TODO read lastConfig.ini ask for MLC01PATH otherwise
+    echo.
+    echo.
+    echo Don^'t forget to create the following accounts
+    echo and users in all your CEMU installs ^: 
+    echo.
+    type !wiiuUsersLog! | find /V "#"
     echo.
     echo =========================================================
 
     choice /C yn /N /M "Do you want to install the files in a mlc01 folder (y, n)? : "
     if !ERRORLEVEL! EQU 2 goto:endMain
     
-    echo Please select a mlc01 source folder
+    set "config="!LOGS:"=!\lastConfig.ini""    
+    if exist !config! (
+        for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
+        set "folder=!MLC01_FOLDER_PATH:"=!"
+        choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
+        if !ERRORLEVEL! EQU 1 goto:getSavesMode
+    )
+    echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
-    for /F %%b in ('cscript /nologo !browseFolder! "Select a mlc01 folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
+    for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
     if [!MLC01_FOLDER_PATH!] == ["NONE"] (
         choice /C yn /N /M "No item selected, do you wish to cancel (y, n)? : "
         if !ERRORLEVEL! EQU 1 timeout /T 4 > NUL 2>&1 && exit /b 75
         goto:askMlc01Folder
     )
-    
+
     REM : check if a usr/save exist
-    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
+    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
     if not exist !savesFolder! (
         echo !savesFolder! not found ^?
         goto:askMlc01Folder
     )
+    REM : update last configuration
+    echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
+
     
     set "srcFolder="!ONLINE_FOLDER:"=!\mlc01""
     robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
@@ -282,7 +297,8 @@ REM : functions
             if exist !wiiuUsersLog! (
                 type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo !accId!=%%d >> !wiiuUsersLog!
             ) else (
-                echo !accId!=%%d > !wiiuUsersLog!
+                echo # account=user > !wiiuUsersLog!
+                echo !accId!=%%d >> !wiiuUsersLog!
             )
             
         )

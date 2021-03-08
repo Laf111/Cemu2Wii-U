@@ -8,37 +8,22 @@ REM : main
     color 4F
 
     set "THIS_SCRIPT=%~0"
-    REM : checking THIS_SCRIPT path
-    call:checkPathForDos "!THIS_SCRIPT!" > NUL 2>&1
-    set /A "cr=!ERRORLEVEL!"
-    if !cr! NEQ 0 (
-        echo ERROR^: Remove DOS reserved characters from the path "!THIS_SCRIPT!" ^(such as ^&^, %% or ^^!^)^, cr=!cr!
-        pause
-        exit 1
-    )
 
     REM : directory of this script
-    set "SCRIPT_FOLDER="%~dp0"" && set "BFW_TOOLS_PATH=!SCRIPT_FOLDER:\"="!"
+    set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
-    for %%a in (!BFW_TOOLS_PATH!) do set "parentFolder="%%~dpa""
-    set "BFW_PATH=!parentFolder:~0,-2!""
-    for %%a in (!BFW_PATH!) do set "parentFolder="%%~dpa""
-    for %%a in (!BFW_PATH!) do set "drive=%%~da"
-    set "GAMES_FOLDER=!parentFolder!"
-    if not [!GAMES_FOLDER!] == ["!drive!\"] set "GAMES_FOLDER=!parentFolder:~0,-2!""
+    pushd !HERE!
+    
+    set "RESOURCES_PATH="!HERE:"=!\resources""
+    set "ffat32="!RESOURCES_PATH:"=!\fat32format.exe""
+    set "7za="!RESOURCES_PATH:"=!\7za.exe""
+    set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
 
-    set "BFW_RESOURCES_PATH="!BFW_PATH:"=!\resources""
-    set "cmdOw="!BFW_RESOURCES_PATH:"=!\cmdOw.exe""
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
-
-    set "ffat32="!BFW_RESOURCES_PATH:"=!\fat32format.exe""
-    set "rarExe="!BFW_PATH:"=!\resources\rar.exe""
-
-    set "StartHiddenWait="!BFW_RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
-    set "browseFolder="!BFW_RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
-
-    set "BFW_LOGS="!BFW_PATH:"=!\logs""    
-    set "logFile="!BFW_LOGS:"=!\Host_!USERDOMAIN!.log""
+    
+    set "LOGS="!HERE:"=!\logs""
+    if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     REM : set current char codeset
     call:setCharSet
@@ -53,13 +38,10 @@ REM : main
     echo       ^* HBL ^(HomeBrew Launcher^)
     echo       ^* appStore ^(HomeBrew AppStore^)
     echo       ^* DDD ^(WiiU Disk itle Dumper^)
-    echo       ^* MOCHA ^(MOCHA CFW^)
     echo       ^* FTP everywhere for MOCHA ^(ftpiiu^)
     echo       ^* FTP everywhere for CBHC ^(ftpiiu^)
-    echo       ^* loadiine_gx2_y_mod ^(to launch DDD dumps^)
     echo       ^* nanddumper ^(to dump your NAND and get online files^)
-    echo       ^* sigpatcher2sysmenu ^(DLC patch with non permanent CFW^)
-    echo       ^* wup_installer_gx2 ^(installer for WUP format^)
+    echo       ^* dumpling ^(dump your games^)
     echo.
     echo Once plugged in your Wii-U^, open the internet browser
     echo and enter the following adress ^: http^:^/^/wiiuexploit^.xyz
@@ -89,14 +71,14 @@ REM : main
     echo ---------------------------------------------------------
     echo Installing content^.^.^.
     REM : install content
-    set "sdCardContent="!BFW_RESOURCES_PATH:"=!\WiiuSDcard.rar""
+    set "sdCardContent="!RESOURCES_PATH:"=!\WiiuSDcard.zip""
 
-    wscript /nologo !StartHiddenWait! !rarExe! x -o+ -inul -w!BFW_LOGS! !sdCardContent! !SDCARD! > NUL 2>&1
+    call !7za! e -y -w!LOGS! !sdCardContent! !SDCARD! > NUL 2>&1
+     
     echo done
     echo =========================================================
 
     pause
-
     exit /b 0
 
     goto:eof
@@ -106,33 +88,6 @@ REM : main
 
 REM : ------------------------------------------------------------------
 REM : functions
-
-    :checkPathForDos
-
-        set "toCheck=%1"
-
-        REM : if implicit expansion failed (when calling this script)
-        if ["!toCheck!"] == [""] (
-            echo Remove specials characters from %1 ^(such as ^&,^(,^),^!^)^, exiting 13
-            exit /b 13
-        )
-
-        REM : try to resolve
-        if not exist !toCheck! (
-            echo This path ^(!toCheck!^) is not compatible with DOS^. Remove specials characters from this path ^(such as ^&,^(,^),^!^)^, exiting 11
-            exit /b 11
-        )
-
-        REM : try to list
-        dir !toCheck! > NUL 2>&1
-        if !ERRORLEVEL! NEQ 0 (
-            echo This path ^(!toCheck!^) is not compatible with DOS^. Remove specials characters from this path ^(such as ^&,^(,^),^!^)^, exiting 12
-            exit /b 12
-        )
-
-        exit /b 0
-    goto:eof
-    REM : ------------------------------------------------------------------
 
     REM : function to get and set char set code for current host
     :setCharSet

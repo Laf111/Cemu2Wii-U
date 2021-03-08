@@ -22,8 +22,7 @@ REM : main
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,6%"
     set "DATE=%ldt%"
         
-    set "LOGS="!HERE:"=!\logs""
-    if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""    if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
     set "myLog="!LOGS:"=!\ftpSyncFolders.log""
 
     REM : set current char codeset

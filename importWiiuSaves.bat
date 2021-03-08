@@ -17,20 +17,34 @@ REM : main
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
+    set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
     set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     set "7za="!RESOURCES_PATH:"=!\7za.exe""
 
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
+    !cmdOw! @ /MAX > NUL 2>&1
+    
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
-    set "syncFolder="!HERE:"=!\ftpSyncFolders.bat""
+    set "ftpSyncFolders="!HERE:"=!\ftpSyncFolders.bat""
     
     REM : set current char codeset
     call:setCharSet
 
+    REM : checking arguments
+    set /A "nbArgs=0"
+    :continue
+        if "%~1"=="" goto:end
+        set "args[%nbArgs%]="%~1""
+        set /A "nbArgs +=1"
+        shift
+        goto:continue
+    :end
+    
     REM : J2000 unix timestamp (/ J1970)
     set /A "j2000=946684800"
-
+        
     REM : search if CEMU is not already running
     set /A "nbI=0"
     for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
@@ -40,17 +54,61 @@ REM : main
         pause
         exit /b 100
     )
-    
+
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
     set "DATE=%ldt%"
-
+    
+    cls
     echo =========================================================
     echo Import Wii-U saves to CEMU^.
     echo =========================================================
     echo.
+    
+    if %nbArgs% EQU 0 goto:getInputs
+    
+    REM : when called with args
+    if %nbArgs% NEQ 2 (
+        echo ERROR on arguments passed ^(%nbArgs%^)
+        echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH userSavesToImport
+        echo userSavesToImport = select ^/ all
+        echo given {%*}
+        pause
+        exit /b 99
+    )
 
+    REM : get and check MLC01_FOLDER_PATH
+    set "MLC01_FOLDER_PATH=!args[0]!"    
+    
+    if not exist !MLC01_FOLDER_PATH! (
+        echo ERROR^: "!MLC01_FOLDER_PATH!" not found
+        pause
+        exit /b 91    
+    )
+    
+    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
+    if not exist !savesFolder! (
+        echo ERROR^: !savesFolder! not found ^?
+        pause
+        exit /b 92
+    )
+    
+    set "userSavesToImport=!args[1]!"
+    set "userSavesToImport=!userSavesToImport: =!"
+    set "userSavesToImport=!userSavesToImport:"=!"
+    
+    echo !userSavesToImport! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+        echo ERROR^: !userSavesToImport! is not equal to 'all' or 'select'
+        pause
+        exit /b 93
+    )
+    set "userSavesToImport="select""    
+    goto:inputsAvailable    
+    
+    :getInputs
+    REM : when called with no args
+    
     set "config="!LOGS:"=!\lastConfig.ini""    
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
@@ -60,7 +118,6 @@ REM : main
     )
     echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
-
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
     if [!MLC01_FOLDER_PATH!] == ["NONE"] (
@@ -88,10 +145,11 @@ REM : main
         if !ERRORLEVEL! EQU 1 set "userSavesToImport="all""
     )
     
+    :inputsAvailable
     echo.    
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
-    echo - disable the sleeping^/shutdown features
+    echo - have your SDCard plugged in your Wii-U
     echo - if you^'re using a permanent hack ^(CBHC^)^:
     echo    ^* launch HomeBrewLauncher
     echo    ^* then ftp-everywhere for CBHC
@@ -183,7 +241,6 @@ REM : main
     if [!LAST_SCAN!] == ["NOT_FOUND"] (
         set "scanNow="!HERE:"=!\scanWiiU.bat""
         call !scanNow! !wiiuIp!
-
         set /A "noOldScan=1"
         goto:scanMyWii
     )
@@ -202,8 +259,10 @@ REM : main
 
     REM create a log file containing all your games titleId
     set "localTid="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\cemuTitlesId.log""
-    if exist !localTid! del /F !localTid!
-
+    if exist !localTid! del /F !localTid! > NUL 2>&1
+    
+    REM : re define savesFolder here in case of config loaded
+    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
     call:getCemuTitles !savesFolder!
     
     set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
@@ -218,11 +277,12 @@ REM : main
     :getList
     REM : get title;endTitleId;source;dataFound from scan results
     set "gamesList="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\gamesList.csv""
+
     set /A "nbGames=0"
 
     cls
     echo =========================================================
-    
+
     set "completeList="
     for /F "delims=~; tokens=1-2" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
 
@@ -318,11 +378,11 @@ REM : main
     set "CEMU_BACKUP="!CEMU_BACKUP_PATH:"=!\!DATE!_CEMU_Saves.zip""
     set "backupLog="!CEMU_BACKUP_PATH:"=!\!DATE!_CEMU_Saves.log"
     
-    echo #Backup CEMU saves in !MLC01_FOLDER_PATH! > !backupLog!
+    echo # Backup CEMU saves in !CEMU_BACKUP! > !backupLog!
     
     if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
     if not exist !CEMU_BACKUP_PATH! mkdir !CEMU_BACKUP_PATH! > NUL 2>&1
-
+    pushd !HERE!
     echo.
     echo Cemu saves will be backup in !CEMU_BACKUP!
     echo.
@@ -385,7 +445,6 @@ REM : functions
     :importSaves
         set /A "num=%~1"
 
-        REM : set gameTitle (used for naming user's rar file)
         set "gameTitle=!selectedTitles[%num%]!"
         set "endTitleId=!selectedEndTitlesId[%num%]!"
         set "src=!selectedtitlesSrc[%num%]!"
@@ -410,7 +469,7 @@ REM : functions
         set "saveinfo="!syncFolderMeta:"=!\saveinfo.xml""
         
         REM : launching transfert (backup the Wii-U saves)
-        call !syncFolder! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "!gameTitle! (saves)"
+        call !ftpSyncFolders! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "!gameTitle! (saves)"
         set "cr=!ERRORLEVEL!"
         if !cr! NEQ 0 (
             echo ERROR when downloading existing saves of !gameTitle! ^!

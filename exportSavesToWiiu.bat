@@ -15,25 +15,32 @@ REM : main
     pushd !HERE!        
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
+    set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
     set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
-    set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
+    set "7za="!RESOURCES_PATH:"=!\7za.exe""
 
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
+    !cmdOw! @ /MAX > NUL 2>&1
+    
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     set "ftpSyncFolders="!HERE:"=!\ftpSyncFolders.bat""
 
-    set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
-    set "StartMinimizedWait="!RESOURCES_PATH:"=!\vbs\StartMinimizedWait.vbs""
-
-    set "LOGS="!HERE:"=!\logs""
-
     REM : set current char codeset
     call:setCharSet
-
-    set "endTitleId=NONE"
-
+    
+    REM : checking arguments
+    set /A "nbArgs=0"
+    :continue
+        if "%~1"=="" goto:end
+        set "args[%nbArgs%]="%~1""
+        set /A "nbArgs +=1"
+        shift
+        goto:continue
+    :end
+    
     REM : J2000 unix timestamp (/ J1970)
     set /A "j2000=946684800"
         
@@ -57,6 +64,49 @@ REM : main
     echo  Export CEMU saves to the Wii-U^.
     echo =========================================================
     echo.
+    
+    if %nbArgs% EQU 0 goto:getInputs
+    
+    REM : when called with args
+    if %nbArgs% NEQ 2 (
+        echo ERROR on arguments passed ^(%nbArgs%^)
+        echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH userSavesToImport
+        echo userSavesToImport = select ^/ all
+        echo given {%*}
+        pause
+        exit /b 99
+    )
+
+    REM : get and check MLC01_FOLDER_PATH
+    set "MLC01_FOLDER_PATH=!args[0]!"    
+    
+    if not exist !MLC01_FOLDER_PATH! (
+        echo ERROR^: "!MLC01_FOLDER_PATH!" not found
+        pause
+        exit /b 91    
+    )
+    
+    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
+    if not exist !savesFolder! (
+        echo ERROR^: !savesFolder! not found ^?
+        pause
+        exit /b 92
+    )
+    
+    set "userSavesToImport=!args[1]!"
+    set "userSavesToImport=!userSavesToImport: =!"
+    set "userSavesToImport=!userSavesToImport:"=!"
+    
+    echo !userSavesToImport! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+        echo ERROR^: !userSavesToImport! is not equal to 'all' or 'select'
+        pause
+        exit /b 93
+    )
+    set "userSavesToImport="select""    
+    goto:inputsAvailable    
+    
+    :getInputs
+    REM : when called with no args
     
     set "config="!LOGS:"=!\lastConfig.ini""    
     if exist !config! (
@@ -94,6 +144,7 @@ REM : main
         if !ERRORLEVEL! EQU 1 set "userSavesToExport="all""
     )
     
+    :inputsAvailable
     echo.    
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
@@ -134,6 +185,8 @@ REM : main
     :getWiiuIp
     set /P "wiiuIp=Please enter your Wii-U local IP adress : "
     set /P "port=Please enter the port used : "
+
+    set "winScpIniTmpl="!WinScpFolder:"=!\WinSCP.ini-tmpl""
 
     REM : prepare winScp.ini file
     copy /Y  !winScpIniTmpl! !winScpIni! > NUL 2>&1
@@ -205,25 +258,20 @@ REM : main
 
     REM create a log file containing all your games titleId
     set "localTid="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\cemuTitlesId.log""
-    if exist !localTid! del /F !localTid!
-
-    REM : cd to savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
-    pushd !savesFolder!
+    if exist !localTid! del /F !localTid! > NUL 2>&1
     
-    REM : searching for meta file from here
-    for /F "delims=~" %%i in ('dir /B /S "meta.xml" 2^> NUL') do (
+    REM : re define savesFolder here in case of config loaded
+    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
+    call:getCemuTitles !savesFolder!
+    
+    set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
+    if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
 
-        REM : meta.xml
-        set "META_FILE="%%i""
-        
-        push !RESOURCES-PATH!
-        
-        call:getValueInXml "//longname_en" !META_FILE! title
-        call:getValueInXml "//title_id" !META_FILE! titleId
+    set "upFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000e"
+    if exist !upFolder! call:getCemuTitles !upFolder!
 
-        if not ["!title!"] == ["NOT_FOUND"] if not ["!titleId!"] == ["NOT_FOUND"] echo !titleId!;!title! >> !localTid!
-        pushd !savesFolder!
-    )
+    set "dlcFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000c""
+    if exist !dlcFolder! call:getCemuTitles !dlcFolder!
 
     :getList
     REM : get title;endTitleId;source;dataFound from scan results
@@ -234,10 +282,10 @@ REM : main
     cls
     echo =========================================================
 
-    for /F "delims=~; tokens=1-4" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
+    set "completeList="
+    for /F "delims=~; tokens=1-2" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
 
         set "endTitleId=%%i"
-
         REM : if the game is also installed on your PC in !MLC01_FOLDER_PATH!
         type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
         
@@ -245,10 +293,12 @@ REM : main
             for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
             set "titles[!nbGames!]=!title!"
             set "endTitlesId[!nbGames!]=%%i"
-            set "titlesSrc[!nbGames!]=%%k"
+            set "titlesSrc[!nbGames!]=%%j"
             echo !nbGames!	: !title!
 
-            set /A "nbGames+=1"
+            set "completeList=!nbGames! !completeList!"
+            
+            set /A "nbGames+=1"            
         )
     )
     echo =========================================================
@@ -257,25 +307,34 @@ REM : main
     REM : selected games
     set /A "nbGamesSelected=0"
 
-    set /P "listGamesSelected=Please enter game's numbers list (separated with a space): "
-    if not ["!listGamesSelected: =!"] == [""] (
-        echo !listGamesSelected! | findStr /R /V /C:"^[0-9 ]*$" > NUL 2>&1 && echo ERROR^: not a list of integers && pause && goto:getList
+    set /P "listGamesSelected=Please enter game's numbers list (separated with a space) or 'all' to treat all games : "
+    set "listGamesSelected=!listGamesSelected: =!"
+    :displayList
+    
+    if not ["!listGamesSelected!"] == ["all"] (
+    
+        if not ["!listGamesSelected: =!"] == [""] (
+            echo !listGamesSelected! | findStr /R /V /C:"^[0-9 ]*$" > NUL 2>&1 && echo ERROR^: not a list of integers && pause && goto:getList
 
-        echo =========================================================
-        for %%l in (!listGamesSelected!) do (
-            echo %%l | findStr /R /V "[0-9]" > NUL 2>&1 && echo ERROR^: %%l not in the list && pause && goto:getList
-            set /A "number=%%l"
-            if !number! GEQ !nbGames! echo ERROR^: !number! not in the list & pause & goto:getList
+            echo =========================================================
+            for %%l in (!listGamesSelected!) do (
+                echo %%l | findStr /R /V "[0-9]" > NUL 2>&1 && echo ERROR^: %%l not in the list && pause && goto:getList
+                set /A "number=%%l"
+                if !number! GEQ !nbGames! echo ERROR^: !number! not in the list & pause & goto:getList
 
-            echo - !titles[%%l]!
-            set "selectedTitles[!nbGamesSelected!]=!titles[%%l]!"
-            set "selectedEndTitlesId[!nbGamesSelected!]=!endTitlesId[%%l]!"
-            set "selectedtitlesSrc[!nbGamesSelected!]=!titlesSrc[%%l]!"
+                echo - !titles[%%l]!
+                set "selectedTitles[!nbGamesSelected!]=!titles[%%l]!"
+                set "selectedEndTitlesId[!nbGamesSelected!]=!endTitlesId[%%l]!"
+                set "selectedtitlesSrc[!nbGamesSelected!]=!titlesSrc[%%l]!"
 
-            set /A "nbGamesSelected+=1"
+                set /A "nbGamesSelected+=1"
+            )
+        ) else (
+            goto:getList
         )
     ) else (
-        goto:getList
+        set "listGamesSelected=!completeList!"
+        goto:displayList
     )
     echo =========================================================
     echo.
@@ -294,8 +353,18 @@ REM : main
 
     cls
 
+    if !nbGamesSelected! EQU 0 (
+        echo WARNING^: no games selected ^?
+        pause
+        exit 11
+    )
+    set /A "nbGamesSelected-=1"
+
+    cls
+
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
+    set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders""    
     
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
@@ -303,14 +372,18 @@ REM : main
     set "DATE=%ldt%"
 
     REM : folder that contains temporarily the backup of each Wii-u Saves
-    set "BACKUP_PATH="!BACKUPS_PATH:"=!\Wii-U_Saves""
-    set "backupLog="!BACKUP_PATH:"=!\!DATE!.log"
+    set "WIIU_BACKUP_PATH="!BACKUPS_PATH:"=!\Wii-U_Saves""
+    set "WIIU_BACKUP="!WIIU_BACKUP_PATH:"=!\!DATE!_WIIU_Saves.zip""
+    set "backupLog="!WIIU_BACKUP_PATH:"=!\!DATE!.log"
     
-    if not exist !BACKUP_PATH! mkdir !BACKUP_PATH! > NUL 2>&1
+    echo # Backup WII-U saves in !WIIU_BACKUP! > !backupLog!
+
+    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
+    if not exist !WIIU_BACKUP_PATH! mkdir !WIIU_BACKUP_PATH! > NUL 2>&1
 
     pushd !HERE!
     echo.
-    echo Wii-U saves will be backup in !BACKUP_PATH!
+    echo Wii-U saves will be backup in !WIIU_BACKUP_PATH!
     echo.
     
     for /L %%n in (0,1,!nbGamesSelected!) do call:exportSaves %%n
@@ -343,7 +416,33 @@ REM : functions
         set "%2=!value!"
     goto:eof
     REM : ------------------------------------------------------------------
+    
+    :getCemuTitles
+        set "folder="%~1""
+    
+        pushd !folder!
+      
+        REM : searching for meta file from here
+        for /F "delims=~" %%i in ('dir /B /S "meta.xml" 2^> NUL') do (
 
+            REM : meta.xml
+            set "META_FILE="%%i""
+           
+            call:getFromMetaXml shortname_en title
+            call:getFromMetaXml title_id titleId
+
+            if not ["!title!"] == ["NOT_FOUND"] if not ["!titleId!"] == ["NOT_FOUND"] (
+                if exist !localTid! (
+                    type !localTid! | find /I /V "!titleId!" > NUL 2>&1 && echo !titleId!;!title! >> !localTid!
+                ) else (
+                    echo !titleId!;!title! > !localTid!
+                )
+            )
+        )
+        
+    goto:eof
+    REM : ------------------------------------------------------------------
+    
     :exportSaves
 
         set /A "num=%~1"
@@ -352,8 +451,7 @@ REM : functions
         set "endTitleId=!selectedEndTitlesId[%num%]!"
         set "src=!selectedtitlesSrc[%num%]!"
 
-        REM : get the account declared on the CEMU, loop on them
-        set "cemuSaveFolder="!MLC01_FOLDER_PATH:"=!\mlc01\usr\save\00050000\!endTitleId!""
+        set "cemuSaveFolder="!savesFolder:"=!\!endTitleId!""
         if not exist !cemuSaveFolder! (
             echo WARNING ^: no CEMU saves found for !gameTitle!
             goto:eof
@@ -366,21 +464,25 @@ REM : functions
         echo Export CEMU saves of !gameTitle! to the Wii-U
         echo =========================================================
 
-        set "backupFolder="!BACKUP_PATH:"=!\usr\save\00050000\!endTitleId!""
+        
+        set "syncFolderPath="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
+        mkdir !syncFolderPath! > NUL 2>&1
         
         echo Backup /storage_!src!/usr/save/00050000/!endTitleId!^.^.^.
-        echo /storage_!src!/usr/save/00050000/!endTitleId!^.^.^. >> !backupLog!
+        echo !gameTitle!;!endTitleId!;/storage_!src!/usr/save/00050000/!endTitleId! >> !backupLog!
 
-        REM : download the whole save from the wii-U (as backup under BACKUP_PATH)
-        wscript /nologo !StartHiddenWait! !ftpSyncFolders! !wiiuIp! local !backupFolder! "/storage_!src!/usr/save/00050000/!endTitleId!" "backup all !gameTitle! saves"
+        REM : download the whole save from the wii-U (as backup under WIIU_BACKUP_PATH)
+        wscript /nologo !StartHiddenWait! !ftpSyncFolders! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "backup all !gameTitle! saves"
         
-        set "metaFolder="!backupFolder:"=!\meta""        
-        set "cemuSaveFolder="!savesFolder:"=!\!endTitleId!""
+        REM : backup the save
+        call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !syncFolderPath!
         
-        REM : robocopy (sync) common folder in backupFolder
+        set "metaFolder="!syncFolderPath:"=!\meta""        
+        
+        REM : robocopy (sync) common folder in syncFolderPath
         set "commonFolder="!cemuSaveFolder:"=!\user\common""
         if exist !commonFolder! (
-            set "localCommon="!backupFolder:"=!\user\common""
+            set "localCommon="!syncFolderPath:"=!\user\common""
             mkdir !localCommon! > NUL 2>&1
             robocopy !commonFolder! !localCommon! /MT:32 /mir > NUL 2>&1
         )
@@ -399,16 +501,16 @@ REM : functions
             call:exportSavesForCurrentAccount
         )
         
-        echo Transfert save of !currentUser! [!folder!] for !gameTitle!^.^.^.
+        echo Transfert for !gameTitle!^.^.^.
         echo ---------------------------------------------------------
         
         REM : launching transfert
-        call !ftpSyncFolders! !wiiuIp! remote !backupFolder! "/storage_!src!/usr/save/00050000/!endTitleId!" "Export !gameTitle! saves for user !currentUser! to the Wii-U"
+        call !ftpSyncFolders! !wiiuIp! remote !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "Export !gameTitle! saves to the Wii-U"
         set "cr=!ERRORLEVEL!"
-        if !cr! NEQ 0 echo ERROR when exporting existing !gameTitle! saves for !currentUser! ^(!folder!^) ^!
+        if !cr! NEQ 0 echo ERROR when exporting existing !gameTitle! saves ^!
 
         REM : log the slot used in a file
-        echo ^> !currentUser! [!folder!] CEMU saves for !gameTitle! were exported to your Wii-U
+        echo ^> CEMU saves for !gameTitle! were exported to your Wii-U
 
         pushd !HERE!
     goto:eof
@@ -504,11 +606,21 @@ REM : functions
             if !ERRORLEVEL! EQU 2 goto:eof
         )
 
+        
+        set "localSaveFolder="!syncFolderPath:"=!\user\!folder!""
+        if not exist !localSaveFolder! (
+            echo.
+            echo No save for the account !folder! was not found
+            echo.
+            echo If you^'re sure that the account !folder! exist on the Wii-U       
+            choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
+            if !ERRORLEVEL! EQU 2 goto:eof
+        )
+        
         REM : treatment for the user
         echo Treating !tobeDisplayed! saves
         
         REM : robocopy (sync) folder of current user
-        set "localSaveFolder="!backupFolder:"=!\user\!folder!""
         mkdir !localSaveFolder! > NUL 2>&1
         robocopy !cemuUserSaveFolder! !localSaveFolder! /MT:32 /MIR > NUL 2>&1
         
@@ -527,7 +639,7 @@ REM : functions
     REM : ------------------------------------------------------------------
 
     :createRemoteFolders
-        set "ftplogFile="!BACKUP_PATH:"=!\ftpCheck.log""
+        set "ftplogFile="!WIIU_BACKUP_PATH:"=!\ftpCheck.log""
         !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "mkdir /storage_!src!/usr/save/00050000/!endTitleId!" "exit"  > !ftplogFile! 2>&1
 
     goto:eof

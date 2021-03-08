@@ -17,6 +17,9 @@ REM : main
     set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     set "brcPath="!RESOURCES_PATH:"=!\BRC_Unicode_64\BRC64.exe""
         
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
+    !cmdOw! @ /MAX > NUL 2>&1
+    
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
     set "changeAccountLog="!LOGS:"=!\changeAccount.log""
@@ -40,10 +43,6 @@ REM : main
     echo =========================================================
     echo.
     
-    echo First create the new accountId in CEMU ^!
-    echo ^(in General settings ^/ Account tab^)
-    echo.
-
     if %nbArgs% EQU 0 goto:getInputs
     
     REM : when called with args
@@ -55,7 +54,7 @@ REM : main
         exit /b 99
     )
 
-    REM : get and check wiiuIp
+    REM : get and check MLC01_FOLDER_PATH
     set "MLC01_FOLDER_PATH=!args[0]!"    
     
     if not exist !MLC01_FOLDER_PATH! (
@@ -166,7 +165,7 @@ REM : main
     echo that point to !MLC01_FOLDER_PATH!
     echo ^(in General settings ^/ Account tab^)
     echo
-    echo Otherwise saves won^' show up ^!
+    echo Otherwise saves won^'t show up ^!
     pause
         
     if %nbArgs% EQU 0 pause

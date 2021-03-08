@@ -26,6 +26,9 @@ REM : main
     set "StartWait="!RESOURCES_PATH:"=!\vbs\StartWait.vbs""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
 
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
+    !cmdOw! @ /MAX > NUL 2>&1
+    
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
     

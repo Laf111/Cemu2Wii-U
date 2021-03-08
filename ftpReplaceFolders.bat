@@ -17,8 +17,7 @@ REM : main
     set "WinScpFolder="!RESOURCES_PATH:"=!\winSCP""
     set "WinScp="!WinScpFolder:"=!\WinScp.com""
 
-    set "LOGS="!HERE:"=!\logs""
-    if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""    if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     REM : set current char codeset
     call:setCharSet
