@@ -36,9 +36,6 @@ Also, Wii-U accounts must already exist in CEMU configuration (define them in Ge
 TODO : 
 
 - Check import/export scripts.
-- Create an install.bat script to create shortcuts on the desktop fo the 4 scripts externalised
-- Add optional arg (MLC PATH) to import/export scripts
-- Remember last configuration (to avoid browsing to the MLC folder systematically)
 
 
 # 
