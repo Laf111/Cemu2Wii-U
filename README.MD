@@ -11,7 +11,7 @@ Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless 
 #
 ## Main features
 
-- **dump wii-u onlines files needed for CEMU** (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually and put them close to CEMU.exe to play online.
+- **dump wii-u onlines files needed for CEMU** (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only **have to dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
 
 - **format (even large) SD card** for the Wii-U containing HBL and essentials apps
 
