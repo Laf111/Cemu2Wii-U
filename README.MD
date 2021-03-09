@@ -20,6 +20,9 @@ Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless 
 - **import Wii-U saves** to a MLC folder
 
 - **export CEMU saves** to Wii-U
+
+Import/Exporting saves concern only games installed on both side (CEMU and Wii-U).
+
 #
 
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
