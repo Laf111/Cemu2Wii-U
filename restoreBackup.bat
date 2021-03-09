@@ -146,7 +146,7 @@ REM : main
         echo.
         echo Uncompressing !BACKUP_PATH!^.^.^.
         echo.
-        call !7za! e -y -aoa -w!SYNCFOLDER_PATH! !BACKUP_PATH! -o!SYNCFOLDER_PATH! > NUL 2>&1
+        call !7za! x -y -aoa -w!SYNCFOLDER_PATH! !BACKUP_PATH! -o!SYNCFOLDER_PATH! > NUL 2>&1
         
         set "userSavesToExport="select""    
         choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
