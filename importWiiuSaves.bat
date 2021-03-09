@@ -360,11 +360,6 @@ REM : main
         exit /b 11
     )
     set /A "nbGamesSelected-=1"
-    if !nbGamesSelected! EQU 0 (
-        echo WARNING^: no games selected ^?
-        pause
-        exit 11
-    )
 
     cls
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
@@ -396,7 +391,7 @@ REM : main
     echo ---------------------------------------------------------
     echo Backup CEMU saves in !CEMU_BACKUP!
     set "pat="!SYNCFOLDER_PATH:"=!\*""
-    call !7za! u -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !pat!  > NUL 2>&1
+    call !7za! a -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !pat!  > NUL 2>&1
     echo Done
     echo.
 

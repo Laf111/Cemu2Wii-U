@@ -353,11 +353,6 @@ REM : main
         exit /b 11
     )
     set /A "nbGamesSelected-=1"
-    if !nbGamesSelected! EQU 0 (
-        echo WARNING^: no games selected ^?
-        pause
-        exit 11
-    )
 
     cls
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
@@ -371,8 +366,7 @@ REM : main
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
     set "DATE=%ldt%"
 
-    REM : folder that contains temporarily the backup of each Wii-u Saves
-    set "WIIU_BACKUP_PATH="!BACKUPS_PATH:"=!\Wii-U_Saves""
+    set "WIIU_BACKUP_PATH="!BACKUPS_PATH:"=!\!DATE!_WIIU_Saves"
     if not exist !WIIU_BACKUP_PATH! mkdir !WIIU_BACKUP_PATH! > NUL 2>&1
     set "WIIU_BACKUP="!WIIU_BACKUP_PATH:"=!\!DATE!_WIIU_Saves.zip""
     
@@ -387,9 +381,9 @@ REM : main
     echo.
     echo ---------------------------------------------------------
     echo Backup WII-U saves in !WIIU_BACKUP!
-    set "pat="!syncFolderPath:"=!\*""
+    set "pat="!SYNCFOLDER_PATH:"=!\*""
     
-    call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat! > NUL 2>&1
+    call !7za! a -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat! > NUL 2>&1
     echo Done
     echo.
     
@@ -465,7 +459,7 @@ REM : functions
         
         REM : create remotes folders
         call:createRemoteFolders
-        
+  
         echo =========================================================
         echo Export CEMU saves of !gameTitle! to the Wii-U
         echo =========================================================
@@ -488,8 +482,11 @@ REM : functions
             mkdir !localCommon! > NUL 2>&1
             robocopy !commonFolder! !localCommon! /MT:32 /mir > NUL 2>&1
         )
+        
+        set "cemuUserGameFolder="!cemuSaveFolder:"=!\user""
 
-        pushd !cemuSaveFolder!
+        pushd !cemuUserGameFolder!
+        
         REM : file that contains mapping between user - account folder (optional because
         REM : created by getWiiuOnlineFiles.bat
         set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
@@ -499,7 +496,7 @@ REM : functions
         for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
             set "folder=%%j"
             
-            set "cemuUserSaveFolder="!cemuSaveFolder:"=!\user\!folder!""            
+            set "cemuUserSaveFolder="!cemuUserGameFolder:"=!\!folder!""            
             call:exportSavesForCurrentAccount
         )
         
@@ -518,6 +515,24 @@ REM : functions
     goto:eof
     REM : ------------------------------------------------------------------
 
+    :getTs1970
+
+        set "arg=%~2"
+
+        set "ts="
+        if not ["!arg!"] == [""] set "ts=%arg%"
+
+        REM : if ts is not given : compute timestamp of the current date
+        if ["%ts%"] == [""] for /F "delims=~= tokens=2" %%t in ('wmic os get localdatetime /value') do set "ts=%%t"
+
+        set /A "yy=10000%ts:~0,4% %% 10000, mm=100%ts:~4,2% %% 100, dd=100%ts:~6,2% %% 100"
+        set /A "dd=dd-2472663+1461*(yy+4800+(mm-14)/12)/4+367*(mm-2-(mm-14)/12*12)/12-3*((yy+4900+(mm-14)/12)/100)/4"
+        set /A "ss=(((1%ts:~8,2%*60)+1%ts:~10,2%)*60)+1%ts:~12,2%-366100-%ts:~21,1%((1%ts:~22,3%*60)-60000)"
+
+        set /A "%1+=dd*86400"
+
+    goto:eof
+    REM : ------------------------------------------------------------------    
 
     :strLength
         Set "s=#%~1"
@@ -617,7 +632,7 @@ REM : functions
             if ["!user!"] == ["NOT_FOUND"] (
                 echo If you^'re sure that the account !folder! exist on the Wii-U
             ) else (
-                echo If you^'re sure that the !user! exists on the Wii-U and use !folder! account
+                echo If you^'re sure that !user! exists on the Wii-U and use !folder! account
             )
             choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
             if !ERRORLEVEL! EQU 2 goto:eof
