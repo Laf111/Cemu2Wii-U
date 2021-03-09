@@ -15,6 +15,7 @@ REM : main
     pushd !HERE!        
     
     set "RESOURCES_PATH="!HERE:"=!\resources""
+    set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     set "browseFile="!RESOURCES_PATH:"=!\vbs\BrowseFileDialog.vbs""
     set "7za="!RESOURCES_PATH:"=!\7za.exe""
 
@@ -107,8 +108,8 @@ REM : main
     echo Please browse to the zip file    
     REM : browse to the file
     :browse2Zip
-    for /F %%b in ('cscript /nologo !browseFile! "Please browse to zip file"') do set "file=%%b" && set "zipFile=!file:?= !"
-    if [!zipFile!] == ["NONE"] (
+    for /F %%b in ('cscript /nologo !browseFile! "Please browse to zip file"') do set "file=%%b" && set "BACKUP_PATH=!file:?= !"
+    if [!BACKUP_PATH!] == ["NONE"] (
         choice /C yn /N /M "No item selected, do you wish to cancel (y, n)? : "
         if !ERRORLEVEL! EQU 1 timeout /T 4 > NUL 2>&1 && exit /b 75
         goto:browse2Zip
@@ -172,10 +173,10 @@ REM : main
         echo. 
         
         choice /C yn /N /M "Confirm (y, n)? : "
-        if !ERRORLEVEL! EQU 1 timeout /T 4 > NUL 2>&1 && exit /b 76
+        if !ERRORLEVEL! EQU 2 echo Cancelled by user & timeout /T 4 > NUL 2>&1 & exit /b 76
         
         REM : extract
-        call !7za! e -y -aoa -w!LOGS! !BACKUP_PATH! -o!MLC01_FOLDER_PATH! > NUL 2>&1
+        call !7za! x -y -aoa -w!LOGS! !BACKUP_PATH! -o!MLC01_FOLDER_PATH!
     )
     set "cr=!ERRORLEVEL!"
     echo =========================================================
@@ -185,6 +186,7 @@ REM : main
         echo Done
     )
     echo.
+    pause
     if !cr! NEQ 0 exit /b !cr!
     exit /b 0
 
@@ -206,8 +208,9 @@ REM : functions
             choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
             if !ERRORLEVEL! EQU 1 goto:eof
         )
-        echo Please select a MLC folder ^(mlc01^)    
+        
         :askMlc01Folder
+        echo Please select a MLC folder ^(mlc01^)    
         for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
         if [!MLC01_FOLDER_PATH!] == ["NONE"] (
