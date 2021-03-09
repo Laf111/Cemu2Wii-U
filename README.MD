@@ -33,7 +33,7 @@ Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framewor
 
 Cemu2Wii-U does not have access to the settings.xml file of CEMU install since the input mlc folder could be an "external" one (not included in a CEMU install's folder and eventually shared by multiple CEMU's versions)
 
-So **you'll have to define manually (if it's not already done) Wii-U accounts (and user's name) in CEMU configuration (General Settings / Accounts tab)**.
+So you'll have to **define manually** (if it's not already done) **Wii-U accounts** (and user's name) in CEMU configuration (General Settings / Accounts tab)**.
 
 Every import or export process :
 - checks are done for accounts on both sides to : 
