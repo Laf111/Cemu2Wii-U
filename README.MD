@@ -1,6 +1,6 @@
-# SyncSaves_Cemu-WiiU
+# Cemu2Wii-U
 
-SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
+Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
 
 Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
@@ -27,7 +27,7 @@ Import/Exporting saves concern only games installed on both side (CEMU and Wii-U
 
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
-SyncSaves_Cemu-WiiU does not have access to the settings.xml file of CEMU install since the input mlc folder could be an "external" one (not included in a CEMU install's folder and eventually shared by multiple CEMU's versions)
+Cemu2Wii-U does not have access to the settings.xml file of CEMU install since the input mlc folder could be an "external" one (not included in a CEMU install's folder and eventually shared by multiple CEMU's versions)
 
 So **you'll have to define manually (if it's not already done) Wii-U accounts (and user's name) in CEMU configuration (General Settings / Accounts tab)**.
 
