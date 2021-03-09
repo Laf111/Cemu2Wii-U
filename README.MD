@@ -57,7 +57,7 @@ Launch setup.bat to create shortcuts on your desktop (or any location).
 - **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). 
 
 The last script will allow you to : 
-- overwrite CEMU saves with Wii-U ones by using the same account in CEMU than on the Wii-U (if you want to synchronize CEMU and your Wii-U)
+- keep only one save for each games by using the same account in CEMU and on the Wii-U (and synchronize CEMU <-> Wii-U game's progression)
 - rename existant CEMU's accounts (you'll need to setup the new accounts manually in CEMU UI)
 - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 
