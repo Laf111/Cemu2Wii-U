@@ -2,7 +2,7 @@
 
 SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
 
-**Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling) !**
+Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
 #
 ## Main features
