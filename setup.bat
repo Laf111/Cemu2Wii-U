@@ -154,7 +154,7 @@ REM : main
     echo =========================================================
     echo.
     echo Done, opening !SHORTCUTS_FOLDER:"=!^.^.^.
-    timeout /T 4 > NUL 2>&1
+    timeout /T 2 > NUL 2>&1
 
     wscript /nologo !Start! "%windir%\explorer.exe" !SHORTCUTS_FOLDER!
         
