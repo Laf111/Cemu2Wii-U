@@ -1,6 +1,7 @@
 # SyncSaves_Cemu-WiiU
 
 SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
+#
 
 - **dump wii-u onlines files needed for CEMU** (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually and put them close to CEMU.exe to play online.
 
@@ -15,7 +16,7 @@ SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU 
 - **import Wii-U saves** to a MLC folder
 
 - **export CEMU saves** to Wii-U
-
+#
 
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
@@ -57,7 +58,7 @@ The last script will allow you to :
 - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 But use it only if you know what you are doing...
 
-
+#
 TODO : 
 
 - Check import/export scripts.
