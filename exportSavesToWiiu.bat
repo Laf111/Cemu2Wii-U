@@ -322,6 +322,7 @@ REM : main
             for %%l in (!listGamesSelected!) do (
                 echo %%l | findStr /R /V "[0-9]" > NUL 2>&1 && echo ERROR^: %%l not in the list && pause && goto:getList
                 set /A "number=%%l"
+          
                 if !number! GEQ !nbGames! echo ERROR^: !number! not in the list & pause & goto:getList
 
                 echo - !titles[%%l]!
@@ -352,18 +353,13 @@ REM : main
         exit /b 11
     )
     set /A "nbGamesSelected-=1"
-
-    cls
-
     if !nbGamesSelected! EQU 0 (
         echo WARNING^: no games selected ^?
         pause
         exit 11
     )
-    set /A "nbGamesSelected-=1"
 
     cls
-
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""

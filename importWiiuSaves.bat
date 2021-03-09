@@ -360,18 +360,13 @@ REM : main
         exit /b 11
     )
     set /A "nbGamesSelected-=1"
-
-    cls
-
     if !nbGamesSelected! EQU 0 (
         echo WARNING^: no games selected ^?
         pause
         exit 11
     )
-    set /A "nbGamesSelected-=1"
 
     cls
-
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
