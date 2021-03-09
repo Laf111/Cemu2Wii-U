@@ -319,12 +319,11 @@ REM : main
     set /A "nbGamesSelected=0"
 
     set /P "listGamesSelected=Please enter game's numbers list (separated with a space) or 'all' to treat all games : "
-    set "listGamesSelected=!listGamesSelected: =!"
     :displayList
 
     if not ["!listGamesSelected!"] == ["all"] (
 
-        if not ["!listGamesSelected: =!"] == [""] (
+        if not ["!listGamesSelected!"] == [""] (
             echo !listGamesSelected! | findStr /R /V /C:"^[0-9 ]*$" > NUL 2>&1 && echo ERROR^: not a list of integers && pause && goto:getList
 
             echo =========================================================
