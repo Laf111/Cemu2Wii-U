@@ -1,6 +1,6 @@
 # Cemu2Wii-U
 
-Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
+Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisely a mlc01 folder : MLC_FOLDER)
 
 <p align="center">
   <img src="resources/Cemu2Wii-U.png">
