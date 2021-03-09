@@ -14,7 +14,7 @@ REM : main
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
     pushd !HERE!
-    
+
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
@@ -23,12 +23,12 @@ REM : main
 
     set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
-    
+
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     set "ftpSyncFolders="!HERE:"=!\ftpSyncFolders.bat""
-    
+
     REM : set current char codeset
     call:setCharSet
 
@@ -41,10 +41,10 @@ REM : main
         shift
         goto:continue
     :end
-    
+
     REM : J2000 unix timestamp (/ J1970)
     set /A "j2000=946684800"
-        
+
     REM : search if CEMU is not already running
     set /A "nbI=0"
     for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
@@ -59,15 +59,15 @@ REM : main
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
     set "DATE=%ldt%"
-    
+
     cls
     echo =========================================================
     echo Import Wii-U saves to CEMU^.
     echo =========================================================
     echo.
-    
+
     if %nbArgs% EQU 0 goto:getInputs
-    
+
     REM : when called with args
     if %nbArgs% NEQ 2 (
         echo ERROR on arguments passed ^(%nbArgs%^)
@@ -79,43 +79,43 @@ REM : main
     )
 
     REM : get and check MLC01_FOLDER_PATH
-    set "MLC01_FOLDER_PATH=!args[0]!"    
-    
+    set "MLC01_FOLDER_PATH=!args[0]!"
+
     if not exist !MLC01_FOLDER_PATH! (
         echo ERROR^: "!MLC01_FOLDER_PATH!" not found
         pause
-        exit /b 91    
+        exit /b 91
     )
-    
+
     set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
     if not exist !savesFolder! (
         echo ERROR^: !savesFolder! not found ^?
         pause
         exit /b 92
     )
-    
+
     set "userSavesToImport=!args[1]!"
     set "userSavesToImport=!userSavesToImport: =!"
     set "userSavesToImport=!userSavesToImport:"=!"
-    
+
     echo !userSavesToImport! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
         echo ERROR^: !userSavesToImport! is not equal to 'all' or 'select'
         pause
         exit /b 93
     )
-    goto:inputsAvailable    
-    
+    goto:inputsAvailable
+
     :getInputs
     REM : when called with no args
-    
-    set "config="!LOGS:"=!\lastConfig.ini""    
+
+    set "config="!LOGS:"=!\lastConfig.ini""
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
         if !ERRORLEVEL! EQU 1 goto:getSavesMode
     )
-    echo Please select a MLC folder ^(mlc01^)    
+    echo Please select a MLC folder ^(mlc01^)
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -133,19 +133,19 @@ REM : main
     )
     REM : update last configuration
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
-    
-    :getSavesMode    
-    echo.    
+
+    :getSavesMode
+    echo.
     echo ---------------------------------------------------------
-    set "userSavesToImport="select""    
+    set "userSavesToImport="select""
     choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
     if !ERRORLEVEL! EQU 2 (
         choice /C yn /N /M "Please confirm, treat all accounts? : "
         if !ERRORLEVEL! EQU 1 set "userSavesToImport="all""
     )
-    
-    :inputsAvailable  
-    echo.    
+
+    :inputsAvailable
+    echo.
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
     echo - have your SDCard plugged in your Wii-U
@@ -222,7 +222,7 @@ REM : main
         goto:checkConnection
     )
     cls
-    
+
     REM : scans folder
     set /A "noOldScan=0"
     :scanMyWii
@@ -259,11 +259,12 @@ REM : main
     REM create a log file containing all your games titleId
     set "localTid="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\cemuTitlesId.log""
     if exist !localTid! del /F !localTid! > NUL 2>&1
-    
+
     set "gamesFolder="!MLC01_FOLDER_PATH:"=!\games""
+
     if exist !gamesFolder! (
         call:getCemuTitles !gamesFolder!
-    ) else (    
+    ) else (
         set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
         if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
 
@@ -273,14 +274,16 @@ REM : main
         set "dlcFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000c""
         if exist !dlcFolder! call:getCemuTitles !dlcFolder!
     )
+
     REM : re define savesFolder here in case of config loaded
     set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
     call:getCemuTitles !savesFolder!
-    
+
     set "cemuAccountsList="
-    call:getCemuAccountsList 
-    
-    
+    call:getCemuAccountsList
+
+
+
     :getList
     REM : get title;endTitleId;source;dataFound from scan results
     set "gamesList="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\gamesList.csv""
@@ -296,7 +299,7 @@ REM : main
         set "endTitleId=%%i"
         REM : if the game is also installed on your PC in !MLC01_FOLDER_PATH!
         type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
-        
+
             REM : get the title from !localTid!
             for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
             set "titles[!nbGames!]=!title!"
@@ -305,8 +308,8 @@ REM : main
             echo !nbGames!	: !title!
 
             set "completeList=!nbGames! !completeList!"
-            
-            set /A "nbGames+=1"            
+
+            set /A "nbGames+=1"
         )
     )
     echo =========================================================
@@ -318,9 +321,9 @@ REM : main
     set /P "listGamesSelected=Please enter game's numbers list (separated with a space) or 'all' to treat all games : "
     set "listGamesSelected=!listGamesSelected: =!"
     :displayList
-    
+
     if not ["!listGamesSelected!"] == ["all"] (
-    
+
         if not ["!listGamesSelected: =!"] == [""] (
             echo !listGamesSelected! | findStr /R /V /C:"^[0-9 ]*$" > NUL 2>&1 && echo ERROR^: not a list of integers && pause && goto:getList
 
@@ -371,11 +374,11 @@ REM : main
     cls
 
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
-    set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
+    set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Import""
     if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
-    
+
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
@@ -388,17 +391,18 @@ REM : main
     if not exist !CEMU_BACKUP_PATH! mkdir !CEMU_BACKUP_PATH! > NUL 2>&1
     set "backupLog="!CEMU_BACKUP_PATH:"=!\!DATE!_CEMU_Saves.log"
     echo # gameTitle;endTitleId;cemu Save Folder > !backupLog!
-    
+
     pushd !HERE!
     echo.
     REM : list of Wii-U accounts that do not exist in CEMU side
-    set "accListToCreateInCemu="    
+    set "accListToCreateInCemu="
     for /L %%n in (0,1,!nbGamesSelected!) do call:importSaves %%n
 
     echo.
     echo ---------------------------------------------------------
     echo Backup CEMU saves in !CEMU_BACKUP!
-    call !7za! u -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !SYNCFOLDER_PATH!  > NUL 2>&1
+    set "pat="!SYNCFOLDER_PATH:"=!\*""
+    call !7za! u -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !pat!  > NUL 2>&1
     echo Done
     echo.
 
@@ -410,7 +414,7 @@ REM : main
         for %%a in ("!accListToCreateInCemu!") do echo %%a
         echo.
     )
-    
+
     echo =========================================================
     echo Now you can stop FTPiiU server
     echo.
@@ -429,45 +433,50 @@ REM : functions
     :getCemuAccountsList
 
         pushd !savesFolder!
-        
+
         for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
-            for /F "delims=~" %i in ("%%a") do (
+            for /F "delims=~" %%i in ("%%a") do (
                 set "account=%%~nxi"
-                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+                set "account=!account: =!"
+
+                set /A "accountValid=1"
+                echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+
+                if !accountValid! EQU 1 (
                     REM : add to to list if it maches the patern and if not already listed
                     echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
                 )
             )
         )
-    
+
     goto:eof
     REM : ------------------------------------------------------------------
-    
+
 
     REM : faster than using xmlStarlet
     :getFromMetaXml
         set "node=%~1"
         set "value=NOT_FOUND"
-        
+
         set "titleLine="NONE""
-        for /F "tokens=1-2 delims=>" %%j in ('type !META_FILE! ^| find "%node%"') do set "titleLine="%%k""        
+        for /F "tokens=1-2 delims=>" %%j in ('type !META_FILE! ^| find "%node%"') do set "titleLine="%%k""
         if not [!titleLine!] == ["NONE"] for /F "delims=<" %%j in (!titleLine!) do set "value=%%j"
-        
+
         set "%2=!value!"
     goto:eof
     REM : ------------------------------------------------------------------
-    
+
     :getCemuTitles
         set "folder="%~1""
-    
+
         pushd !folder!
-        
+
         REM : searching for meta file from here
         for /F "delims=~" %%i in ('dir /B /S "meta.xml" 2^> NUL') do (
 
             REM : meta.xml
             set "META_FILE="%%i""
-            
+
             call:getFromMetaXml shortname_en title
             call:getFromMetaXml title_id titleId
 
@@ -479,11 +488,11 @@ REM : functions
                 )
             )
         )
-        
+
     goto:eof
     REM : ------------------------------------------------------------------
-    
-    
+
+
     :importSaves
         set /A "num=%~1"
 
@@ -503,13 +512,13 @@ REM : functions
 
         REM : log title
         echo !gameTitle!;!endTitleId!;!cemuSaveFolder! >> !backupLog!
-        
+
         REM : copy CEMU saves for this game to syncFolderPath
-        robocopy !cemuSaveFolder! !syncFolderPath! /MT:32 /MIR > NUL 2>&1        
-        
+        robocopy !cemuSaveFolder! !syncFolderPath! /MT:32 /MIR > NUL 2>&1
+
         set "syncFolderMeta="!syncFolderPath:"=!\meta""
         set "saveinfo="!syncFolderMeta:"=!\saveinfo.xml""
-        
+
         REM : launching transfert (backup the Wii-U saves)
         call !ftpSyncFolders! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "!gameTitle! (saves)"
         set "cr=!ERRORLEVEL!"
@@ -518,7 +527,7 @@ REM : functions
             goto:eof
         )
 
-        echo Synchronize last imported saves for !gameTitle! ^(%endTitleId%^) 
+        echo Synchronize last imported saves for !gameTitle! ^(%endTitleId%^)
         echo ---------------------------------------------------------
 
         REM : get the account declared on the Wii-U, loop on them
@@ -527,12 +536,12 @@ REM : functions
             echo No Wii-U save was found for !gameTitle!
             goto:eof
         )
-        
+
         pushd !syncFolderUser!
         REM : file that contains mapping between user - account folder (optional because
         REM : created by getWiiuOnlineFiles.bat
         set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
-        
+
         REM : loop on accounts found on the Wii-U
         set "folder=NONE"
         for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
@@ -544,7 +553,7 @@ REM : functions
             call:importSavesForCurrentUser
             pushd !MLC01_FOLDER_PATH!
         )
-      
+
         REM : robocopy common folder
         set "wiiuCommonFolder="!syncFolderPath:"=!\user\common""
         if exist !wiiuCommonFolder! (
@@ -552,14 +561,14 @@ REM : functions
             if not exist !cemuCommonFolder! mkdir !cemuCommonFolder! > NUL 2>&1
             robocopy !wiiuCommonFolder! !cemuCommonFolder! /MT:32 /MIR > NUL 2>&1
         )
-        
+
         REM : CEMU does not use te saveInfo.xml file for now => copy Wii-U one
-        
+
         REM : robocopy meta folder
         set "cemuMetaFolder="!cemuSaveFolder:"=!\meta""
         if not exist !cemuMetaFolder! mkdir !cemuMetaFolder! > NUL 2>&1
         robocopy !syncFolderMeta! !cemuMetaFolder! /MT:32 /MIR > NUL 2>&1
-        
+
         echo ---------------------------------------------------------
 
         pushd !MLC01_FOLDER_PATH!
@@ -572,13 +581,13 @@ REM : functions
 
         set "user=NOT_FOUND"
         set "tobeDisplayed=!folder!"
-        
+
         if exist !wiiuUsersLog! (
             type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
                 for /F "delims=~= tokens=1" %%k in ('type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"
                 if ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
-            )            
+            )
         )
 
         if [!userSavesToImport!] == ["select"] (
@@ -588,10 +597,10 @@ REM : functions
         REM : CEMU save for the current user
         set "cemuUserSaveFolder="!cemuSaveFolder:"=!\user\!folder!""
         if not exist !cemuUserSaveFolder! (
-        
+
             REM : check if it is listed in cemuAccountsList
             echo !cemuAccountsList! | find /V "!folder!" > NUL 2>&1 && (
-            
+
                 choice /C yn /N /M "Account !tobeDisplayed! does not exist in CEMU, import it anyway ? (y, n)? : "
                 if !ERRORLEVEL! EQU 2 goto:eof
                 if ["!user!"] == ["NOT_FOUND"] (
@@ -603,7 +612,7 @@ REM : functions
             mkdir !cemuUserSaveFolder! > NUl 2>&1
         )
         REM : folder come from Wii-U => robocopy !wiiuUserFolder! !cemuUserSaveFolder!
-        robocopy !wiiuUserFolder! !cemuUserSaveFolder! /MT:32 /MIR > NUL 2>&1        
+        robocopy !wiiuUserFolder! !cemuUserSaveFolder! /MT:32 /MIR > NUL 2>&1
 
         echo ^> !gameTitle! WII-U saves imported for !tobeDisplayed!
 

@@ -392,7 +392,9 @@ REM : main
     echo.
     echo ---------------------------------------------------------
     echo Backup WII-U saves in !WIIU_BACKUP!
-    call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !syncFolderPath! > NUL 2>&1
+    set "pat="!syncFolderPath:"=!\*""
+    
+    call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat! > NUL 2>&1
     echo Done
     echo.
     
