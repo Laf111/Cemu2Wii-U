@@ -3,9 +3,9 @@
 #
 SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
 
-- dump wii-u onlines files needed fo CEMU (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually.
+- dump wii-u onlines files needed for CEMU (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually and put them close to CEMU.exe to play online.
 
-- prepare a SD card for the Wii-U containing HBL and essentials 'legal' apps
+- format (even large) SD card for the Wii-U containing HBL and essentials apps
 
 - en/disable remotely the firmware auto-update feature on the Wii-U
 
@@ -51,7 +51,14 @@ Scripts available to user :
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
 - **importWiiuSaves.bat** : get saves from the Wii-U for games that also exist in MLC_FOLDER (backup existing CEMU saves before overwrite files)
 - **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U filesystem (backup existing Wii-U saves before overwrite files)
-- **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). So you can rename your existing CEMU accounts to match your Wii-U ones before if you want to synchronize your saves between CEMU and the Wii-U or if you want bypass the CEMU version limitation above with using only the 80000001 account (the only one supported on CEMU < 1.15.19).
+- **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). 
+
+The last script will allow you to : 
+- overwrite CEMU saves with Wii-U ones by using the same account in CEMU than on the Wii-U (if you want to synchronize CEMU and your Wii-U)
+- rename existant CEMU's accounts (you'll need to setup the new accounts manually in CEMU UI)
+- bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
+But use it only if you know what you are doing...
+
 
 TODO : 
 
