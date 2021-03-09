@@ -5,6 +5,7 @@ SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU 
 **Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling) !**
 
 #
+## Main features
 
 - **dump wii-u onlines files needed for CEMU** (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually and put them close to CEMU.exe to play online.
 
@@ -36,12 +37,12 @@ Every import or export process :
 
 
 #
-Install (optional):
+## Install (optional):
 
 Launch setup.bat to create shortcuts on your desktop (or any location).
 
 #
-Scripts available to user :
+## Scripts available to user :
 
 - **createWiiuSDcard.bat** : format (using Fat32Format.exe) an prepare a SD card for the Wii-U containing HBL and essentials apps
 - **ftpSetWiiuFirmwareUpdateMode.bat** : en/disable remotely the firmware auto-update feature on the Wii-U
@@ -59,7 +60,7 @@ The last script will allow you to :
 But use it only if you know what you are doing...
 
 #
-TODO : 
+## TODO : 
 
 - Check import/export scripts.
 
