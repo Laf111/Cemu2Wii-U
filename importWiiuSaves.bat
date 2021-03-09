@@ -533,9 +533,9 @@ REM : functions
         REM : created by getWiiuOnlineFiles.bat
         set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
         
-        REM : loop on saves found on the Wii-U
+        REM : loop on accounts found on the Wii-U
         set "folder=NONE"
-        for /F "delims=~" %%j in ('dir /B /A:D "80000*" 2^>NUL') do (
+        for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
             set "folder=%%j"
 
             REM : all Wii-U accounts are treated and imported (even if account does not exist in CEMU)

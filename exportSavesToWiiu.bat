@@ -497,9 +497,9 @@ REM : functions
         REM : created by getWiiuOnlineFiles.bat
         set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
         
-        REM : loop on saves found in CEMU
+        REM : loop on accounts found in CEMU
         set "folder=NONE"
-        for /F "delims=~" %%j in ('dir /B /A:D "80000*" 2^>NUL') do (
+        for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
             set "folder=%%j"
             
             set "cemuUserSaveFolder="!cemuSaveFolder:"=!\user\!folder!""            

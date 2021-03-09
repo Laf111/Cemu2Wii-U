@@ -65,10 +65,10 @@ REM : main
     if %nbArgs% EQU 0 goto:getInputs
     
     REM : when called with args
-    if %nbArgs% NEQ 2 (
+    if %nbArgs% NEQ 3 (
         echo ERROR on arguments passed ^(%nbArgs%^)
-        echo SYNTAX^: "!THIS_SCRIPT!" BACKUP_PATH userSavesMode
-        echo userSavesMode = select ^/ all
+        echo SYNTAX^: "!THIS_SCRIPT!" BACKUP_PATH gameMode userSavesMode
+        echo userSavesMode and gameMode = select ^/ all
         echo given {%*}
         pause
         exit /b 99
@@ -99,6 +99,16 @@ REM : main
         pause
         exit /b 93
     )
+
+    set "gamesMode=!args[2]!"
+    set "gamesMode=!gamesMode: =!"
+    set "gamesMode=!gamesMode:"=!"
+    
+    echo !gamesMode! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+        echo ERROR^: !gamesMode! is not equal to 'all' or 'select'
+        pause
+        exit /b 93
+    )
     
     goto:inputsAvailable    
     
@@ -122,11 +132,19 @@ REM : main
 
     echo.    
     echo ---------------------------------------------------------
-    set "userSavesToExport="select""    
+    set "gamesMode="select""    
+    choice /C yn /N /M "Do you want to choose which games to be treated (y = select, n = treat all)? : "
+    if !ERRORLEVEL! EQU 2 (
+        choice /C yn /N /M "Please confirm, treat all games? : "
+        if !ERRORLEVEL! EQU 1 set "gamesMode="all""
+    )
+    echo.    
+    echo ---------------------------------------------------------
+    set "userSavesMode="select""    
     choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
     if !ERRORLEVEL! EQU 2 (
         choice /C yn /N /M "Please confirm, treat all accounts? : "
-        if !ERRORLEVEL! EQU 1 set "userSavesToExport="all""
+        if !ERRORLEVEL! EQU 1 set "userSavesMode="all""
     )
     
     :inputsAvailable
@@ -143,41 +161,65 @@ REM : main
         if exist !SYNCFOLDER_PATH! rmdir /Y !SYNCFOLDER_PATH! > NUL 2>&1        
         mkdir !SYNCFOLDER_PATH! > NUL 2>&1
         
-        echo.
-        echo Uncompressing !BACKUP_PATH!^.^.^.
-        echo.
-        call !7za! x -y -aoa -w!SYNCFOLDER_PATH! !BACKUP_PATH! -o!SYNCFOLDER_PATH! > NUL 2>&1
-        
-        set "userSavesToExport="select""    
+        call:uncompress
+
+        REM : gamesMode not used
+        set "userSavesMode="select""    
         choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
         if !ERRORLEVEL! EQU 2 (
             choice /C yn /N /M "Please confirm, treat all accounts? : "
-            if !ERRORLEVEL! EQU 1 set "userSavesToExport="all""
+            if !ERRORLEVEL! EQU 1 set "userSavesMode="all""
         )
         
-        REM : export a Wii-U backup decompress to a mlc path to te Wii-U
+        REM : export a Wii-U backup decompressed in a SYNCFOLDER_PATH to the Wii-U
         call "exportSavesToWiiu.bat" !SYNCFOLDER_PATH! select
     ) else (
         REM : ask for mlc destination
         set "MLC01_FOLDER_PATH="NONE""
         call:getMlcTarget
 
-        if [!MLC01_FOLDER_PATH!] == ["NONE"] (
-            choice /C yn /N /M "No item selected, do you wish to cancel (y, n)? : "
-            if !ERRORLEVEL! EQU 1 timeout /T 4 > NUL 2>&1 && exit /b 75
+        if [!MLC01_FOLDER_PATH!] == ["NONE"] echo Cancelled by user & timeout /T 4 > NUL 2>&1 && exit /b 75
+
+        REM : gamesMode
+        set "gamesMode="select""    
+        choice /C yn /N /M "Do you want to choose which games to be treated (y = select, n = treat all)? : "
+        if !ERRORLEVEL! EQU 2 (
+            choice /C yn /N /M "Please confirm, treat all games? : "
+            if !ERRORLEVEL! EQU 1 set "gamesMode="all""
         )
-        REM : confirm deletion
-        echo. 
-        echo You choose to restore the backup in !MLC01_FOLDER_PATH!
-        echo Duplicated saves will be overwriten
-        echo. 
         
-        choice /C yn /N /M "Confirm (y, n)? : "
-        if !ERRORLEVEL! EQU 2 echo Cancelled by user & timeout /T 4 > NUL 2>&1 & exit /b 76
+        set "userSavesMode="select""    
+        choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
+        if !ERRORLEVEL! EQU 2 (
+            choice /C yn /N /M "Please confirm, treat all accounts? : "
+            if !ERRORLEVEL! EQU 1 set "userSavesMode="all""
+        )
+        if [!gamesMode!] == ["all"] if [!userSavesMode!] == ["all"] (
+            REM : confirm deletion
+            echo. 
+            echo You choose to restore the backup in !MLC01_FOLDER_PATH!
+            echo Duplicated saves will be overwriten
+            echo. 
         
-        REM : extract
-        call !7za! x -y -aoa -w!LOGS! !BACKUP_PATH! -o!MLC01_FOLDER_PATH!
+            choice /C yn /N /M "Confirm (y, n)? : "
+            if !ERRORLEVEL! EQU 2 echo Cancelled by user & timeout /T 4 > NUL 2>&1 & exit /b 76
+            
+            REM : extract
+            call !7za! x -y -aoa -w!LOGS! !BACKUP_PATH! -o!MLC01_FOLDER_PATH!
+            goto:endMain
+        )
+        
+        REM : here user choose to select games and/or accounts
+        set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Restore""
+        if exist !SYNCFOLDER_PATH! rmdir /Y !SYNCFOLDER_PATH! > NUL 2>&1        
+        mkdir !SYNCFOLDER_PATH! > NUL 2>&1
+        
+        call:uncompress
+
+        call:syncMlcFolders
+        
     )
+    :endMain
     set "cr=!ERRORLEVEL!"
     echo =========================================================
     if !cr! NEQ 0 (
@@ -198,6 +240,35 @@ REM : main
 REM : ------------------------------------------------------------------
 REM : functions
 
+    REM : uncompress in SYNCFOLDER_PATH
+    :uncompress
+    
+        echo.
+        echo Uncompressing !BACKUP_PATH!^.^.^.
+        echo.
+        call !7za! x -y -aoa -w!SYNCFOLDER_PATH! !BACKUP_PATH! -o!SYNCFOLDER_PATH! > NUL 2>&1
+    
+    goto:eof
+    REM : ------------------------------------------------------------------
+
+    REM : scan MLC01_PATH_FOLDER to get accounts defined in CEMU
+    :getCemuAccountsList
+
+        pushd !savesFolder!
+        
+        for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
+            for /F "delims=~" %i in ("%%a") do (
+                set "account=%%~nxi"
+                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+                    REM : add to to list if it maches the patern and if not already listed
+                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
+                )
+            )
+        )
+    
+    goto:eof
+    REM : ------------------------------------------------------------------
+    
     REM : function to get and set char set code for current host
     :getMlcTarget
 
@@ -231,7 +302,119 @@ REM : functions
     goto:eof
     REM : ------------------------------------------------------------------
 
+    :syncAccounts
+    
+                        
+        REM : loop on accounts found in 
+        set "folder=NONE"
+        for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
+            set "folder=%%j"
+            
+            set "srcGameAccount="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!\!folder!""
+            set "gameAccount="!MLC01_FOLDER_PATH:"=!\usr\save\00050000\!endTitleId!\!folder!""
+            
+            REM : do you want to overwrite saves for !folder! account 
+            REM : YES robocopy !srcGameAccount! !gameAccount!
 
+        )
+            
+    goto:eof
+    REM : ------------------------------------------------------------------
+
+    :syncGame
+    
+                        
+            REM : if the game is also installed on your PC in !MLC01_FOLDER_PATH!
+            type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
+            
+                REM : get the title from !localTid!
+                for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
+                
+                if [!gamesMode!] == ["select"] (
+                    choice /C yn /N /M "Import !title![!endTitleId!] saves (y, n)? : "
+                    if !ERRORLEVEL! EQU 2 goto:eof
+                    
+                    REM : loop on accounts found in source SYNCFOLDER_PATH
+                    pushd !srcGameSaveFolder!
+                    
+                    if [!userSavesMode!] == ["all"] (
+                        REM : robocopy whole folder
+                    
+                    ) else (
+                    
+                        call:syncAccounts
+                    )
+                )
+                
+            
+            )
+            
+    goto:eof
+    REM : ------------------------------------------------------------------
+    
+    REM : synchronize games and account : overwrite MLC01_FOLDER_PATH files with selected ones from SYNCFOLDER_PATH
+    :syncMlcFolders
+
+        set "localTid="!SYNCFOLDER_PATH:"=!\cemuTitlesId.log""
+        if exist !localTid! del /F !localTid! > NUL 2>&1
+    
+        REM : get games list in !MLC01_FOLDER_PATH! : targetGamesList
+        set "gamesFolder="!MLC01_FOLDER_PATH:"=!\games""
+        if exist !gamesFolder! (
+            call:getCemuTitles !gamesFolder!
+        ) else (    
+            set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
+            if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
+
+            set "upFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000e"
+            if exist !upFolder! call:getCemuTitles !upFolder!
+
+            set "dlcFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000c""
+            if exist !dlcFolder! call:getCemuTitles !dlcFolder!
+        )
+        REM : re define savesFolder here in case of config loaded
+        set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
+        call:getCemuTitles !savesFolder!
+        
+        set "cemuAccountsList="
+        call:getCemuAccountsList 
+        
+        set "srcSaveFolder="!SYNCFOLDER_PATH:"=!\usr\save\00050000""
+        if not exist !srcSaveFolder! (
+            echo ERROR^: !srcSaveFolder! does not exist^, cancelling
+            pause
+            exit /b 55
+        )
+        REM : cd SYNCFOLDER_PATH\usr\save\00050000
+        pushd !srcSaveFolder!
+
+        
+        for /F "delims=~" %%i in ('dir /S /B /A:D "*" 2^>NUL') do (
+            for /F "delims=~" %i in ("%%a") do (
+                set "endTitleId=%%~nxi"
+                
+                echo !endTitleId!| findStr /R /I "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+                
+                    REM : if MLC01_FOLDER_PATH\usr\save\00050000\titleId exist
+                    set "gameSaveFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
+                    set "srcGameSaveFolder="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""                    
+                    if exist !gameSaveFolder! if exist !srcGameSaveFolder! call:syncGame
+                )
+            )
+        )        
+
+            
+        REM : do you want to treat title[titleId] ? 
+        
+        REM : YES : if userSavesMode = all
+        REM             YES : robocopy SYNCFOLDER_PATH\usr\save\00050000\titleId MLC01_FOLDER_PATH\usr\save\00050000\titleId (created before if needed)
+        REM             NO : cd SYNCFOLDER_PATH\usr\save\00050000\titleId\user
+        REM                  loop on accounts in SYNCFOLDER_PATH\usr\save\00050000\titleId\user
+        REM                  robocopy SYNCFOLDER_PATH\usr\save\00050000\titleId\user\account MLC01_FOLDER_PATH\usr\save\00050000\titleId\account
+    
+    goto:eof
+    REM : ------------------------------------------------------------------
+    
     REM : function to get and set char set code for current host
     :setCharSet
 
