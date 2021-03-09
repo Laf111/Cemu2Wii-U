@@ -21,11 +21,11 @@ Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless 
 
 - **export CEMU saves** to Wii-U
 
-Import/Exporting saves concern only your **selection of the games installed on both side** (CEMU and Wii-U).
+Import/Exporting saves concern only your **selection of the games installed on both sides** (CEMU and Wii-U).
 
 You can choose to treat all games as well.
 
-Then, choose to select wih account will be concerned (or 'all') for each game.
+Then, choose to **select wich account** will be concerned (or 'all') for each game.
 
 #
 
@@ -36,7 +36,7 @@ Cemu2Wii-U does not have access to the settings.xml file of CEMU install since t
 So **you'll have to define manually (if it's not already done) Wii-U accounts (and user's name) in CEMU configuration (General Settings / Accounts tab)**.
 
 Every import or export process :
-- checks are done for accounts on both side to : 
+- checks are done for accounts on both sides to : 
   - see if an account need to be created in CEMU UI (import Wii-U account)
   - verify that the account exist on the Wii-U (export only existing accounts on the Wii-U)
 
