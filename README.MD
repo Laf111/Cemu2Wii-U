@@ -2,7 +2,9 @@
 
 Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
 
-![Cemu2Wii-U](resources/Cemu2Wii-U.png)
+<p align="center">
+  <img src="resources/Cemu2Wii-U.png">
+</p>
 
 Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
