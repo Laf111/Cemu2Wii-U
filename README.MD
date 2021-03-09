@@ -60,6 +60,7 @@ Launch setup.bat to create shortcuts on your desktop (or any location).
 - **importWiiuSaves.bat** : get saves from the Wii-U for games that also exist in MLC_FOLDER (backup existing CEMU saves before overwrite files)
 - **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U filesystem (backup existing Wii-U saves before overwrite files)
 - **scanWiiU.bat** : take a snapshot of your Wii-U install (games and location mlc/usb). You need to create a new one on every install/move/delete games operation on your Wii-U
+**restoreBackup.bat** : restore CEMU or Wii-U backups
 - **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). 
 
 The last script will allow you to : 
@@ -69,12 +70,13 @@ The last script will allow you to :
 
 But use it only if you know what you are doing...
 
+Scripts accepts optionnals arguments in order to be called by another API.
+
 #
 ## TODO : 
 
-- Check import/export scripts.
+- Check import/export and restore scripts.
 
-- **restoreBackup.bat** : restore CEMU or Wii-U backups
 
 # 
 **IMPORTANT : if you get the files from the repository : use the script ./fixBatFiles.bat (used to produce a release) to force the ANSI encoding and remove trailing spaces in all files (this script also put files in read only) because GitHub will format all files from ANSI to UTF-8 and it might break silentlty some scripts.**
