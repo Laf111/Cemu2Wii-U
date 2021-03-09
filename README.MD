@@ -9,7 +9,7 @@ SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU 
 
 - en/disable remotely the firmware auto-update feature on the Wii-U
 
-- change the account (8000000X) used (remane folders in a MLC_PATH)
+- change a CEMU's account (8000000X) used (remane folders in a MLC_PATH)
 
 - restore backups of saves (on CEMU and Wii-U)
 
@@ -24,11 +24,10 @@ SyncSaves_Cemu-WiiU does not have access to the settings.xml file of CEMU instal
 
 So you'll have to define manually (if it's not already done) Wii-U accounts (and user's name) in CEMU configuration (General Settings / Accounts tab).
 
-Every import or export process :  
-
-- checks are done for accounts on both side to see if : 
-  - account need to be created in CEMU UI (import)
-  - verify that account exist on the Wii-U (export only existing accounts on the Wii-U)
+Every import or export process :
+- checks are done for accounts on both side to : 
+  - see if an account need to be created in CEMU UI (import Wii-U account)
+  - verify that the account exist on the Wii-U (export only existing accounts on the Wii-U)
 
 - backups of saves are done under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and can be restored (to Wii-U or CEMU).
 
