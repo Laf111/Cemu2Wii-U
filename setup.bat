@@ -6,9 +6,9 @@ REM : main
     setlocal EnableDelayedExpansion
     
     
-    REM : SyncSaves_Cemu-WiiU Version
+    REM : Cemu2Wii-U Version
     set "VERSION=V1"    
-    title SyncSaves_CEMU-WiiU !VERSION!
+    title Cemu2Wii-U !VERSION!
 
     color 4F
     set "THIS_SCRIPT=%~0"
@@ -39,7 +39,7 @@ REM : main
     cls
 
     echo =========================================================
-    echo SyncSaves_CEMU-WiiU !VERSION! installer
+    echo Cemu2Wii-U !VERSION! installer
     echo =========================================================
     echo.
     
@@ -137,6 +137,16 @@ REM : main
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\cemu.ico""
     if not exist !LINK_PATH! (
             echo Creating a shortcut to changeAccount^.bat
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
+    )
+
+    REM : create a shortcut to restoreBackup.bat (if needed)
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Restore a Wii-U or CEMU backup^.lnk""
+    set "LINK_DESCRIPTION="Restore a Wii-U or CEMU backup""
+    set "TARGET_PATH="!HERE:"=!\restoreBackup.bat""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\compress.ico""
+    if not exist !LINK_PATH! (
+            echo Creating a shortcut to restoreBackup^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
     

@@ -215,9 +215,9 @@ REM : main
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
         if !ERRORLEVEL! EQU 1 goto:installFiles
     )
-    echo Please select a MLC path folder ^(mlc01^)    
+    echo Please select a MLC folder ^(mlc01^)    
     :askMlc01Folder
-    for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
+    for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
     if [!MLC01_FOLDER_PATH!] == ["NONE"] (
         choice /C yn /N /M "No item selected, do you wish to cancel (y, n)? : "

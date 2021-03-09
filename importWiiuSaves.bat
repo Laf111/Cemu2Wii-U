@@ -103,7 +103,6 @@ REM : main
         pause
         exit /b 93
     )
-    set "userSavesToImport="select""    
     goto:inputsAvailable    
     
     :getInputs
@@ -116,9 +115,9 @@ REM : main
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
         if !ERRORLEVEL! EQU 1 goto:getSavesMode
     )
-    echo Please select a MLC path folder ^(mlc01^)    
+    echo Please select a MLC folder ^(mlc01^)    
     :askMlc01Folder
-    for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC pacth folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
+    for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
     if [!MLC01_FOLDER_PATH!] == ["NONE"] (
         choice /C yn /N /M "No item selected, do you wish to cancel (y, n)? : "
@@ -261,6 +260,19 @@ REM : main
     set "localTid="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\cemuTitlesId.log""
     if exist !localTid! del /F !localTid! > NUL 2>&1
     
+    set "gamesFolder="!MLC01_FOLDER_PATH:"=!\games""
+    if exist !gamesFolder! (
+        call:getCemuTitles !gamesFolder!
+    ) else (    
+        set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
+        if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
+
+        set "upFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000e"
+        if exist !upFolder! call:getCemuTitles !upFolder!
+
+        set "dlcFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000c""
+        if exist !dlcFolder! call:getCemuTitles !dlcFolder!
+    )
     REM : re define savesFolder here in case of config loaded
     set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
     call:getCemuTitles !savesFolder!
@@ -268,15 +280,7 @@ REM : main
     set "cemuAccountsList="
     call:getCemuAccountsList 
     
-    set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
-    if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
-
-    set "upFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000e"
-    if exist !upFolder! call:getCemuTitles !upFolder!
-
-    set "dlcFolder="!MLC01_FOLDER_PATH:"=!\usr\title\0005000c""
-    if exist !dlcFolder! call:getCemuTitles !dlcFolder!
-
+    
     :getList
     REM : get title;endTitleId;source;dataFound from scan results
     set "gamesList="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\gamesList.csv""
@@ -369,7 +373,7 @@ REM : main
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
-    set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders""
+    set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Import""
     if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
     
     REM : get current date
