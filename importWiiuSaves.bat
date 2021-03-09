@@ -591,7 +591,7 @@ REM : functions
         )
 
         if [!userSavesToImport!] == ["select"] (
-            choice /C yn /N /M "Import !tobeDisplayed! Wii-U saves to CEMU (y, n)? : "
+            choice /C yn /N /M "Import !tobeDisplayed! !gameTitle! saves to CEMU (y, n)? : "
             if !ERRORLEVEL! EQU 2 goto:eof
         )
         REM : CEMU save for the current user

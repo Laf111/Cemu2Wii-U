@@ -609,7 +609,7 @@ REM : functions
         )
         
         if [!userSavesToExport!] == ["select"] (
-            choice /C yn /N /M "Export !tobeDisplayed! CEMU saves to Wii-U (y, n)? : "
+            choice /C yn /N /M "Export !tobeDisplayed! CEMU saves for !gameTitle! to Wii-U (y, n)? : "
             if !ERRORLEVEL! EQU 2 goto:eof
         )
         
