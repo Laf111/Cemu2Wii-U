@@ -25,7 +25,7 @@ Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless 
 
 - **export CEMU saves** to Wii-U
 
-Import/Exporting saves concern only your **selection of the games installed on both sides** (CEMU and Wii-U).
+Import/Exporting/restoring saves concern only your **selection of the games installed on both sides** (CEMU and Wii-U).
 
 You can choose to treat all games as well.
 
