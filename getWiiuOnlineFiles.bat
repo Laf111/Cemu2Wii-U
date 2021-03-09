@@ -202,26 +202,18 @@ REM : main
     echo ---------------------------------------------------------
     set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
 
-    call:setUsersFromWiiu
+    call:getWiiuUsers
 
-    echo.
-    echo.
-    echo Don^'t forget to create the following accounts
-    echo and users in all your CEMU installs ^: 
-    echo.
-    type !wiiuUsersLog! | find /V "#"
-    echo.
     echo =========================================================
-
     choice /C yn /N /M "Do you want to install the files in a mlc01 folder (y, n)? : "
-    if !ERRORLEVEL! EQU 2 goto:endMain
+    if !ERRORLEVEL! EQU 2 goto:noMlcInstall
     
     set "config="!LOGS:"=!\lastConfig.ini""    
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
-        if !ERRORLEVEL! EQU 1 goto:getSavesMode
+        if !ERRORLEVEL! EQU 1 goto:installFiles
     )
     echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
@@ -242,9 +234,42 @@ REM : main
     REM : update last configuration
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
 
-    
+    :installFiles
     set "srcFolder="!ONLINE_FOLDER:"=!\mlc01""
+    
+    REM : saves folder in the target mlc01 path
+    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
+    
+    REM : get the list of the accounts existing in CEMU
+    set "cemuAccountsList="
+    call:getCemuAccountsList 
+    
+    REM : list of Wii-U accounts that do not exist in CEMU side
+    set "accListToCreateInCemu=" 
+    call:getUndefinedWiiuAccounts    
+    
+    pushd !HERE!
+    
+    if not ["!accListToCreateInCemu!"] == [""] (
+        echo WARNING ^: If needed^, create the following accounts in CEMU
+        echo ^(accounts tab of ^'General Settings^'^)
+        echo.
+        for %%a in ("!accListToCreateInCemu!") do echo %%a
+        echo.
+    )    
+    
     robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
+    goto:endMain
+    
+    :noMlcInstall
+    echo.
+    echo.
+    echo Don^'t forget to create the following accounts
+    echo and users in all your CEMU installs ^: 
+    echo.
+    type !wiiuUsersLog! | find /V "#"
+    echo.
+    echo =========================================================
     
     :endMain
     echo.
@@ -270,7 +295,46 @@ REM : ------------------------------------------------------------------
 REM : functions
 
 
-    :setUsersFromWiiu
+
+    REM : check if Wii-U accounts need to be defined in CEMU
+    :getUndefinedWiiuAccounts
+    
+        pusd !ACCOUNTS_FOLDER!
+        for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
+            for /F "delims=~" %i in ("%%a") do (
+                set "account=%%~nxi"
+                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+                    REM : if it maches the patern
+                    
+                    REM : check if it is listed in cemuAccountsList
+                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "accListToCreateInCemu=!accListToCreateInCemu! !account!"
+                )
+            )
+        )
+    goto:eof
+    REM : ------------------------------------------------------------------
+
+
+    REM : scan MLC01_PATH_FOLDER to get accounts defined in CEMU
+    :getCemuAccountsList
+
+        pushd !savesFolder!
+        
+        for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
+            for /F "delims=~" %i in ("%%a") do (
+                set "account=%%~nxi"
+                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+                    REM : add to to list if it maches the patern and if not already listed
+                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
+                )
+            )
+        )
+    
+    goto:eof
+    REM : ------------------------------------------------------------------
+
+
+    :getWiiuUsers
 
         REM : loop on all 800000XX folders found
         pushd !ACCOUNTS_FOLDER!

@@ -165,7 +165,7 @@ REM : main
     echo.
     echo Create the account !TARGET_ACCOUNT! in all versions of CEMU 
     echo using the MLC path !MLC01_FOLDER_PATH!
-    echo ^(in General settings ^/ Account tab^)
+    echo ^(in ^'General Settings^' ^/ Accounts tab^)
     echo.
     echo Otherwise saves won^'t show up ^!
     pause

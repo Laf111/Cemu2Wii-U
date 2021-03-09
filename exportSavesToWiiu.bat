@@ -366,6 +366,7 @@ REM : main
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders""    
+    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
     
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
@@ -374,20 +375,24 @@ REM : main
 
     REM : folder that contains temporarily the backup of each Wii-u Saves
     set "WIIU_BACKUP_PATH="!BACKUPS_PATH:"=!\Wii-U_Saves""
-    set "WIIU_BACKUP="!WIIU_BACKUP_PATH:"=!\!DATE!_WIIU_Saves.zip""
-    set "backupLog="!WIIU_BACKUP_PATH:"=!\!DATE!.log"
-    
-    echo # Backup WII-U saves in !WIIU_BACKUP! > !backupLog!
-
-    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
     if not exist !WIIU_BACKUP_PATH! mkdir !WIIU_BACKUP_PATH! > NUL 2>&1
-
+    set "WIIU_BACKUP="!WIIU_BACKUP_PATH:"=!\!DATE!_WIIU_Saves.zip""
+    
+    set "backupLog="!WIIU_BACKUP_PATH:"=!\!DATE!.log"
+    echo # gameTitle;endTitleId;WiiU Save Folder > !backupLog!
+    
     pushd !HERE!
-    echo.
-    echo Wii-U saves will be backup in !WIIU_BACKUP_PATH!
     echo.
     
     for /L %%n in (0,1,!nbGamesSelected!) do call:exportSaves %%n
+    
+    echo.
+    echo ---------------------------------------------------------
+    echo Backup WII-U saves in !WIIU_BACKUP!
+    call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !syncFolderPath! > NUL 2>&1
+    echo Done
+    echo.
+    
     echo =========================================================
     echo Now you can stop FTPiiU server
     echo.
@@ -469,14 +474,10 @@ REM : functions
         set "syncFolderPath="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
         mkdir !syncFolderPath! > NUL 2>&1
         
-        echo Backup /storage_!src!/usr/save/00050000/!endTitleId!^.^.^.
         echo !gameTitle!;!endTitleId!;/storage_!src!/usr/save/00050000/!endTitleId! >> !backupLog!
 
         REM : download the whole save from the wii-U (as backup under WIIU_BACKUP_PATH)
         wscript /nologo !StartHiddenWait! !ftpSyncFolders! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "backup all !gameTitle! saves"
-        
-        REM : backup the save
-        call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !syncFolderPath! > NUL 2>&1
         
         set "metaFolder="!syncFolderPath:"=!\meta""        
         
@@ -591,14 +592,14 @@ REM : functions
     
     :exportSavesForCurrentAccount
 
-        set "tobeDisplayed="!folder!""
+        set "user="NOT_FOUND""    
+        set "tobeDisplayed=!folder!"
         
         if exist !wiiuUsersLog! (
+            type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
-            type !wiiuUsersLog! | find /I !folder! > NUL 2>&1 && (
-                set "user="NOT_FOUND""
-                for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! | find /I !folder!') do set "user="%%k""                
-                if [!user!] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+                for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"                
+                if ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
             )            
         )
         
@@ -606,14 +607,18 @@ REM : functions
             choice /C yn /N /M "Export !tobeDisplayed! CEMU saves to Wii-U (y, n)? : "
             if !ERRORLEVEL! EQU 2 goto:eof
         )
-
         
         set "localSaveFolder="!syncFolderPath:"=!\user\!folder!""
         if not exist !localSaveFolder! (
             echo.
-            echo No save for the account !folder! was not found
+            echo WARNING ^: No Wii-U save for the account !folder! was not found
             echo.
-            echo If you^'re sure that the account !folder! exist on the Wii-U       
+            
+            if ["!user!"] == ["NOT_FOUND"] (
+                echo If you^'re sure that the account !folder! exist on the Wii-U
+            ) else (
+                echo If you^'re sure that the !user! exists on the Wii-U and use !folder! account
+            )
             choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
             if !ERRORLEVEL! EQU 2 goto:eof
         )
@@ -635,7 +640,6 @@ REM : functions
 
         pushd !MLC01_FOLDER_PATH!
 
-        set /A "nbUsersTreated+=1"
     goto:eof
     REM : ------------------------------------------------------------------
 
