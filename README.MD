@@ -43,6 +43,8 @@ Every import or export process :
 - backups of saves are done under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and can be restored (to Wii-U or CEMU).
 
 
+Scripts check if CEMU is not running before launching treaments.
+
 #
 ## Install (optional):
 
