@@ -60,6 +60,7 @@ The last script will allow you to :
 - overwrite CEMU saves with Wii-U ones by using the same account in CEMU than on the Wii-U (if you want to synchronize CEMU and your Wii-U)
 - rename existant CEMU's accounts (you'll need to setup the new accounts manually in CEMU UI)
 - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
+
 But use it only if you know what you are doing...
 
 #
