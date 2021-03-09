@@ -5,25 +5,32 @@ SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU 
 
 - dump wii-u onlines files needed fo CEMU (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually.
 
-- import Wii-U saves to a MLC folder
-
-- export CEMU saves to Wii-U
-
 - prepare a SD card for the Wii-U containing HBL and essentials 'legal' apps
 
 - en/disable remotely the firmware auto-update feature on the Wii-U
 
 - change the account (8000000X) used (remane folders in a MLC_PATH)
 
+- restore backups of saves (on CEMU and Wii-U)
+
+- import Wii-U saves to a MLC folder
+
+- export CEMU saves to Wii-U
 
 
-It uses scripts adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
+Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
 SyncSaves_Cemu-WiiU does not have access to the settings.xml file of CEMU install since the input mlc folder could be an "external" one (not included in a CEMU install's folder and eventually shared by multiple CEMU's versions)
 
 So you'll have to define manually (if it's not already done) Wii-U accounts (and user's name) in CEMU configuration (General Settings / Accounts tab).
 
-Every import or export process, backups of saves are done under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and can be restored (to Wii-U or CEMU side).
+Every import or export process :  
+
+- checks are done for accounts on both side to see if : 
+  - account need to be created in CEMU UI (import)
+  - verify that account exist on the Wii-U (export only existing accounts on the Wii-U)
+
+- backups of saves are done under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and can be restored (to Wii-U or CEMU).
 
 
 #
