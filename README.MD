@@ -25,7 +25,7 @@ Import/Exporting saves concern only your **selection of the games installed on b
 
 You can choose to treat all games as well.
 
-Then, choose to **select wich account** will be concerned (or 'all') for each game.
+Then, you can choose to **select wich account** will be concerned for each game **or treat all accounts**.
 
 #
 
