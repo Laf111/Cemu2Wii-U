@@ -145,7 +145,7 @@ REM : main
         if !ERRORLEVEL! EQU 1 set "userSavesToImport="all""
     )
     
-    :inputsAvailable
+    :inputsAvailable  
     echo.    
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
@@ -364,8 +364,10 @@ REM : main
     cls
 
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
+    set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders""
+    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
     
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
@@ -376,22 +378,33 @@ REM : main
 
     set "CEMU_BACKUP_PATH="!BACKUPS_PATH:"=!\!DATE!_CEMU_Saves""
     set "CEMU_BACKUP="!CEMU_BACKUP_PATH:"=!\!DATE!_CEMU_Saves.zip""
+    if not exist !CEMU_BACKUP_PATH! mkdir !CEMU_BACKUP_PATH! > NUL 2>&1
     set "backupLog="!CEMU_BACKUP_PATH:"=!\!DATE!_CEMU_Saves.log"
     
     echo # Backup CEMU saves in !CEMU_BACKUP! > !backupLog!
     
-    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
-    if not exist !CEMU_BACKUP_PATH! mkdir !CEMU_BACKUP_PATH! > NUL 2>&1
     pushd !HERE!
     echo.
     echo Cemu saves will be backup in !CEMU_BACKUP!
     echo.
 
+    set "accListToCreateInCemu="
+    
     for /L %%n in (0,1,!nbGamesSelected!) do call:importSaves %%n
     echo =========================================================
     echo Now you can stop FTPiiU server
     echo.
+    
+    if not ["!accListToCreateInCemu!"] == [""] (
+        echo WARNING ^: If needed^, create the following accounts in CEMU
+        echo ^(account tab of ^'General Settings^'^)
+        echo.
+        for %%a in ("!accListToCreateInCemu!") do echo %%a
+        echo.
+    )
+    echo.
     pause
+    
 
     if !ERRORLEVEL! NEQ 0 exit /b !ERRORLEVEL!
     exit /b 0
@@ -456,14 +469,14 @@ REM : functions
 
         set "syncFolderPath="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
         mkdir !syncFolderPath! > NUL 2>&1
-        set "srcFolder="!savesFolder:"=!\!endTitleId!""
-        REM : srcFolder exist because it was listed in localTid
+        set "cemuSaveFolder="!savesFolder:"=!\!endTitleId!""
+        REM : cemuSaveFolder exist because it was listed in localTid
 
         REM : log title
-        echo !gameTitle!;!endTitleId!;!srcFolder! >> !backupLog!
+        echo !gameTitle!;!endTitleId!;!cemuSaveFolder! >> !backupLog!
         
-        robocopy !srcFolder! !syncFolderPath! /MT:32 /MIR > NUL 2>&1        
-        call !7za! u -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !srcFolder!
+        robocopy !cemuSaveFolder! !syncFolderPath! /MT:32 /MIR > NUL 2>&1        
+        call !7za! u -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !cemuSaveFolder!  > NUL 2>&1
         
         set "syncFolderMeta="!syncFolderPath:"=!\meta""
         set "saveinfo="!syncFolderMeta:"=!\saveinfo.xml""
@@ -495,15 +508,12 @@ REM : functions
         set "folder=NONE"
         for /F "delims=~" %%j in ('dir /B /A:D "80000*" 2^>NUL') do (
             set "folder=%%j"
-           
-            set "wiiuUserFolder="!syncFolderUser:"=!\user\!folder!""
-            if exist !wiiuUserFolder! (
-                pushd !wiiuUserFolder!
-                call:importSavesForCurrentUser
-                pushd !MLC01_FOLDER_PATH!
-            ) else (
-                echo No Wii-U save found for account !folder!
-            )
+
+            REM : all Wii-U accounts are treated and imported (even if account does not exist in CEMU)
+            set "wiiuUserFolder="!syncFolderUser:"=!\!folder!""
+            pushd !wiiuUserFolder!
+            call:importSavesForCurrentUser
+            pushd !MLC01_FOLDER_PATH!
         )
       
         REM : robocopy common folder
@@ -531,27 +541,39 @@ REM : functions
 
     :importSavesForCurrentUser
 
-    
-        set "tobeDisplayed="!folder!""
+        set "user="NOT_FOUND""
+        set "tobeDisplayed=!folder!"
         
         if exist !wiiuUsersLog! (
+            type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
-            type !wiiuUsersLog! | find /I !folder! > NUL 2>&1 && (
-                set "user="NOT_FOUND""
-                for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! | find /I !folder!') do set "user="%%k""                
+                for /F "delims=~= tokens=1" %%k in ('type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"
                 if [!user!] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
             )            
         )
-        
+
         if [!userSavesToImport!] == ["select"] (
             choice /C yn /N /M "Import !tobeDisplayed! Wii-U saves to CEMU (y, n)? : "
             if !ERRORLEVEL! EQU 2 goto:eof
         )
-
         REM : CEMU save for the current user
         set "cemuUserSaveFolder="!cemuSaveFolder:"=!\user\!folder!""
-        if not exist !cemuUserSaveFolder! mkdir !cemuUserSaveFolder! > NUl 2>&1
+        if not exist !cemuUserSaveFolder! (
         
+            choice /C yn /N /M "Account !tobeDisplayed! does not exist in CEMU, import it anyway ? (y, n)? : "
+            if !ERRORLEVEL! EQU 2 goto:eof
+            if [!user!] == ["NOT_FOUND"] (
+                set "accListToCreateInCemu=!accListToCreateInCemu! !folder!"
+            ) else (
+                set "accListToCreateInCemu=!accListToCreateInCemu! !folder![user=!tobeDisplayed!]"
+            )
+            echo.
+            echo WARNING ^: If needed^, create !tobeDisplayed! account in the account tab
+            echo of 'General Settings' of CEMU UI
+            echo.
+            timeout /T 3 > NUL 2>&1
+            mkdir !cemuUserSaveFolder! > NUl 2>&1
+        )
         REM : folder come from Wii-U => robocopy !wiiuUserFolder! !cemuUserSaveFolder!
         robocopy !wiiuUserFolder! !cemuUserSaveFolder! /MT:32 /MIR > NUL 2>&1        
 

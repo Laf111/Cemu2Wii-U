@@ -97,7 +97,7 @@ REM : main
         set "folder=!MLC01_FOLDER_PATH:"=!"
 
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
-        if !ERRORLEVEL! EQU 1 goto:getSavesMode
+        if !ERRORLEVEL! EQU 1 goto:getSrcAcc
     )
     echo Please select a MLC path folder ^(mlc01^)    
     :askMlc01Folder
@@ -118,6 +118,8 @@ REM : main
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
     
     :getSrcAcc
+    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"    
+    
     echo.
     set /P "SRC_ACCOUNT=Please enter the source account Id (8XXXXXXX) : "
     echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
@@ -141,7 +143,8 @@ REM : main
     cls
     echo =========================================================
     if %nbArgs% NEQ 0 goto:rename
-    choice /C yn /N /M "Rename all folders named !SRC_ACCOUNT! with !TARGET_ACCOUNT! in !savesFolder:"=! ? (y, n) : "
+    set "sf=!savesFolder:"=!"
+    choice /C yn /N /M "Rename all folders named !SRC_ACCOUNT! with !TARGET_ACCOUNT! in !sf! ? (y, n) : "
     if !ERRORLEVEL! EQU 2 (
         echo WARNING^: cancelled by user
         pause
@@ -151,8 +154,7 @@ REM : main
     
     :rename
     call !brcPath! /DIR^:!savesFolder! /REPLACECI^:!SRC_ACCOUNT!^:!TARGET_ACCOUNT! /EXECUTE /RECURSIVE > !changeAccountLog!
-    type !changeAccountLog!
-    
+
     echo.
     echo.
     echo =========================================================
@@ -162,9 +164,9 @@ REM : main
 
     echo.
     echo Create the account !TARGET_ACCOUNT! in all versions of CEMU 
-    echo that point to !MLC01_FOLDER_PATH!
+    echo using the MLC path !MLC01_FOLDER_PATH!
     echo ^(in General settings ^/ Account tab^)
-    echo
+    echo.
     echo Otherwise saves won^'t show up ^!
     pause
         

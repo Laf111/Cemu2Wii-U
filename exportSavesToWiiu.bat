@@ -363,6 +363,7 @@ REM : main
     cls
 
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
+    set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders""    
     
@@ -475,7 +476,7 @@ REM : functions
         wscript /nologo !StartHiddenWait! !ftpSyncFolders! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "backup all !gameTitle! saves"
         
         REM : backup the save
-        call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !syncFolderPath!
+        call !7za! u -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !syncFolderPath! > NUL 2>&1
         
         set "metaFolder="!syncFolderPath:"=!\meta""        
         
