@@ -74,7 +74,7 @@ REM : main
     REM : install content
     set "sdCardContent="!RESOURCES_PATH:"=!\WiiuSDcard.zip""
 
-    call !7za! e -y -w!LOGS! !sdCardContent! !SDCARD! > NUL 2>&1
+    call !7za! x -y -w!LOGS! !sdCardContent! !SDCARD! > NUL 2>&1
      
     echo done
     echo =========================================================
