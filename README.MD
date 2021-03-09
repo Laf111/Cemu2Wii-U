@@ -79,6 +79,8 @@ But use it only if you know what you are doing...
 #
 ## TODO : 
 
+- Finish restore script
+
 - Check import/export and restore scripts.
 
 
