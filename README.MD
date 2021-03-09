@@ -1,6 +1,9 @@
 # SyncSaves_Cemu-WiiU
 
 SyncSaves_Cemu-WiiU is an **automated FTP interface** between the WiiU and CEMU (a mlc01 folder : MLC_FOLDER)
+
+**Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling) !**
+
 #
 
 - **dump wii-u onlines files needed for CEMU** (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only have to dump opt.bin and seeprom.bin using NANDDUMPER manually and put them close to CEMU.exe to play online.
@@ -33,9 +36,6 @@ Every import or export process :
 
 
 #
-**Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling) !**
-#
-
 Install (optional):
 
 Launch setup.bat to create shortcuts on your desktop (or any location).
@@ -64,7 +64,6 @@ TODO :
 - Check import/export scripts.
 
 - **restoreBackup.bat** : restore CEMU or Wii-U backups
--  
 
 # 
 **IMPORTANT : if you get the files from the repository : use the script ./fixBatFiles.bat (used to produce a release) to force the ANSI encoding and remove trailing spaces in all files (this script also put files in read only) because GitHub will format all files from ANSI to UTF-8 and it might break silentlty some scripts.**
