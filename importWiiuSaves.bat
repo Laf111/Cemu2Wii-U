@@ -32,6 +32,16 @@ REM : main
     REM : set current char codeset
     call:setCharSet
 
+    REM : search if Cemu2Wii-U is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 2 (
+        echo ERROR^: Cemu2Wii-U is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+    
     REM : checking arguments
     set /A "nbArgs=0"
     :continue
@@ -399,7 +409,7 @@ REM : main
         echo WARNING ^: If needed^, create the following accounts in CEMU
         echo ^(accounts tab of ^'General Settings^'^)
         echo.
-        for %%a in ("!accListToCreateInCemu!") do echo %%a
+        for %%a in (!accListToCreateInCemu!) do echo ^> %%a
         echo.
     )
 
@@ -579,7 +589,7 @@ REM : functions
             type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
                 for /F "delims=~= tokens=1" %%k in ('type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"
-                if ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
             )
         )
 
@@ -596,10 +606,13 @@ REM : functions
 
                 choice /C yn /N /M "Account !tobeDisplayed! does not exist in CEMU, import it anyway ? (y, n)? : "
                 if !ERRORLEVEL! EQU 2 goto:eof
-                if ["!user!"] == ["NOT_FOUND"] (
-                    set "accListToCreateInCemu=!accListToCreateInCemu! !folder!"
-                ) else (
-                    set "accListToCreateInCemu=!accListToCreateInCemu! !folder![user=!tobeDisplayed!]"
+                
+                echo !accListToCreateInCemu! | find /V "!folder!" > NUL 2>&1 && (
+                    if ["!user!"] == ["NOT_FOUND"] (
+                        set "accListToCreateInCemu=!accListToCreateInCemu! !folder!"
+                    ) else (
+                        set "accListToCreateInCemu=!accListToCreateInCemu! !folder![user=!tobeDisplayed!]"
+                    )
                 )
             )
             mkdir !cemuUserSaveFolder! > NUl 2>&1

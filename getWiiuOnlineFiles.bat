@@ -255,7 +255,7 @@ REM : main
         echo WARNING ^: If needed^, create the following accounts in CEMU
         echo ^(accounts tab of ^'General Settings^'^)
         echo.
-        for %%a in ("!accListToCreateInCemu!") do echo %%a
+        for %%a in (!accListToCreateInCemu!) do echo ^> %%a
         echo.
     )    
     

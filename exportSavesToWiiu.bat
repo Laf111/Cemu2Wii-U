@@ -31,6 +31,16 @@ REM : main
     REM : set current char codeset
     call:setCharSet
 
+    REM : search if Cemu2Wii-U is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 2 (
+        echo ERROR^: Cemu2Wii-U is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+    
     REM : checking arguments
     set /A "nbArgs=0"
     :continue
@@ -374,7 +384,7 @@ REM : main
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
     set "DATE=%ldt%"
 
-    set "WIIU_BACKUP_PATH="!BACKUPS_PATH:"=!\!DATE!_WIIU_Saves"
+    set "WIIU_BACKUP_PATH="!BACKUPS_PATH:"=!\!DATE!_WIIU_Saves""
     if not exist !WIIU_BACKUP_PATH! mkdir !WIIU_BACKUP_PATH! > NUL 2>&1
     set "WIIU_BACKUP="!WIIU_BACKUP_PATH:"=!\!DATE!_WIIU_Saves.zip""
     
@@ -620,7 +630,7 @@ REM : functions
             type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
                 for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"                
-                if ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
             )            
         )
         

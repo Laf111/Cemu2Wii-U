@@ -27,6 +27,16 @@ REM : main
     REM : set current char codeset
     call:setCharSet
 
+    REM : search if CEMU is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 1 (
+        echo ERROR^: CEMU is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+    
     REM : checking arguments
     set /A "nbArgs=0"
     :continue
@@ -177,8 +187,6 @@ REM : main
     echo.
     echo Otherwise saves won^'t show up ^!
     pause
-        
-    if %nbArgs% EQU 0 pause
     exit /b 0
 
     goto:eof

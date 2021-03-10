@@ -37,16 +37,7 @@ REM : main
         shift
         goto:continue
     :end
-        
-    REM : search if CEMU is not already running
-    set /A "nbI=0"
-    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
-    if %nbI% GEQ 1 (
-        echo ERROR^: CEMU is already^/still running^! Aborting^!
-        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
-        pause
-        exit /b 100
-    )
+
 
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
@@ -166,7 +157,7 @@ REM : main
             if !ERRORLEVEL! EQU 1 set "gamesMode=all"
         )
         goto:CemuBackup
-    )
+    )    
     echo ---------------------------------------------------------    
     call:uncompress
 
@@ -177,6 +168,17 @@ REM : main
     goto:endMain
     
     :CemuBackup
+        
+    REM : search if CEMU is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 1 (
+        echo ERROR^: CEMU is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+    
     REM : ask for mlc destination
     set "MLC01_FOLDER_PATH="NONE""
     call:getMlcTarget

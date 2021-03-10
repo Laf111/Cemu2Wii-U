@@ -149,6 +149,26 @@ REM : main
             echo Creating a shortcut to restoreBackup^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
+
+    REM : create a shortcut to backupWiiuSaves.bat (if needed)
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Backup all Wii-U saves^.lnk""
+    set "LINK_DESCRIPTION="Backup all Wii-U saves""
+    set "TARGET_PATH="!HERE:"=!\backupWiiuSaves.bat""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\BackupWiiU.ico""
+    if not exist !LINK_PATH! (
+            echo Creating a shortcut to backupWiiuSaves^.bat
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
+    )
+    
+    REM : create a shortcut to backupCemuSaves.bat (if needed)
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Backup all Cemu saves^.lnk""
+    set "LINK_DESCRIPTION="Backup all Cemu saves""
+    set "TARGET_PATH="!HERE:"=!\backupCemuSaves.bat""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\BackupCemu.ico""
+    if not exist !LINK_PATH! (
+            echo Creating a shortcut to backupCemuSaves^.bat
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
+    )
     
     echo.
     echo =========================================================
