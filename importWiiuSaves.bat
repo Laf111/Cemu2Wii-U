@@ -42,9 +42,6 @@ REM : main
         goto:continue
     :end
 
-    REM : J2000 unix timestamp (/ J1970)
-    set /A "j2000=946684800"
-
     REM : search if CEMU is not already running
     set /A "nbI=0"
     for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
@@ -390,7 +387,7 @@ REM : main
     echo.
     echo ---------------------------------------------------------
     echo Backup CEMU saves in !CEMU_BACKUP!
-    set "pat="!SYNCFOLDER_PATH:"=!\*""
+    set "pat="!CEMU_BACKUP_PATH:"=!\*""
     call !7za! a -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !pat!  > NUL 2>&1
     echo Done
     echo.
@@ -494,8 +491,6 @@ REM : functions
         echo Source location ^: ^/storage_!src!
         echo =========================================================
 
-        set "syncFolderPath="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
-        mkdir !syncFolderPath! > NUL 2>&1
         set "cemuSaveFolder="!savesFolder:"=!\!endTitleId!""
         REM : cemuSaveFolder exist because it was listed in localTid
 
@@ -503,7 +498,14 @@ REM : functions
         echo !gameTitle!;!endTitleId!;!cemuSaveFolder! >> !backupLog!
 
         REM : copy CEMU saves for this game to syncFolderPath
+        set "syncFolderPath="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
+        mkdir !syncFolderPath! > NUL 2>&1
         robocopy !cemuSaveFolder! !syncFolderPath! /MT:32 /MIR > NUL 2>&1
+
+        REM : backup CEMU saves for this game to CEMU_BACKUP_PATH
+        set "backupFolderPath="!CEMU_BACKUP_PATH:"=!\usr\save\00050000\!endTitleId!""
+        mkdir !backupFolderPath! > NUL 2>&1
+        robocopy !cemuSaveFolder! !backupFolderPath! /MT:32 /MIR > NUL 2>&1
 
         set "syncFolderMeta="!syncFolderPath:"=!\meta""
         set "saveinfo="!syncFolderMeta:"=!\saveinfo.xml""

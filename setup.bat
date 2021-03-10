@@ -50,7 +50,7 @@ REM : main
         if !ERRORLEVEL! EQU 1 timeout /T 4 > NUL 2>&1 && exit 75
         goto:askShortcutsFolder
     )    
-    set "SHORTCUTS_FOLDER="!OUTPUT_FOLDER:"=!\Wii-U""
+    set "SHORTCUTS_FOLDER="!OUTPUT_FOLDER:"=!\Cemu2Wii-U""
 
     mkdir !SHORTCUTS_FOLDER! > NUL 2>&1
     

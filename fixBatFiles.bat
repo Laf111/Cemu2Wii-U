@@ -5,6 +5,8 @@ REM : main
     setlocal EnableDelayedExpansion
     color 4F
 
+    title fix formating issues on batch files
+
     REM : set current char codeset
     call:setCharSet
 

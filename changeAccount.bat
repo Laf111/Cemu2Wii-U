@@ -72,7 +72,9 @@ REM : main
     
     set "SRC_ACCOUNT=!args[1]!"
     set "SRC_ACCOUNT=!SRC_ACCOUNT:"=!"    
-    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+    set /A "srcAccValidity=1"
+    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=0"
+    if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
         exit /b 92
@@ -80,7 +82,9 @@ REM : main
     
     set "TARGET_ACCOUNT=!args[2]!"
     set "TARGET_ACCOUNT=!TARGET_ACCOUNT:"=!"
-    echo !TARGET_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+    set /A "tgtAccValidity=1"
+    echo !TARGET_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
+    if !tgtAccValidity! EQU 0 (
         echo ERROR^: !TARGET_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
         exit /b 93
@@ -122,7 +126,9 @@ REM : main
     
     echo.
     set /P "SRC_ACCOUNT=Please enter the source account Id (8XXXXXXX) : "
-    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+    set /A "srcAccValidity=1"
+    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=0"
+    if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getSrcAcc
     )
@@ -131,7 +137,9 @@ REM : main
     echo.
     set /P "TARGET_ACCOUNT=Please enter the target account Id (8XXXXXXX) : "
     echo.
-    echo !TARGET_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && (
+    set /A "tgtAccValidity=1"
+    echo !TARGET_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
+    if !tgtAccValidity! EQU 0 (
         echo ERROR^: !TARGET_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getTgtAcc
     )

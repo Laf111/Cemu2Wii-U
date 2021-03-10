@@ -12,8 +12,8 @@ REM : main
     REM : directory of this script
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
-    pushd !HERE!        
-    
+    pushd !HERE!
+
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
@@ -22,7 +22,7 @@ REM : main
 
     set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
-    
+
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
@@ -30,7 +30,7 @@ REM : main
 
     REM : set current char codeset
     call:setCharSet
-    
+
     REM : checking arguments
     set /A "nbArgs=0"
     :continue
@@ -43,6 +43,11 @@ REM : main
     
     REM : J2000 unix timestamp (/ J1970)
     set /A "j2000=946684800"
+    
+    REM : init the value with now (J2000)
+    call:getTs1970 now
+    set /A "nowJ2K=!now!-j2000"
+    call:num2hex !nowJ2K! hexValue
         
     REM : search if CEMU is not already running
     set /A "nbI=0"
@@ -58,15 +63,15 @@ REM : main
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
     set "DATE=%ldt%"
-    
+
     cls
     echo =========================================================
     echo  Export CEMU saves to the Wii-U^.
     echo =========================================================
     echo.
-    
+
     if %nbArgs% EQU 0 goto:getInputs
-    
+
     REM : when called with args
     if %nbArgs% NEQ 2 (
         echo ERROR on arguments passed ^(%nbArgs%^)
@@ -78,43 +83,43 @@ REM : main
     )
 
     REM : get and check MLC01_FOLDER_PATH
-    set "MLC01_FOLDER_PATH=!args[0]!"    
-    
+    set "MLC01_FOLDER_PATH=!args[0]!"
+
     if not exist !MLC01_FOLDER_PATH! (
         echo ERROR^: "!MLC01_FOLDER_PATH!" not found
         pause
-        exit /b 91    
+        exit /b 91
     )
-    
+
     set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
     if not exist !savesFolder! (
         echo ERROR^: !savesFolder! not found ^?
         pause
         exit /b 92
     )
-    
+
     set "userSavesToImport=!args[1]!"
     set "userSavesToImport=!userSavesToImport: =!"
     set "userSavesToImport=!userSavesToImport:"=!"
-    
+
     echo !userSavesToImport! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
         echo ERROR^: !userSavesToImport! is not equal to 'all' or 'select'
         pause
         exit /b 93
     )
-    goto:inputsAvailable    
-    
+    goto:inputsAvailable
+
     :getInputs
     REM : when called with no args
-    
-    set "config="!LOGS:"=!\lastConfig.ini""    
+
+    set "config="!LOGS:"=!\lastConfig.ini""
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
         if !ERRORLEVEL! EQU 1 goto:getSavesMode
     )
-    echo Please select a MLC folder ^(mlc01^)    
+    echo Please select a MLC folder ^(mlc01^)
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -132,9 +137,9 @@ REM : main
     )
     REM : update last configuration
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
-    
+
     :getSavesMode
-    echo.    
+    echo.
     echo ---------------------------------------------------------
     set "userSavesToExport="select""    
     choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
@@ -142,9 +147,9 @@ REM : main
         choice /C yn /N /M "Please confirm, treat all accounts? : "
         if !ERRORLEVEL! EQU 1 set "userSavesToExport="all""
     )
-    
+
     :inputsAvailable
-    echo.    
+    echo.
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
     echo - have your SDCard plugged in your Wii-U
@@ -221,7 +226,7 @@ REM : main
         goto:checkConnection
     )
     cls
-    
+
     REM : scans folder
     set /A "noOldScan=0"
     :scanMyWii
@@ -258,11 +263,12 @@ REM : main
     REM create a log file containing all your games titleId
     set "localTid="!WIIUSCAN_FOLDER:"=!\!LAST_SCAN:"=!\cemuTitlesId.log""
     if exist !localTid! del /F !localTid! > NUL 2>&1
-    
+
     set "gamesFolder="!MLC01_FOLDER_PATH:"=!\games""
+
     if exist !gamesFolder! (
         call:getCemuTitles !gamesFolder!
-    ) else (    
+    ) else (
         set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
         if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
 
@@ -291,7 +297,7 @@ REM : main
         set "endTitleId=%%i"
         REM : if the game is also installed on your PC in !MLC01_FOLDER_PATH!
         type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
-        
+
             REM : get the title from !localTid!
             for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
             set "titles[!nbGames!]=!title!"
@@ -300,8 +306,8 @@ REM : main
             echo !nbGames!	: !title!
 
             set "completeList=!nbGames! !completeList!"
-            
-            set /A "nbGames+=1"            
+
+            set /A "nbGames+=1"
         )
     )
     echo =========================================================
@@ -312,9 +318,9 @@ REM : main
 
     set /P "listGamesSelected=Please enter game's numbers list (separated with a space) or 'all' to treat all games : "
     :displayList
-    
+
     if not ["!listGamesSelected!"] == ["all"] (
-    
+
         if not ["!listGamesSelected!"] == [""] (
             echo !listGamesSelected! | findStr /R /V /C:"^[0-9 ]*$" > NUL 2>&1 && echo ERROR^: not a list of integers && pause && goto:getList
 
@@ -322,7 +328,6 @@ REM : main
             for %%l in (!listGamesSelected!) do (
                 echo %%l | findStr /R /V "[0-9]" > NUL 2>&1 && echo ERROR^: %%l not in the list && pause && goto:getList
                 set /A "number=%%l"
-          
                 if !number! GEQ !nbGames! echo ERROR^: !number! not in the list & pause & goto:getList
 
                 echo - !titles[%%l]!
@@ -356,11 +361,11 @@ REM : main
 
     cls
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
-    set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""    
+    set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Export""    
     if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
-    
+
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
@@ -381,16 +386,15 @@ REM : main
     echo.
     echo ---------------------------------------------------------
     echo Backup WII-U saves in !WIIU_BACKUP!
-    set "pat="!SYNCFOLDER_PATH:"=!\*""
+    set "pat="!WIIU_BACKUP_PATH:"=!\*""
     
-    call !7za! a -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat! > NUL 2>&1
+    call !7za! a -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat!
     echo Done
     echo.
     
     echo =========================================================
     echo Now you can stop FTPiiU server
     echo.
-    
     pause
 
     if !ERRORLEVEL! NEQ 0 exit /b !ERRORLEVEL!
@@ -408,26 +412,26 @@ REM : functions
     :getFromMetaXml
         set "node=%~1"
         set "value=NOT_FOUND"
-        
+
         set "titleLine="NONE""
-        for /F "tokens=1-2 delims=>" %%j in ('type !META_FILE! ^| find "%node%"') do set "titleLine="%%k""        
+        for /F "tokens=1-2 delims=>" %%j in ('type !META_FILE! ^| find "%node%"') do set "titleLine="%%k""
         if not [!titleLine!] == ["NONE"] for /F "delims=<" %%j in (!titleLine!) do set "value=%%j"
-        
+
         set "%2=!value!"
     goto:eof
     REM : ------------------------------------------------------------------
-    
+
     :getCemuTitles
         set "folder="%~1""
-    
+
         pushd !folder!
-      
+
         REM : searching for meta file from here
         for /F "delims=~" %%i in ('dir /B /S "meta.xml" 2^> NUL') do (
 
             REM : meta.xml
             set "META_FILE="%%i""
-           
+
             call:getFromMetaXml shortname_en title
             call:getFromMetaXml title_id titleId
 
@@ -439,7 +443,7 @@ REM : functions
                 )
             )
         )
-        
+
     goto:eof
     REM : ------------------------------------------------------------------
     
@@ -517,19 +521,19 @@ REM : functions
 
     :getTs1970
 
-        set "arg=%~2"
-
-        set "ts="
-        if not ["!arg!"] == [""] set "ts=%arg%"
+        REM : initialize
+        set /A "%1=0"
+        set /A "yy=0"
+        set /A "dd=0"
+        set /A "ss=0"
 
         REM : if ts is not given : compute timestamp of the current date
-        if ["%ts%"] == [""] for /F "delims=~= tokens=2" %%t in ('wmic os get localdatetime /value') do set "ts=%%t"
+        for /F "delims=~= tokens=2" %%t in ('wmic os get localdatetime /value') do set "ts=%%t"
 
-        set /A "yy=10000%ts:~0,4% %% 10000, mm=100%ts:~4,2% %% 100, dd=100%ts:~6,2% %% 100"
+        set /A "yy=10000!ts:~0,4! %% 10000, mm=100!ts:~4,2! %% 100, dd=100!ts:~6,2! %% 100"
         set /A "dd=dd-2472663+1461*(yy+4800+(mm-14)/12)/4+367*(mm-2-(mm-14)/12*12)/12-3*((yy+4900+(mm-14)/12)/100)/4"
-        set /A "ss=(((1%ts:~8,2%*60)+1%ts:~10,2%)*60)+1%ts:~12,2%-366100-%ts:~21,1%((1%ts:~22,3%*60)-60000)"
-
-        set /A "%1+=dd*86400"
+        set /A "ss=(((1!ts:~8,2!*60)+1!ts:~10,2!)*60)+1!ts:~12,2!-366100-!ts:~21,1!((1!ts:~22,3!*60)-60000)"
+        set /A "%1+=dd*86400+ss"
 
     goto:eof
     REM : ------------------------------------------------------------------    
@@ -577,26 +581,25 @@ REM : functions
 
     :updateSaveInfoFile
 
-        REM : init the value with now (J2000)
-        call:getTs1970 now
-        set /A "nowJ2K=!now!-j2000"
-        call:num2hex !nowJ2K! hexValue
-
+        set "stmp=!saveInfo!tmp"
+        del /F !stmp! > NUL 2>&1
+            
         REM : if exist saveInfo.xml check if !folder! exist in saveinfo.xml
         if exist !saveInfo! (
             REM : if the account is not present in saveInfo.xml
-            type !saveInfo! | find /I !folder! > NUL 2>&1 && goto:updateSaveInfo
+            type !saveInfo! | find /I "!folder!" > NUL 2>&1 && goto:updateSaveInfo
             REM : add it
-            set "stmp=!saveInfo!tmp"
             xml ed -s "//info" -t elem -n "account persistentId=""!folder!""" !saveInfo! > !stmp!
             xml ed -s "//info/account[@persistentId='!folder!']" -t elem -n "timestamp" -v "!hexValue!" !stmp! > !saveInfo!
+            del /F !stmp! > NUL 2>&1
             goto:eof
 
             :updateSaveInfo
             REM : else update it
-            set "stmp=!saveInfo!tmp"
-            xml ed -u "//info/account[@persistentId='!folder!']" -v "!hexValue!" !saveInfo! > !stmp!
-            if !ERRORLEVEL! EQU 0 del /F !saveInfo! > NUL 2>&1 & move /Y !stmp! !saveInfo!
+
+            xml ed -u "//info/account[@persistentId='!folder!']/timestamp" -v "!hexValue!" !saveInfo! > !stmp!
+            if !ERRORLEVEL! EQU 0 del /F !saveInfo! > NUL 2>&1 & move /Y !stmp! !saveInfo! > NUL 2>&1
+            del /F !stmp! > NUL 2>&1
             goto:eof
         )
         REM : if saveinfo.xml does not exist
@@ -644,6 +647,12 @@ REM : functions
         REM : robocopy (sync) folder of current user
         mkdir !localSaveFolder! > NUL 2>&1
         robocopy !cemuUserSaveFolder! !localSaveFolder! /MT:32 /MIR > NUL 2>&1
+
+        REM : backup CEMU saves for this game to CEMU_BACKUP_PATH
+        set "backupUserFolderPath="!WIIU_BACKUP_PATH:"=!\usr\save\00050000\!endTitleId!""
+        mkdir !backupUserFolderPath! > NUL 2>&1
+        robocopy !cemuUserSaveFolder! !backupUserFolderPath! /MT:32 /MIR > NUL 2>&1
+        
         
         REM : cd to RESOURCES_PATH to use xml.exe
         pushd !RESOURCES_PATH!
@@ -699,4 +708,3 @@ REM : functions
     goto:eof
     REM : ------------------------------------------------------------------
 
-    

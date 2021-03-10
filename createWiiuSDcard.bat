@@ -52,6 +52,9 @@ REM : main
     echo appStore to update^/install other apps.
     echo.
     echo =========================================================
+    echo.
+    echo Close ALL windows explorer instances^, before continue
+    echo.
     pause
 
     :askDrive
@@ -74,7 +77,7 @@ REM : main
     REM : install content
     set "sdCardContent="!RESOURCES_PATH:"=!\WiiuSDcard.zip""
 
-    call !7za! x -y -w!LOGS! !sdCardContent! !SDCARD! > NUL 2>&1
+    call !7za! x -y -aoa -w!LOGS! !sdCardContent! -o!SDCARD!
      
     echo done
     echo =========================================================
