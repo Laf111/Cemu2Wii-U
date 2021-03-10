@@ -102,7 +102,7 @@ REM : main
     set "userSavesToImport=!userSavesToImport: =!"
     set "userSavesToImport=!userSavesToImport:"=!"
 
-    echo !userSavesToImport! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+    echo !userSavesToImport! | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
         echo ERROR^: !userSavesToImport! is not equal to 'all' or 'select'
         pause
         exit /b 93
@@ -149,6 +149,7 @@ REM : main
     )
 
     :inputsAvailable
+    
     echo.
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
@@ -174,10 +175,14 @@ REM : main
     if not exist !winScpIni! goto:getWiiuIp
 
     REM : get the hostname
+    set "ipRead="
     for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "HostName="') do set "ipRead=%%i"
-    REM : and teh port
-    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"
-
+    if ["!ipRead!"] == [""] goto:getWiiuIp 
+    REM : and the port
+    set "portRead="
+    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"    
+    if ["!portRead!"] == [""] goto:getWiiuIp 
+    
     echo Found an existing FTP configuration ^:
     echo.
     echo PortNumber=!ipRead!
@@ -189,8 +194,6 @@ REM : main
     :getWiiuIp
     set /P "wiiuIp=Please enter your Wii-U local IP adress : "
     set /P "port=Please enter the port used : "
-
-    set "winScpIniTmpl="!WinScpFolder:"=!\WinSCP.ini-tmpl""
 
     REM : prepare winScp.ini file
     copy /Y  !winScpIniTmpl! !winScpIni! > NUL 2>&1
@@ -640,6 +643,9 @@ REM : functions
             choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
             if !ERRORLEVEL! EQU 2 goto:eof
         )
+        
+        REM : should not happen
+        if not exist !cemuUserSaveFolder! goto:eof
         
         REM : treatment for the user
         echo Treating !tobeDisplayed! saves

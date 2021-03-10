@@ -11,17 +11,15 @@ REM : main
     title Set Wii-U Firmware Update Mode
 
     REM : directory of this script
-    set "SCRIPT_FOLDER="%~dp0"" && set "BFW_TOOLS_PATH=!SCRIPT_FOLDER:\"="!"
+    set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
-    for %%a in (!BFW_TOOLS_PATH!) do set "parentFolder="%%~dpa""
-    set "BFW_PATH=!parentFolder:~0,-2!""
-    for %%a in (!BFW_PATH!) do set "parentFolder="%%~dpa""
-    for %%a in (!BFW_PATH!) do set "drive=%%~da"
-    set "GAMES_FOLDER=!parentFolder!"
-    if not [!GAMES_FOLDER!] == ["!drive!\"] set "GAMES_FOLDER=!parentFolder:~0,-2!""
+    pushd !HERE!
+    
+    set "RESOURCES_PATH="!HERE:"=!\resources""
+    set "WinScpFolder="!RESOURCES_PATH:"=!\winSCP""
+    set "WinScp="!WinScpFolder:"=!\WinScp.com""
 
-    set "BFW_RESOURCES_PATH="!BFW_PATH:"=!\resources""
-    set "logFile="!BFW_PATH:"=!\logs\Host_!USERDOMAIN!.log""
+    set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""    if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     REM : set current char codeset
     call:setCharSet
@@ -75,7 +73,7 @@ REM : main
         exit /b 9
     )
 
-    REM : get and check GAME_FOLDER_PATH
+    REM : get and check str
     set "str=!args[0]!"
     if [!str!] == ["ON"] set /A "wfum=1"
 
@@ -104,17 +102,19 @@ REM : main
     pause
     cls
 
-    set "WinScpFolder="!BFW_RESOURCES_PATH:"=!\winSCP""
-    set "WinScp="!WinScpFolder:"=!\WinScp.com""
     set "winScpIniTmpl="!WinScpFolder:"=!\WinSCP.ini-tmpl""
     set "winScpIni="!WinScpFolder:"=!\WinScp.ini""
 
     if not exist !winScpIni! goto:getWiiuIp
 
     REM : get the hostname
+    set "ipRead="
     for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "HostName="') do set "ipRead=%%i"
-    REM : and teh port
-    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"
+    if ["!ipRead!"] == [""] goto:getWiiuIp 
+    REM : and the port
+    set "portRead="
+    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"    
+    if ["!portRead!"] == [""] goto:getWiiuIp 
 
     echo Found an existing FTP configuration ^:
     echo.
@@ -128,12 +128,9 @@ REM : main
     set /P "wiiuIp=Please enter your Wii-U local IP adress : "
     set /P "port=Please enter the port used : "
 
-    set "winScpIniTmpl="!WinScpFolder:"=!\WinSCP.ini-tmpl""
-
-
     REM : prepare winScp.ini file
     copy /Y  !winScpIniTmpl! !winScpIni! > NUL 2>&1
-    set "fnrLog="!BFW_PATH:"=!\logs\fnr_WinScp.log""
+    set "fnrLog="!HERE:"=!\logs\fnr_WinScp.log""
 
     REM : set WiiU ip adress
     !StartHiddenWait! !fnrPath! --cl --dir !WinScpFolder! --fileMask WinScp.ini --find "FTPiiU-IP" --replace "!wiiuIp!" --logFile !fnrLog!
@@ -152,7 +149,7 @@ REM : main
         if %nbArgs% NEQ 0 exit /b 2
     )
 
-    set "ftplogFile="!BFW_PATH:"=!\logs\ftpCheck_swfum.log""
+    set "ftplogFile="!HERE:"=!\logs\ftpCheck_swfum.log""
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "ls /storage_mlc/usr/save/system/act" "exit" > !ftplogFile! 2>&1
     type !ftplogFile! | find /I "Connection failed" > NUL 2>&1 && (
         echo ERROR ^: unable to connect^, check that your Wii-U is powered on and that FTP_every_where is launched

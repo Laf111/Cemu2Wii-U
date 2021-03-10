@@ -94,7 +94,7 @@ REM : main
     set "userSavesMode=!userSavesMode: =!"
     set "userSavesMode=!userSavesMode:"=!"
     
-    echo !userSavesMode! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+    echo !userSavesMode! | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
         echo ERROR^: !userSavesMode! is not equal to 'all' or 'select'
         pause
         exit /b 93
@@ -104,7 +104,7 @@ REM : main
     set "gamesMode=!gamesMode: =!"
     set "gamesMode=!gamesMode:"=!"
     
-    echo !gamesMode! | | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+    echo !gamesMode! | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
         echo ERROR^: !gamesMode! is not equal to 'all' or 'select'
         pause
         exit /b 93
@@ -132,13 +132,6 @@ REM : main
 
     echo.    
     echo ---------------------------------------------------------
-    set "gamesMode=select"    
-    choice /C yn /N /M "Do you want to choose which games to be treated (y = select, n = treat all)? : "
-    if !ERRORLEVEL! EQU 2 (
-        choice /C yn /N /M "Please confirm, treat all games? : "
-        if !ERRORLEVEL! EQU 1 set "gamesMode=all"
-    )
-    echo.    
     set "userSavesMode=select"    
     choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
     if !ERRORLEVEL! EQU 2 (
@@ -152,7 +145,7 @@ REM : main
     
     REM : update zipNature
     echo !BACKUP_PATH! | find "WIIU_Saves.zip" > NUL 2>&1 && set "zipNature=WIIU"    
-    
+
     REM : extract archive as MLC01_FOLDER_PATH    
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     pushd !HERE!
@@ -163,8 +156,17 @@ REM : main
     mkdir !SYNCFOLDER_PATH! > NUL 2>&1
 
     
-    if ["!zipNature!"] == ["CEMU"] goto:CemuBackup
-    
+    if ["!zipNature!"] == ["CEMU"] (
+
+        echo.    
+        set "gamesMode=select"    
+        choice /C yn /N /M "Do you want to choose which games to be treated (y = select, n = treat all)? : "
+        if !ERRORLEVEL! EQU 2 (
+            choice /C yn /N /M "Please confirm, treat all games? : "
+            if !ERRORLEVEL! EQU 1 set "gamesMode=all"
+        )
+        goto:CemuBackup
+    )
     echo ---------------------------------------------------------    
     call:uncompress
 
