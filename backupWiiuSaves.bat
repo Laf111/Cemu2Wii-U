@@ -217,8 +217,6 @@ REM : main
     set "pat="!SYNCFOLDER_PATH:"=!\*""
     
     
-echo  call !7za! a -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat!
-   
     call !7za! a -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat!
     echo Done
     echo.
