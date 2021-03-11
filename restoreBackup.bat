@@ -38,7 +38,26 @@ REM : main
         goto:continue
     :end
 
+    REM : search if Cemu2Wii-U is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 2 (
+        echo ERROR^: Cemu2Wii-U is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find"
+        pause
+        exit /b 100
+    )
 
+    REM : search if CEMU is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 1 (
+        echo ERROR^: CEMU is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
+        pause
+        exit /b 101
+    )
+    
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
@@ -362,7 +381,7 @@ REM : functions
 
         set "localTid="!SYNCFOLDER_PATH:"=!\cemuTitlesId.log""
         if exist !localTid! del /F !localTid! > NUL 2>&1
-    
+
         REM : get games list in !MLC01_FOLDER_PATH! : targetGamesList
         set "gamesFolder="!MLC01_FOLDER_PATH:"=!\games""
         if exist !gamesFolder! (
@@ -387,20 +406,20 @@ REM : functions
             pause
             exit /b 55
         )
+        
         REM : cd SYNCFOLDER_PATH\usr\save\00050000
         pushd !srcSaveFolder!
 
         for /F "delims=~" %%i in ('dir /B /A:D "*" 2^>NUL') do (
             set "endTitleId=%%i"
             
-            set /A "tidValidity=0"
-            echo !endTitleId!| findStr /R /I "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tidValidity=1"
+            set /A "tidValidity=1"
+            echo !endTitleId!| findStr /R /V "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tidValidity=0"
             if !tidValidity! EQU 1 (
 
                 REM : if MLC01_FOLDER_PATH\usr\save\00050000\titleId exist
                 set "gameSaveFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
                 set "srcGameSaveFolder="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
-
 
                 REM : get the title from !localTid! if exist
                 set "toBeDisplayed=!endTitleId!"
