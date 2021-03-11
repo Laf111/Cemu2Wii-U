@@ -3,6 +3,11 @@ setlocal EnableExtensions
 REM : ------------------------------------------------------------------
 REM : main
 
+REM : This script backup Wii-U saves for selected games then prepare a 
+REM : folder (syncFolder) like the Wii-U side. If an account is defined in CEMU
+REM : but not on the Wii-U, user will be asked to confirm its treatment (even if
+REM : userSaveMode = all)
+
     setlocal EnableDelayedExpansion
     color 4F
     title Export CEMU saves to your Wii-U
@@ -85,8 +90,8 @@ REM : main
     REM : when called with args
     if %nbArgs% NEQ 2 (
         echo ERROR on arguments passed ^(%nbArgs%^)
-        echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH userSavesToImport
-        echo userSavesToImport = select ^/ all
+        echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH userSaveMode
+        echo userSaveMode = select ^/ all
         echo given {%*}
         pause
         exit /b 99
@@ -108,12 +113,12 @@ REM : main
         exit /b 92
     )
 
-    set "userSavesToImport=!args[1]!"
-    set "userSavesToImport=!userSavesToImport: =!"
-    set "userSavesToImport=!userSavesToImport:"=!"
+    set "userSaveMode=!args[1]!"
+    set "userSaveMode=!userSaveMode: =!"
+    set "userSaveMode=!userSaveMode:"=!"
 
-    echo !userSavesToImport! | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
-        echo ERROR^: !userSavesToImport! is not equal to 'all' or 'select'
+    echo !userSaveMode! | find /I /V "select" | find /I /V "all" > NUL 2>&1 && (
+        echo ERROR^: !userSaveMode! is not equal to 'all' or 'select'
         pause
         exit /b 93
     )
@@ -151,11 +156,11 @@ REM : main
     :getSavesMode
     echo.
     echo ---------------------------------------------------------
-    set "userSavesToExport="select""    
+    set "userSaveMode="select""    
     choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
     if !ERRORLEVEL! EQU 2 (
         choice /C yn /N /M "Please confirm, treat all accounts? : "
-        if !ERRORLEVEL! EQU 1 set "userSavesToExport="all""
+        if !ERRORLEVEL! EQU 1 set "userSaveMode="all""
     )
 
     :inputsAvailable
@@ -377,7 +382,8 @@ REM : main
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Export""    
-    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
+    if exist !SYNCFOLDER_PATH! rmdir /Q /S !SYNCFOLDER_PATH! > NUL 2>&1
+    mkdir !SYNCFOLDER_PATH! > NUL 2>&1
 
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
@@ -391,9 +397,7 @@ REM : main
     set "backupLog="!WIIU_BACKUP_PATH:"=!\!DATE!.log"
     echo # gameTitle;endTitleId;WiiU Save Folder > !backupLog!
     
-    pushd !HERE!
-    echo.
-    
+    echo.    
     for /L %%n in (0,1,!nbGamesSelected!) do call:exportSaves %%n
     
     echo.
@@ -460,6 +464,128 @@ REM : functions
     goto:eof
     REM : ------------------------------------------------------------------
     
+    :treatCemuAccount
+
+        set "user="NOT_FOUND""    
+        set "tobeDisplayed=!folder!"
+        
+        if exist !wiiuUsersLog! (
+            type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
+
+                for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"                
+                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+            )            
+        )
+        REM : cemuUserSaveFolder exists
+        set "cemuUserSaveFolder="!cemuSaveFolder:"=!\user\!folder!""     
+        
+        REM : what about on wii-u side ? 
+        set "wiiuUserSaveFolder="!wiiuUserGameFolder:"=!\!folder!""     
+        REM : YES => already treated in treatWiiuAccount, exit
+        if not exist !wiiuUserSaveFolder! goto:eof
+            
+        REM : patch the saveInfo.xml file (earlier copied from wii-u side in syncFolderPath)
+        set "saveinfo="!syncMetaFolder:"=!\saveinfo.xml""
+            
+        REM : existance flag
+        set /A "accExistOnWiiu=1"
+        type !saveinfo! | find /V "!folder!" > NUL 2>&1 && set /A "accExistOnWiiu=0"
+        if !accExistOnWiiu! EQU 0 (
+            echo.
+            echo WARNING ^: No Wii-U save for the account !folder! defined in CEMU
+            echo.
+            
+            if ["!user!"] == ["NOT_FOUND"] (
+                echo If you^'re SURE that the account !folder! exist on the Wii-U
+            ) else (
+                echo If you^'re SURE that !user! exists on the Wii-U and use !folder! account
+            )
+            choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
+            if !ERRORLEVEL! EQU 2 goto:eof
+        )
+        
+        if [!userSaveMode!] == ["select"] (
+            if !accExistOnWiiu! EQU 1 (
+                choice /C yn /N /M "Export !tobeDisplayed! CEMU saves for !gameTitle! to Wii-U (y, n)? : "
+                if !ERRORLEVEL! EQU 2 goto:eof
+                choice /C yn /N /M "Please confirm (y, n)? : "
+                if !ERRORLEVEL! EQU 2 goto:eof                
+            )
+        )
+        
+        REM : treatment for the user
+        echo Treating !tobeDisplayed! saves
+        
+        set "syncUserSaveFolder="!syncUserGameFolder:"=!\!folder!""
+        
+        REM : add !folder! account contribution in syncFolderPath
+        robocopy !cemuUserSaveFolder! !syncUserSaveFolder! /MT:32 /mir > NUL 2>&1
+        
+        REM : cd to RESOURCES_PATH to use xml.exe
+        pushd !RESOURCES_PATH!
+        REM : saveInfo.xml come from Wii-u side (cemu one was overwritten earlier)
+        
+        REM : update saveinfo file using user last settings
+        call:updateSaveInfoFile
+        
+        REM : cd back to cemuUserGameFolder 
+        pushd !cemuUserGameFolder!
+
+    goto:eof
+    REM : ------------------------------------------------------------------    
+    
+    :treatWiiuAccount
+
+        set "user="NOT_FOUND""    
+        set "tobeDisplayed=!folder!"
+        
+        if exist !wiiuUsersLog! (
+            type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
+
+                for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"                
+                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+            )            
+        )
+        REM : wiiuUserSaveFolder exists
+        set "wiiuUserSaveFolder="!wiiuUserGameFolder:"=!\!folder!""
+        
+        REM : what about on CEMU side ? 
+        set "cemuUserSaveFolder="!cemuSaveFolder:"=!\user\!folder!""     
+            
+        REM : cemuUserSaveFolder folder does not exist, exit
+        if not exist !cemuUserSaveFolder! goto:eof
+        
+        if [!userSaveMode!] == ["select"] (
+            choice /C yn /N /M "Export !tobeDisplayed! CEMU saves for !gameTitle! to Wii-U (y, n)? : "
+            if !ERRORLEVEL! EQU 2 goto:eof
+            choice /C yn /N /M "Please confirm (y, n)? : "
+            if !ERRORLEVEL! EQU 2 goto:eof
+        )
+        
+        REM : treatment for the user
+        echo Treating !tobeDisplayed! saves
+        
+        set "syncUserSaveFolder="!syncUserGameFolder:"=!\!folder!""
+        
+        REM : add !folder! account contribution in syncFolderPath
+        robocopy !cemuUserSaveFolder! !syncUserSaveFolder! /MT:32 /mir > NUL 2>&1
+        
+        REM : patch the saveInfo.xml file (earlier copied from wii-u side in syncFolderPath)
+        set "saveinfo="!syncMetaFolder:"=!\saveinfo.xml""
+        
+        REM : cd to RESOURCES_PATH to use xml.exe
+        pushd !RESOURCES_PATH!
+        REM : saveInfo.xml come from Wii-u side (cemu one was overwritten earlier)
+        
+        REM : update saveinfo file using user last settings
+        call:updateSaveInfoFile
+        
+        REM : cd back to wiiuUserGameFolder 
+        pushd !wiiuUserGameFolder!
+
+    goto:eof
+    REM : ------------------------------------------------------------------
+    
     :exportSaves
 
         set /A "num=%~1"
@@ -469,62 +595,96 @@ REM : functions
         set "src=!selectedtitlesSrc[%num%]!"
 
         set "cemuSaveFolder="!savesFolder:"=!\!endTitleId!""
-        if not exist !cemuSaveFolder! (
-            echo WARNING ^: no CEMU saves found for !gameTitle!
-            goto:eof
-        )        
-        
-        REM : create remotes folders
+        REM : cemuSaveFolder exist because it was listed in localTid
+
+        REM : create game save folder on the wii-U (if needed)
         call:createRemoteFolders
   
         echo =========================================================
         echo Export CEMU saves of !gameTitle! to the Wii-U
         echo =========================================================
 
+        echo.
+        echo Backup Wii-U !gameTitle! saves^.^.^.
         
+        REM : backup Wii-U saves for this game to WIIU_BACKUP_PATH
+        set "backupFolderPath="!WIIU_BACKUP_PATH:"=!\usr\save\00050000\!endTitleId!""
+        mkdir !backupFolderPath! > NUL 2>&1
+        
+        REM : launching transfert (donwloading wii-u saves as !backupFolderPath! is empty)
+        call !ftpSyncFolders! !wiiuIp! local !backupFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "!gameTitle! (saves)"
+        set "cr=!ERRORLEVEL!"
+        if !cr! NEQ 0 (
+            echo ERROR when backuping !gameTitle! saves in !backupFolderPath! ^!
+            goto:eof
+        )
+        
+        REM : backup done, continue treatments for synchronizing using !SYNCFOLDER_PATH!
+        
+        REM : log title
+        echo !gameTitle!;!endTitleId!;/storage_!src!/usr/save/00050000/!endTitleId! >> !backupLog!
+
+        REM : temporary folder for FTP sync
         set "syncFolderPath="!SYNCFOLDER_PATH:"=!\usr\save\00050000\!endTitleId!""
         mkdir !syncFolderPath! > NUL 2>&1
         
-        echo !gameTitle!;!endTitleId!;/storage_!src!/usr/save/00050000/!endTitleId! >> !backupLog!
-
-        REM : download the whole save from the wii-U (as backup under WIIU_BACKUP_PATH)
-        wscript /nologo !StartHiddenWait! !ftpSyncFolders! !wiiuIp! local !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "backup all !gameTitle! saves"
+        REM : fill syncFolder with 
         
-        set "metaFolder="!syncFolderPath:"=!\meta""        
-        
-        REM : robocopy (sync) common folder in syncFolderPath
-        set "commonFolder="!cemuSaveFolder:"=!\user\common""
-        if exist !commonFolder! (
-            set "localCommon="!syncFolderPath:"=!\user\common""
-            mkdir !localCommon! > NUL 2>&1
-            robocopy !commonFolder! !localCommon! /MT:32 /mir > NUL 2>&1
+        REM : meta folder from the wii-U        
+        set "wiiuMetaFolder="!backupFolderPath:"=!\meta""        
+        set "syncMetaFolder="!syncFolderPath:"=!\meta""
+        if exist !wiiuMetaFolder! (
+            mkdir !syncMetaFolder! > NUL 2>&1
+            robocopy !wiiuMetaFolder! !syncMetaFolder! /MT:32 /mir > NUL 2>&1
         )
         
-        set "cemuUserGameFolder="!cemuSaveFolder:"=!\user""
-
-        pushd !cemuUserGameFolder!
+        REM : user/common folder from CEMU
+        set "commonMetaFolder="!cemuSaveFolder:"=!\user\common""        
+        set "syncCommonFolder="!syncFolderPath:"=!\user\common""
+        if exist !commonMetaFolder! (
+            mkdir !syncCommonFolder! > NUL 2>&1
+            robocopy !commonMetaFolder! !syncCommonFolder! /MT:32 /mir > NUL 2>&1
+        )
+        
+        set "syncUserGameFolder="!syncFolderPath:"=!\user""
+        
+        set "wiiuUserGameFolder="!backupFolderPath:"=!\user""        
+        pushd !wiiuUserGameFolder!
         
         REM : file that contains mapping between user - account folder (optional because
         REM : created by getWiiuOnlineFiles.bat
         set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
+        
+        REM : loop on accounts found in WII-U
+        set "folder=NONE"
+        for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
+            set "folder=%%j"
+            
+            call:treatWiiuAccount
+        )
+        
+        REM : add account existing in CEMU side and found in saveInfo.xml, otherwise ask user what to do
+        REM :  loop on accounts found in CEMU
+        set "cemuUserGameFolder="!cemuSaveFolder:"=!\user""        
+        pushd !cemuUserGameFolder!
         
         REM : loop on accounts found in CEMU
         set "folder=NONE"
         for /F "delims=~" %%j in ('dir /B /A:D "80*" 2^>NUL') do (
             set "folder=%%j"
             
-            set "cemuUserSaveFolder="!cemuUserGameFolder:"=!\!folder!""            
-            call:exportSavesForCurrentAccount
+            call:treatCemuAccount
         )
         
         echo Transfert for !gameTitle!^.^.^.
         echo ---------------------------------------------------------
         
-        REM : launching transfert
+        REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId! with syncFolderPath content
         call !ftpSyncFolders! !wiiuIp! remote !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "Export !gameTitle! saves to the Wii-U"
         set "cr=!ERRORLEVEL!"
         if !cr! NEQ 0 echo ERROR when exporting existing !gameTitle! saves ^!
 
+        echo ---------------------------------------------------------
         REM : log the slot used in a file
         echo ^> CEMU saves for !gameTitle! were exported to your Wii-U
 
@@ -621,68 +781,6 @@ REM : functions
     goto:eof
     REM : ------------------------------------------------------------------
     
-    :exportSavesForCurrentAccount
-
-        set "user="NOT_FOUND""    
-        set "tobeDisplayed=!folder!"
-        
-        if exist !wiiuUsersLog! (
-            type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
-
-                for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"                
-                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
-            )            
-        )
-        
-        if [!userSavesToExport!] == ["select"] (
-            choice /C yn /N /M "Export !tobeDisplayed! CEMU saves for !gameTitle! to Wii-U (y, n)? : "
-            if !ERRORLEVEL! EQU 2 goto:eof
-        )
-        
-        set "localSaveFolder="!syncFolderPath:"=!\user\!folder!""
-        if not exist !localSaveFolder! (
-            echo.
-            echo WARNING ^: No Wii-U save for the account !folder! was not found
-            echo.
-            
-            if ["!user!"] == ["NOT_FOUND"] (
-                echo If you^'re sure that the account !folder! exist on the Wii-U
-            ) else (
-                echo If you^'re sure that !user! exists on the Wii-U and use !folder! account
-            )
-            choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
-            if !ERRORLEVEL! EQU 2 goto:eof
-        )
-        
-        REM : should not happen
-        if not exist !cemuUserSaveFolder! goto:eof
-        
-        REM : treatment for the user
-        echo Treating !tobeDisplayed! saves
-        
-        REM : robocopy (sync) folder of current user
-        mkdir !localSaveFolder! > NUL 2>&1
-        robocopy !cemuUserSaveFolder! !localSaveFolder! /MT:32 /MIR > NUL 2>&1
-
-        REM : backup CEMU saves for this game to CEMU_BACKUP_PATH
-        set "backupUserFolderPath="!WIIU_BACKUP_PATH:"=!\usr\save\00050000\!endTitleId!""
-        mkdir !backupUserFolderPath! > NUL 2>&1
-        robocopy !cemuUserSaveFolder! !backupUserFolderPath! /MT:32 /MIR > NUL 2>&1
-        
-        
-        REM : cd to RESOURCES_PATH to use xml.exe
-        pushd !RESOURCES_PATH!
-
-        set "saveinfo="!metaFolder:"=!\saveinfo.xml""
-        
-        REM : update saveinfo file using user last settings
-        call:updateSaveInfoFile
-
-        pushd !MLC01_FOLDER_PATH!
-
-    goto:eof
-    REM : ------------------------------------------------------------------
-
     :createRemoteFolders
         set "ftplogFile="!WIIU_BACKUP_PATH:"=!\ftpCheck.log""
         !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "mkdir /storage_!src!/usr/save/00050000/!endTitleId!" "exit"  > !ftplogFile! 2>&1

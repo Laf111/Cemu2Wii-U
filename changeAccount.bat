@@ -58,7 +58,7 @@ REM : main
     REM : when called with args
     if %nbArgs% NEQ 3 (
         echo ERROR on arguments passed ^(%nbArgs%^)
-        echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH SRC_ACCOUNT TARGET_ACCOUNT
+        echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH SRC_ACCOUNT TGT_ACCOUNT
         echo given {%*}
         pause
         exit /b 99
@@ -87,17 +87,17 @@ REM : main
     if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
-        exit /b 92
+        exit /b 93
     )
     
-    set "TARGET_ACCOUNT=!args[2]!"
-    set "TARGET_ACCOUNT=!TARGET_ACCOUNT:"=!"
+    set "TGT_ACCOUNT=!args[2]!"
+    set "TGT_ACCOUNT=!TGT_ACCOUNT:"=!"
     set /A "tgtAccValidity=1"
-    echo !TARGET_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
+    echo !TGT_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
     if !tgtAccValidity! EQU 0 (
-        echo ERROR^: !TARGET_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
+        echo ERROR^: !TGT_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
-        exit /b 93
+        exit /b 94
     )
     
     goto:inputsAvailable
@@ -145,24 +145,45 @@ REM : main
     
     :getTgtAcc
     echo.
-    set /P "TARGET_ACCOUNT=Please enter the target account Id (8XXXXXXX) : "
+    set /P "TGT_ACCOUNT=Please enter the target account Id (8XXXXXXX) : "
     echo.
     set /A "tgtAccValidity=1"
-    echo !TARGET_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
+    echo !TGT_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
     if !tgtAccValidity! EQU 0 (
-        echo ERROR^: !TARGET_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
+        echo ERROR^: !TGT_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getTgtAcc
     )
     timeout /T 2 > NUL 2>&1
     
     :inputsAvailable
 
-    title Change accountId recursively in !MLC01_FOLDER_PATH!
+    title Change !SRC_ACCOUNT! with !TGT_ACCOUNT! in !MLC01_FOLDER_PATH!
+    
+    set /A "srcAccountFound=0"
+    dir /S /B "!SRC_ACCOUNT!" > NUL 2>&1 && set /A "srcAccountFound=1"
+    if !srcAccountFound! EQU 0 (
+        echo WARNING^: !SRC_ACCOUNT! not found in !MLC01_PATH_FOLDER!
+        pause
+        exit /b 5
+    )
+
+    set /A "tgtAccountFound=0"
+    dir /S /B "!TGT_ACCOUNT!" > NUL 2>&1 && set /A "tgtAccountFound=1"
+    if !srcAccountFound! EQU 1 (
+        echo ERROR^: !TGT_ACCOUNT! already found in !MLC01_PATH_FOLDER!
+        echo.
+        dir /S /B "!TGT_ACCOUNT!"
+        pause
+        exit /b 6
+    )
+    
+    
+    
     cls
     echo =========================================================
     if %nbArgs% NEQ 0 goto:rename
     set "sf=!savesFolder:"=!"
-    choice /C yn /N /M "Rename all folders named !SRC_ACCOUNT! with !TARGET_ACCOUNT! in !sf! ? (y, n) : "
+    choice /C yn /N /M "Rename all folders named !SRC_ACCOUNT! with !TGT_ACCOUNT! in !sf! ? (y, n) : "
     if !ERRORLEVEL! EQU 2 (
         echo WARNING^: cancelled by user
         pause
@@ -171,7 +192,7 @@ REM : main
     )
     
     :rename
-    call !brcPath! /DIR^:!savesFolder! /REPLACECI^:!SRC_ACCOUNT!^:!TARGET_ACCOUNT! /EXECUTE /RECURSIVE > !changeAccountLog!
+    call !brcPath! /DIR^:!savesFolder! /REPLACECI^:!SRC_ACCOUNT!^:!TGT_ACCOUNT! /EXECUTE /RECURSIVE > !changeAccountLog!
 
     echo.
     echo.
@@ -181,7 +202,7 @@ REM : main
     echo.
 
     echo.
-    echo Create the account !TARGET_ACCOUNT! in all versions of CEMU 
+    echo Create the account !TGT_ACCOUNT! in all versions of CEMU 
     echo using the MLC path !MLC01_FOLDER_PATH!
     echo ^(in ^'General Settings^' ^/ Accounts tab^)
     echo.

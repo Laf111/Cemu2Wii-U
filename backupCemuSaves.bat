@@ -66,7 +66,6 @@ REM : main
     if %nbArgs% NEQ 1 (
         echo ERROR on arguments passed ^(%nbArgs%^)
         echo SYNTAX^: "!THIS_SCRIPT!" MLC01_FOLDER_PATH
-        echo userSavesToImport = select ^/ all
         echo given {%*}
         pause
         exit /b 99
@@ -126,7 +125,8 @@ REM : main
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Export""    
-    if not exist !SYNCFOLDER_PATH! mkdir !SYNCFOLDER_PATH! > NUL 2>&1
+    if exist !SYNCFOLDER_PATH! rmdir /Q /S !SYNCFOLDER_PATH! > NUL 2>&1
+    mkdir !SYNCFOLDER_PATH! > NUL 2>&1
 
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
