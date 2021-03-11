@@ -19,6 +19,8 @@ Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless 
 
 - **change a CEMU's account** (8000000X) used (remane folders in a MLC_PATH)
 
+- **create Wii-U and Cemu backups of your saves**
+
 - **restore backups of saves** (on CEMU and Wii-U)
 
 - **import Wii-U saves** to a MLC folder
@@ -75,6 +77,8 @@ The last script will allow you to :
 - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 
 But use it only if you know what you are doing...
+
+All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
 
 **Scripts accepts optionnals arguments in order to be called from command line**.
 
