@@ -83,7 +83,7 @@ The last script will allow you to :
 
 But use it only if you know what you are doing...
 
-**Scripts accepts optionnals arguments in order to be called from command line**.
+**Scripts accept optionals arguments in order to be called from command line**.
 
 #
 ## TODO : 
