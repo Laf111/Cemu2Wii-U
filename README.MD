@@ -64,6 +64,8 @@ Launch setup.bat to create shortcuts on your desktop (or any location).
 - **importWiiuSaves.bat** : get saves from the Wii-U for games that also exist in MLC_FOLDER (backup existing CEMU saves before overwrite files)
 - **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U filesystem (backup existing Wii-U saves before overwrite files)
 - **scanWiiU.bat** : take a snapshot of your Wii-U install (games and location mlc/usb). You need to create a new one on every install/move/delete games operation on your Wii-U
+- **backupCemuSaves.bat** : backup only saves in a mlc folder
+- **backupWiiuSaves.bat** : backup ALL saves from the Wii-U
 - **restoreBackup.bat** : restore CEMU or Wii-U backups
 - **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). 
 
@@ -79,9 +81,8 @@ But use it only if you know what you are doing...
 #
 ## TODO : 
 
-- Finish restore script
-
-- Check import/export and restore scripts.
+- valid export feature (and so restoreBackup.bat when using a Wii-U backup)
+- change icons
 
 
 # 
