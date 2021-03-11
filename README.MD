@@ -33,7 +33,7 @@ You can choose to treat all games that exist in both side as well.
 
 Then, you can choose to **select wich account** will be concerned for each game **or treat all accounts**.
 
-Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side are treated unless user ask it.
+Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side are treated unless user demands it.
 (So you can still force to install a saves created under CEMU on the Wii-U. The meta/saveinfo.xml file is updated when exporting CEMU saves)
 
 #
@@ -47,7 +47,7 @@ So you'll have to **define manually** (if it's not already done) **Wii-U account
 Every import or export process :
 - checks are done for accounts on both sides to : 
   - see if an account need to be created in CEMU UI (import Wii-U account)
-  - verify that the account exist on the Wii-U (export only existing accounts on the Wii-U unless user demands it)
+  - verify that the account exist on the Wii-U
 
 - backups of saves are done under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and can be restored (to Wii-U or CEMU).
 
