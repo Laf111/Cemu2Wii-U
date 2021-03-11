@@ -143,9 +143,9 @@ REM : main
 
     for /F "delims=~" %%i in (!BACKUP_PATH!) do set "fileName=%%~nxi"
     set "BACKUP_NAME=!filename:_Saves.zip=!"
-    set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Restore\!BACKUP_NAME:"=!""
+    set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Restore""
+    if exist !SYNCFOLDER_PATH! rmdir /Q /S !SYNCFOLDER_PATH! > NUL 2>&1
     mkdir !SYNCFOLDER_PATH! > NUL 2>&1
-
     
     if ["!zipNature!"] == ["CEMU"] (
 
@@ -393,8 +393,8 @@ REM : functions
         for /F "delims=~" %%i in ('dir /B /A:D "*" 2^>NUL') do (
             set "endTitleId=%%i"
             
-            set /A "tidValidity=1"
-            echo !endTitleId!| findStr /R /V "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tidValidity=0"
+            set /A "tidValidity=0"
+            echo !endTitleId!| findStr /R /I "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tidValidity=1"
             if !tidValidity! EQU 1 (
 
                 REM : if MLC01_FOLDER_PATH\usr\save\00050000\titleId exist

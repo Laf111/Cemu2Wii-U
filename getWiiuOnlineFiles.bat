@@ -304,8 +304,8 @@ REM : functions
         for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
             for /F "delims=~" %i in ("%%a") do (
                 set "account=%%~nxi"
-                set /A "accountValid=1"
-                echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+                set /A "accountValid=0"
+                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=1"
 
                 if !accountValid! EQU 1 (
                     REM : check if it is listed in cemuAccountsList
@@ -317,7 +317,7 @@ REM : functions
     REM : ------------------------------------------------------------------
 
 
-    REM : scan MLC01_PATH_FOLDER to get accounts defined in CEMU
+    REM : scan MLC01_FOLDER_PATH to get accounts defined in CEMU
     :getCemuAccountsList
 
         pushd !savesFolder!
@@ -325,8 +325,8 @@ REM : functions
         for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
             for /F "delims=~" %i in ("%%a") do (
                 set "account=%%~nxi"
-                set /A "accountValid=1"
-                echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+                set /A "accountValid=0"
+                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=1"
 
                 if !accountValid! EQU 1 (
                     REM : add to to list if it maches the patern and if not already listed

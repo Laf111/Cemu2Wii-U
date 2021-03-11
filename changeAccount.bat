@@ -82,8 +82,8 @@ REM : main
     
     set "SRC_ACCOUNT=!args[1]!"
     set "SRC_ACCOUNT=!SRC_ACCOUNT:"=!"    
-    set /A "srcAccValidity=1"
-    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=0"
+    set /A "srcAccValidity=0"
+    echo !SRC_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=1"
     if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
@@ -92,8 +92,8 @@ REM : main
     
     set "TGT_ACCOUNT=!args[2]!"
     set "TGT_ACCOUNT=!TGT_ACCOUNT:"=!"
-    set /A "tgtAccValidity=1"
-    echo !TGT_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
+    set /A "tgtAccValidity=0"
+    echo !TGT_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=1"
     if !tgtAccValidity! EQU 0 (
         echo ERROR^: !TGT_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
@@ -136,8 +136,8 @@ REM : main
     
     echo.
     set /P "SRC_ACCOUNT=Please enter the source account Id (8XXXXXXX) : "
-    set /A "srcAccValidity=1"
-    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=0"
+    set /A "srcAccValidity=0"
+    echo !SRC_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=1"
     if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getSrcAcc
@@ -147,8 +147,8 @@ REM : main
     echo.
     set /P "TGT_ACCOUNT=Please enter the target account Id (8XXXXXXX) : "
     echo.
-    set /A "tgtAccValidity=1"
-    echo !TGT_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
+    set /A "tgtAccValidity=0"
+    echo !TGT_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=1"
     if !tgtAccValidity! EQU 0 (
         echo ERROR^: !TGT_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getTgtAcc
@@ -159,25 +159,37 @@ REM : main
 
     title Change !SRC_ACCOUNT! with !TGT_ACCOUNT! in !MLC01_FOLDER_PATH!
     
+    REM : checks on accounts given
+    pushd !MLC01_FOLDER_PATH!
+    
+    
+    if ["!SRC_ACCOUNT!"] == ["!TGT_ACCOUNT!"] echo Nothing to do !SRC_ACCOUNT!=!TGT_ACCOUNT! & pause & exit /b 0
+    
     set /A "srcAccountFound=0"
     dir /S /B "!SRC_ACCOUNT!" > NUL 2>&1 && set /A "srcAccountFound=1"
     if !srcAccountFound! EQU 0 (
-        echo WARNING^: !SRC_ACCOUNT! not found in !MLC01_PATH_FOLDER!
+        echo WARNING^: !SRC_ACCOUNT! not found in !MLC01_FOLDER_PATH!
         pause
         exit /b 5
     )
 
     set /A "tgtAccountFound=0"
     dir /S /B "!TGT_ACCOUNT!" > NUL 2>&1 && set /A "tgtAccountFound=1"
-    if !srcAccountFound! EQU 1 (
-        echo ERROR^: !TGT_ACCOUNT! already found in !MLC01_PATH_FOLDER!
-        echo.
-        dir /S /B "!TGT_ACCOUNT!"
-        pause
-        exit /b 6
+    if !tgtAccountFound! EQU 1 (
+        if !srcAccountFound! EQU 1 (        
+            echo WARNING^: !TGT_ACCOUNT! already found in !MLC01_FOLDER_PATH!
+            echo.
+            choice /C yn /N /M "As folder !SRC_ACCOUNT! was found, do you want to continue ? : "
+            if !ERRORLEVEL! EQU 1 timeout /T 3 > NUL 2>&1 exit /b 6
+            
+        ) else (
+            echo ERROR^: !TGT_ACCOUNT! already found in !MLC01_FOLDER_PATH!
+            echo.
+            dir /S /B "!TGT_ACCOUNT!"
+            pause
+            exit /b 6
+        )
     )
-    
-    
     
     cls
     echo =========================================================
