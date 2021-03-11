@@ -47,12 +47,14 @@ So you'll have to **define manually** (if it's not already done) **Wii-U account
 Every import or export process :
 - checks are done for accounts on both sides to : 
   - see if an account need to be created in CEMU UI (import Wii-U account)
-  - verify that the account exist on the Wii-U (export only existing accounts on the Wii-U)
+  - verify that the account exist on the Wii-U (export only existing accounts on the Wii-U unless user demands it)
 
 - backups of saves are done under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and can be restored (to Wii-U or CEMU).
 
 
-Scripts check if CEMU is not running before launching treaments.
+All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
+
+
 
 #
 ## Install (optional):
@@ -80,8 +82,6 @@ The last script will allow you to :
 - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 
 But use it only if you know what you are doing...
-
-All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
 
 **Scripts accepts optionnals arguments in order to be called from command line**.
 
