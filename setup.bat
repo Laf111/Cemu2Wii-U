@@ -85,7 +85,7 @@ REM : main
         set "ICO_PATH="!RESOURCES_PATH:"=!\icons\scanResults.ico""
 
         if not exist !LINK_PATH! (
-            echo Creating a shortcut to access to Wii-U scans results
+        echo Creating a shortcut to access to Wii-U scans results
             call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
         )
     )
@@ -96,7 +96,7 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\getWiiuOnlineFiles.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\online.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to getWiiuOnlineFiles^.bat
+        echo Creating a shortcut to getWiiuOnlineFiles^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
@@ -106,7 +106,7 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\createWiiuSDcard.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\sdcard.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to createWiiuSDcard^.bat
+        echo Creating a shortcut to createWiiuSDcard^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
@@ -116,7 +116,7 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\exportSavesToWiiu.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\exportSaves.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to exportSavesToWiiu^.bat
+        echo Creating a shortcut to exportSavesToWiiu^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
@@ -126,7 +126,7 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\importWiiuSaves.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\importSaves.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to importWiiuSaves^.bat
+        echo Creating a shortcut to importWiiuSaves^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
@@ -136,7 +136,7 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\changeAccount.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\changeAccount.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to changeAccount^.bat
+        echo Creating a shortcut to changeAccount^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
@@ -146,7 +146,7 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\restoreBackup.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\restoreBackup.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to restoreBackup^.bat
+        echo Creating a shortcut to restoreBackup^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
@@ -156,20 +156,41 @@ REM : main
     set "TARGET_PATH="!HERE:"=!\backupWiiuSaves.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\BackupWiiU.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to backupWiiuSaves^.bat
+        echo Creating a shortcut to backupWiiuSaves^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
     
     REM : create a shortcut to backupCemuSaves.bat (if needed)
-    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Backup all Cemu saves^.lnk""
-    set "LINK_DESCRIPTION="Backup all Cemu saves""
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Backup all CEMU saves^.lnk""
+    set "LINK_DESCRIPTION="Backup all CEMU saves""
     set "TARGET_PATH="!HERE:"=!\backupCemuSaves.bat""
     set "ICO_PATH="!RESOURCES_PATH:"=!\icons\BackupCemu.ico""
     if not exist !LINK_PATH! (
-            echo Creating a shortcut to backupCemuSaves^.bat
+        echo Creating a shortcut to backupCemuSaves^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
     
+    set "ARGS=ON"
+    REM : create a shortcut to ftpSetWiiuFirmwareUpdateMode.bat
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Enable firmware update on the Wii-U^.lnk""
+    set "LINK_DESCRIPTION="Enable firmware update on the Wii-U""
+    set "TARGET_PATH="!HERE:"=!\ftpSetWiiuFirmwareUpdateMode.bat""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\WiiUfwuOn.ico""
+    if not exist !LINK_PATH! (
+        echo Creating a shortcut to enable firmware update on the Wii-U
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !GAMES_FOLDER!
+    )
+    set "ARGS=OFF"
+    REM : create a shortcut to ftpSetWiiuFirmwareUpdateMode.bat
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Disable firmware update on the Wii-U^.lnk""
+    set "LINK_DESCRIPTION="Disable firmware update on the Wii-U""
+    set "TARGET_PATH="!HERE:"=!\ftpSetWiiuFirmwareUpdateMode.bat""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\WiiUfwuOff.ico""
+    if not exist !LINK_PATH! (
+        echo Creating a shortcut to disable firmware update on the Wii-U
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !GAMES_FOLDER!
+    )
+        
     echo.
     echo =========================================================
     echo.
