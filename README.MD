@@ -89,7 +89,6 @@ But use it only if you know what you are doing...
 ## TODO : 
 
 - valid export feature (and so restoreBackup.bat when using a Wii-U backup)
-- change icons
 
 
 # 
