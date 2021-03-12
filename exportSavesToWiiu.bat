@@ -406,6 +406,8 @@ REM : userSaveMode = all)
     set "pat="!WIIU_BACKUP_PATH:"=!\*""
     
     call !7za! a -y -w!WIIU_BACKUP_PATH! !WIIU_BACKUP! !pat!
+    set "zipSrc="!WIIU_BACKUP_PATH:"=!\usr""
+    rmdir /Q /S !zipSrc! > NUL 2>&1
     echo Done
     echo.
     
@@ -466,7 +468,7 @@ REM : functions
     
     :treatCemuAccount
 
-        set "user="NOT_FOUND""    
+        set "user=NOT_FOUND"    
         set "tobeDisplayed=!folder!"
         
         if exist !wiiuUsersLog! (
@@ -482,14 +484,14 @@ REM : functions
         REM : what about on wii-u side ? 
         set "wiiuUserSaveFolder="!wiiuUserGameFolder:"=!\!folder!""     
         REM : YES => already treated in treatWiiuAccount, exit
-        if not exist !wiiuUserSaveFolder! goto:eof
+        if exist !wiiuUserSaveFolder! goto:eof
             
         REM : patch the saveInfo.xml file (earlier copied from wii-u side in syncFolderPath)
         set "saveinfo="!syncMetaFolder:"=!\saveinfo.xml""
             
         REM : existance flag
-        set /A "accExistOnWiiu=1"
-        type !saveinfo! | find /V "!folder!" > NUL 2>&1 && set /A "accExistOnWiiu=0"
+        set /A "accExistOnWiiu=0"
+        type !saveinfo! | find /I "!folder!" > NUL 2>&1 && set /A "accExistOnWiiu=1"
         if !accExistOnWiiu! EQU 0 (
             echo.
             echo WARNING ^: No Wii-U save for the account !folder! defined in CEMU
@@ -516,14 +518,13 @@ REM : functions
         REM : treatment for the user
         echo Treating !tobeDisplayed! saves
         
-        set "syncUserSaveFolder="!syncUserGameFolder:"=!\!folder!""
-        
-        REM : add !folder! account contribution in syncFolderPath
-        robocopy !cemuUserSaveFolder! !syncUserSaveFolder! /MT:32 /mir > NUL 2>&1
+        REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId! with syncFolderPath content
+        call !ftpSyncFolders! !wiiuIp! remote !cemuUserSaveFolder! "/storage_!src!/usr/save/00050000/!endTitleId!/user/!folder!" "Export !gameTitle! saves to the Wii-U"
+        set "cr=!ERRORLEVEL!"
         
         REM : cd to RESOURCES_PATH to use xml.exe
         pushd !RESOURCES_PATH!
-        REM : saveInfo.xml come from Wii-u side (cemu one was overwritten earlier)
+        set "saveinfo="!syncMetaFolder:"=!\saveinfo.xml""
         
         REM : update saveinfo file using user last settings
         call:updateSaveInfoFile
@@ -565,10 +566,9 @@ REM : functions
         REM : treatment for the user
         echo Treating !tobeDisplayed! saves
         
-        set "syncUserSaveFolder="!syncUserGameFolder:"=!\!folder!""
-        
-        REM : add !folder! account contribution in syncFolderPath
-        robocopy !cemuUserSaveFolder! !syncUserSaveFolder! /MT:32 /mir > NUL 2>&1
+        REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId! with syncFolderPath content
+        call !ftpSyncFolders! !wiiuIp! remote !cemuUserSaveFolder! "/storage_!src!/usr/save/00050000/!endTitleId!/user/!folder!" "Export !gameTitle! saves to the Wii-U"
+        set "cr=!ERRORLEVEL!"
         
         REM : patch the saveInfo.xml file (earlier copied from wii-u side in syncFolderPath)
         set "saveinfo="!syncMetaFolder:"=!\saveinfo.xml""
@@ -638,16 +638,6 @@ REM : functions
             robocopy !wiiuMetaFolder! !syncMetaFolder! /MT:32 /mir > NUL 2>&1
         )
         
-        REM : user/common folder from CEMU
-        set "commonMetaFolder="!cemuSaveFolder:"=!\user\common""        
-        set "syncCommonFolder="!syncFolderPath:"=!\user\common""
-        if exist !commonMetaFolder! (
-            mkdir !syncCommonFolder! > NUL 2>&1
-            robocopy !commonMetaFolder! !syncCommonFolder! /MT:32 /mir > NUL 2>&1
-        )
-        
-        set "syncUserGameFolder="!syncFolderPath:"=!\user""
-        
         set "wiiuUserGameFolder="!backupFolderPath:"=!\user""        
         pushd !wiiuUserGameFolder!
         
@@ -676,13 +666,17 @@ REM : functions
             call:treatCemuAccount
         )
         
-        echo Transfert for !gameTitle!^.^.^.
-        echo ---------------------------------------------------------
+        REM : user/common folder from CEMU
+        set "commonMetaFolder="!cemuSaveFolder:"=!\user\common""        
+        if exist !commonMetaFolder! (
+            REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId! with syncFolderPath content
+            call !ftpSyncFolders! !wiiuIp! remote !commonMetaFolder! "/storage_!src!/usr/save/00050000/!endTitleId!/user/common" "Export !gameTitle! saves to the Wii-U"
+            set "cr=!ERRORLEVEL!"
+        )
         
-        REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId! with syncFolderPath content
-        call !ftpSyncFolders! !wiiuIp! remote !syncFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "Export !gameTitle! saves to the Wii-U"
+        REM : Synchronize meta folder updated under syncMetaFolder
+        call !ftpSyncFolders! !wiiuIp! remote !syncMetaFolder! "/storage_!src!/usr/save/00050000/!endTitleId!/meta" "Export !gameTitle! saves to the Wii-U"
         set "cr=!ERRORLEVEL!"
-        if !cr! NEQ 0 echo ERROR when exporting existing !gameTitle! saves ^!
 
         echo ---------------------------------------------------------
         REM : log the slot used in a file

@@ -70,7 +70,7 @@ REM : main
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Scan my Wii-U^.lnk""
     set "LINK_DESCRIPTION="Take snapshot of your Wii-U content ^(list games^, saves^, updates and DLC^)""
     set "TARGET_PATH="!HERE:"=!\scanWiiU.bat""
-    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\wii-u.ico""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\ScanWii-u.ico""
     if not exist !LINK_PATH! (
         echo Creating a shortcut to scanWiiU^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
@@ -114,7 +114,7 @@ REM : main
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Export CEMU saves to my Wii-U^.lnk""
     set "LINK_DESCRIPTION="Export CEMU saves to your Wii-U""
     set "TARGET_PATH="!HERE:"=!\exportSavesToWiiu.bat""
-    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\exportSave.ico""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\exportSaves.ico""
     if not exist !LINK_PATH! (
             echo Creating a shortcut to exportSavesToWiiu^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
@@ -124,7 +124,7 @@ REM : main
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Import saves from my Wii-U^.lnk""
     set "LINK_DESCRIPTION="Import saves from my Wii-U""
     set "TARGET_PATH="!HERE:"=!\importWiiuSaves.bat""
-    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\importSave.ico""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\importSaves.ico""
     if not exist !LINK_PATH! (
             echo Creating a shortcut to importWiiuSaves^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
@@ -134,7 +134,7 @@ REM : main
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Rename an account in a MLC folder^.lnk""
     set "LINK_DESCRIPTION="Rename an account in a MLC folder""
     set "TARGET_PATH="!HERE:"=!\changeAccount.bat""
-    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\cemu.ico""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\changeAccount.ico""
     if not exist !LINK_PATH! (
             echo Creating a shortcut to changeAccount^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
@@ -144,7 +144,7 @@ REM : main
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Restore a Wii-U or CEMU backup^.lnk""
     set "LINK_DESCRIPTION="Restore a Wii-U or CEMU backup""
     set "TARGET_PATH="!HERE:"=!\restoreBackup.bat""
-    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\compress.ico""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\restoreBackup.ico""
     if not exist !LINK_PATH! (
             echo Creating a shortcut to restoreBackup^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!

@@ -405,6 +405,9 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     echo Backup CEMU saves in !CEMU_BACKUP!
     set "pat="!CEMU_BACKUP_PATH:"=!\*""
     call !7za! a -y -w!CEMU_BACKUP_PATH! !CEMU_BACKUP! !pat!  > NUL 2>&1
+    set "zipSrc="!CEMU_BACKUP_PATH:"=!\usr""
+    rmdir /Q /S !zipSrc! > NUL 2>&1
+    
     echo Done
     echo.
 
