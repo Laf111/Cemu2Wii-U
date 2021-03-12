@@ -99,5 +99,7 @@ HISTORY :
         - exportSavesToWiiu.bat : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U
           Backup existing save then replace files
         - createWiiuSDcard.bat : format large SDCard and istall HBL + apps (DDD, NANDDUMPER, dumpling, FTP-everywhere MOCHA & CHBC)
+        - ftpSetWiiuFirmwareUpdateMode.bat : en/disable remotely the firmware auto-update feature on the Wii-U
+        
     > add : creation of other scripts
 

@@ -30,7 +30,6 @@ REM : main
     REM : create folders
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
-
     REM : create folders
     if not exist !ONLINE_FOLDER! mkdir !ONLINE_FOLDER! > NUL 2>&1
 
@@ -122,15 +121,20 @@ REM : main
         goto:checkConnection
     )
     cls
-
+    REM : because FTP server on the wii-u does not manage timestamp
+    REM : (returning 1970-01-01:23:00:00 for all files)
+    REM : use only an empty local folder
     set "CCERTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\0005001b\10054000\content\ccerts""
-    if not exist !CCERTS_FOLDER! mkdir !CCERTS_FOLDER! > NUL 2>&1
+    rmdir /Q /S !CCERTS_FOLDER! > NUL 2>&1 
+    mkdir !CCERTS_FOLDER! > NUL 2>&1
 
     set "SCERTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\0005001b\10054000\content\scerts""
-    if not exist !SCERTS_FOLDER! mkdir !SCERTS_FOLDER! > NUL 2>&1
+    rmdir /Q /S !SCERTS_FOLDER! > NUL 2>&1 
+    mkdir !SCERTS_FOLDER! > NUL 2>&1
 
     set "MIIH_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\0005001b\10056000""
-    if not exist !MIIH_FOLDER! mkdir !MIIH_FOLDER! > NUL 2>&1
+    rmdir /Q /S !MIIH_FOLDER! > NUL 2>&1 
+    mkdir !MIIH_FOLDER! > NUL 2>&1
 
     set "JFL_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\00050030\1001500A""
     set "UFL_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\00050030\1001510A""
@@ -165,7 +169,8 @@ REM : main
     )
     echo.
     echo found JPN one
-    if not exist !JFL_FOLDER! mkdir !JFL_FOLDER! > NUL 2>&1
+    rmdir /Q /S !JFL_FOLDER! > NUL 2>&1 
+    mkdir !JFL_FOLDER! > NUL 2>&1
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!JFL_FOLDER!" /storage_mlc/sys/title/00050030/1001500A" "exit"
 
     :US
@@ -175,7 +180,8 @@ REM : main
     )
     echo.
     echo found USA one
-    if not exist !UFL_FOLDER! mkdir !UFL_FOLDER! > NUL 2>&1
+    rmdir /Q /S !UFL_FOLDER! > NUL 2>&1 
+    mkdir !UFL_FOLDER! > NUL 2>&1
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!UFL_FOLDER!" /storage_mlc/sys/title/00050030/1001510A" "exit"
 
     :EU
@@ -184,7 +190,8 @@ REM : main
         goto:getAccounts
     )
     echo found EUR one
-    if not exist !EFL_FOLDER! mkdir !EFL_FOLDER! > NUL 2>&1
+    rmdir /Q /S !EFL_FOLDER! > NUL 2>&1 
+    mkdir !EFL_FOLDER! > NUL 2>&1
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!EFL_FOLDER!" /storage_mlc/sys/title/00050030/1001520A" "exit"
 
     :getAccounts
@@ -192,8 +199,9 @@ REM : main
     echo ---------------------------------------------------------
     echo - WII-U accounts
     echo ---------------------------------------------------------
-    set "ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\usr\save\system\act""
-    if not exist !ACCOUNTS_FOLDER! mkdir !ACCOUNTS_FOLDER! > NUL 2>&1
+    set "ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\usr\save\system\act""    
+    rmdir /Q /S !ACCOUNTS_FOLDER! > NUL 2>&1 
+    mkdir !ACCOUNTS_FOLDER! > NUL 2>&1
     
     !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!ACCOUNTS_FOLDER!" /storage_mlc/usr/save/system/act" "exit"
 

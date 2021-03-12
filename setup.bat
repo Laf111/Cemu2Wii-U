@@ -4,10 +4,10 @@ REM : ------------------------------------------------------------------
 REM : main
 
     setlocal EnableDelayedExpansion
-    
-    
+
+
     REM : Cemu2Wii-U Version
-    set "VERSION=V1"    
+    set "VERSION=V1"
     title Cemu2Wii-U !VERSION!
 
     color 4F
@@ -17,43 +17,43 @@ REM : main
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
     pushd !HERE!
-    
+
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     set "Start="!RESOURCES_PATH:"=!\vbs\Start.vbs""
 
     set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
-    
+
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     REM : set current char codeset
     call:setCharSet
-    
+
     REM : get current date
     for /F "usebackq tokens=1,2 delims=~=" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set "ldt=%%j"
     set "ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%_%ldt:~8,2%-%ldt:~10,2%-%ldt:~12,2%"
     set "DATE=%ldt%"
-    
+
     cls
 
     echo =========================================================
     echo Cemu2Wii-U !VERSION! installer
     echo =========================================================
     echo.
-    
+
     :askShortcutsFolder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a folder where to create shortcuts (a Wii-U subfolder will be created)"') do set "folder=%%b" && set "OUTPUT_FOLDER=!folder:?= !"
     if [!OUTPUT_FOLDER!] == ["NONE"] (
         choice /C yn /N /M "No item selected, do you wish to cancel (y, n)? : "
         if !ERRORLEVEL! EQU 1 timeout /T 4 > NUL 2>&1 && exit 75
         goto:askShortcutsFolder
-    )    
+    )
     set "SHORTCUTS_FOLDER="!OUTPUT_FOLDER:"=!\Cemu2Wii-U""
 
     mkdir !SHORTCUTS_FOLDER! > NUL 2>&1
-    
+
     REM : create a shortcut to WinSCP
     set "WD_FOLDER="!RESOURCES_PATH:"=!\winSCP""
     set "TARGET_PATH="!WD_FOLDER:"=!\WinSCP.exe""
@@ -159,7 +159,7 @@ REM : main
         echo Creating a shortcut to backupWiiuSaves^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
-    
+
     REM : create a shortcut to backupCemuSaves.bat (if needed)
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Backup all CEMU saves^.lnk""
     set "LINK_DESCRIPTION="Backup all CEMU saves""
@@ -169,7 +169,17 @@ REM : main
         echo Creating a shortcut to backupCemuSaves^.bat
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
-    
+
+    REM : create a shortcut to Wii-U error codes (if needed)
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Wii-U error codes^.lnk""
+    set "LINK_DESCRIPTION="Wii-U errors code list""
+    set "TARGET_PATH="!HERE:"=!\resources\Wii U Error Codes.pdf""
+    set "ICO_PATH="!HERE:"=!\resources\icons\Wii-U Error Codes.ico""
+    if not exist !LINK_PATH! (
+        echo Creating a shortcut to Wii-U error codes list
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !BFW_TOOLS_PATH!
+    )
+
     set "ARGS=ON"
     REM : create a shortcut to ftpSetWiiuFirmwareUpdateMode.bat
     set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Enable firmware update on the Wii-U^.lnk""
@@ -190,7 +200,7 @@ REM : main
         echo Creating a shortcut to disable firmware update on the Wii-U
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !GAMES_FOLDER!
     )
-        
+
     echo.
     echo =========================================================
     echo.
@@ -198,7 +208,7 @@ REM : main
     timeout /T 2 > NUL 2>&1
 
     wscript /nologo !Start! "%windir%\explorer.exe" !SHORTCUTS_FOLDER!
-        
+
     timeout /T 4 > NUL 2>&1
     exit /b 0
 
@@ -270,4 +280,3 @@ REM : functions
 
     goto:eof
     REM : ------------------------------------------------------------------
-        

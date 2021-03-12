@@ -378,7 +378,10 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
     set "BACKUPS_PATH="!WIIU_FOLDER:"=!\Backups""
     set "SYNCFOLDER_PATH="!WIIU_FOLDER:"=!\SyncFolders\Import""    
-    if exist !SYNCFOLDER_PATH! rmdir /Q /S !SYNCFOLDER_PATH! > NUL 2>&1
+    REM : because FTP server on the wii-u does not manage timestamp
+    REM : (returning 1970-01-01:23:00:00 for all files)
+    REM : use only an empty local folder    
+    rmdir /Q /S !SYNCFOLDER_PATH! > NUL 2>&1
     mkdir !SYNCFOLDER_PATH! > NUL 2>&1
 
     REM : get current date
