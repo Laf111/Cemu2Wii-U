@@ -15,7 +15,8 @@ I've tried using WinSCP and FileZilla, same date = 01/01/1970
 
 Injecting "simple" saves (such as Fast Racing Neo one) will work but for some games using slots with dates (BOTW, WWHD) saves will be invalidated by the Wii-U because of incoherent timestamps on files.
 
-A workaround consist in forcing the timestamp to 0 (=01/01/200) as the files will be injected with this date and will not be rejected.
+A workaround consists in forcing the timestamp to 0 (=01/01/200).
+As files are injected with this date (0) they will not be rejected.
 
 
 #
