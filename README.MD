@@ -13,7 +13,7 @@ And more, see the shortcuts created when installed :
 Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
 #
-**NOTE for FTP-Everywhere users :**
+**NOTE for FTP-Everywhere users who already experienced issues with saves injection :**
 The FTP server has an issue : it can't handle files timestamps (dates).
 I've tried using WinSCP and FileZilla, same date = 01/01/1970
 
