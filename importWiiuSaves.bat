@@ -509,7 +509,7 @@ REM : functions
             type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
                 for /F "delims=~= tokens=1" %%k in ('type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"
-                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =![!folder!]"
             )
         )
 

@@ -55,14 +55,7 @@ REM : userSaveMode = all)
         shift
         goto:continue
     :end
-    
-    REM : J2000 unix timestamp (/ J1970)
-    set /A "j2000=946684800"
-    
-    REM : init the value with now (J2000)
-    call:getTs1970 now
-    set /A "nowJ2K=!now!-j2000"
-    call:num2hex !nowJ2K! hexValue
+
         
     REM : search if CEMU is not already running
     set /A "nbI=0"
@@ -495,33 +488,13 @@ REM : functions
         REM : existance flag
         set /A "accExistOnWiiu=0"
         type !saveinfo! | find /I "!folder!" > NUL 2>&1 && set /A "accExistOnWiiu=1"
-        if !accExistOnWiiu! EQU 0 (
-            echo.
-            echo WARNING ^: No Wii-U save for the account !folder! defined in CEMU
-            echo.
-            
-            if ["!user!"] == ["NOT_FOUND"] (
-                echo If you^'re SURE that the account !folder! exist on the Wii-U
-            ) else (
-                echo If you^'re SURE that !user! exists on the Wii-U and use !folder! account
-            )
-            choice /C yn /N /M "Continue and inject !folder! save for !gameTitle! ? (y, n) : "
-            if !ERRORLEVEL! EQU 2 goto:eof
-        )
-        
-        if [!userSaveMode!] == ["select"] (
-            if !accExistOnWiiu! EQU 1 (
-                choice /C yn /N /M "Export !tobeDisplayed! CEMU saves for !gameTitle! to Wii-U (y, n)? : "
-                if !ERRORLEVEL! EQU 2 goto:eof
-                choice /C yn /N /M "Please confirm (y, n)? : "
-                if !ERRORLEVEL! EQU 2 goto:eof                
-            )
-        )
+        REM : if accont is not found, exit
+        if !accExistOnWiiu! EQU 0 goto:eof
         
         REM : treatment for the user
         echo Treating !tobeDisplayed! saves
         
-        REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId! with syncFolderPath content
+        REM : Synchronize /storage_!src!/usr/save/00050000/!endTitleId!/user/!folder! with syncFolderPath content
         call !ftpSyncFolders! !wiiuIp! remote !cemuUserSaveFolder! "/storage_!src!/usr/save/00050000/!endTitleId!/user/!folder!" "Export !gameTitle! saves to the Wii-U"
         set "cr=!ERRORLEVEL!"
         
@@ -547,7 +520,7 @@ REM : functions
             type !wiiuUsersLog! | find /I "!folder!" > NUL 2>&1 && (
 
                 for /F "delims=~= tokens=1" %%k in (' type !wiiuUsersLog! ^| find /I "!folder!"') do set "user=%%k"                
-                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =!"
+                if not ["!user!"] == ["NOT_FOUND"] set "tobeDisplayed=!user: =![!folder!]"
             )            
         )
         REM : wiiuUserSaveFolder exists
@@ -614,6 +587,11 @@ REM : functions
         set "backupFolderPath="!WIIU_BACKUP_PATH:"=!\usr\save\00050000\!endTitleId!""
         mkdir !backupFolderPath! > NUL 2>&1
         
+        
+        set "SITENAME=!gameTitle! (saves)"
+        set "logFile="!HERE:"=!\logs\ftpSyncFolders_!SITENAME!.log""
+        del /F /S !logFile! > NUL 2>&1
+                
         REM : launching transfert (donwloading wii-u saves as !backupFolderPath! is empty)
         call !ftpSyncFolders! !wiiuIp! local !backupFolderPath! "/storage_!src!/usr/save/00050000/!endTitleId!" "!gameTitle! (saves)"
         set "cr=!ERRORLEVEL!"
@@ -647,6 +625,10 @@ REM : functions
         REM : file that contains mapping between user - account folder (optional because
         REM : created by getWiiuOnlineFiles.bat
         set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
+        
+        set "SITENAME=Export !gameTitle! saves to the Wii-U"
+        set "logFile="!HERE:"=!\logs\ftpSyncFolders_!SITENAME!.log""
+        del /F /S !logFile! > NUL 2>&1
         
         REM : loop on accounts found in WII-U
         set "folder=NONE"
@@ -689,68 +671,11 @@ REM : functions
     goto:eof
     REM : ------------------------------------------------------------------
 
-    :getTs1970
-
-        REM : initialize
-        set /A "%1=0"
-        set /A "yy=0"
-        set /A "dd=0"
-        set /A "ss=0"
-
-        REM : if ts is not given : compute timestamp of the current date
-        for /F "delims=~= tokens=2" %%t in ('wmic os get localdatetime /value') do set "ts=%%t"
-
-        set /A "yy=10000!ts:~0,4! %% 10000, mm=100!ts:~4,2! %% 100, dd=100!ts:~6,2! %% 100"
-        set /A "dd=dd-2472663+1461*(yy+4800+(mm-14)/12)/4+367*(mm-2-(mm-14)/12*12)/12-3*((yy+4900+(mm-14)/12)/100)/4"
-        set /A "ss=(((1!ts:~8,2!*60)+1!ts:~10,2!)*60)+1!ts:~12,2!-366100-!ts:~21,1!((1!ts:~22,3!*60)-60000)"
-        set /A "%1+=dd*86400+ss"
-
-    goto:eof
-    REM : ------------------------------------------------------------------    
-
-    :strLength
-        Set "s=#%~1"
-        Set "len=0"
-        For %%N in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
-          if "!s:~%%N,1!" neq "" (
-            set /a "len+=%%N"
-            set "s=!s:~%%N!"
-          )
-        )
-        set /A "%2=%len%"
-    goto:eof
-    REM : ------------------------------------------------------------------
-
-    REM : number to hexa with 16 digits
-    :num2hex
-
-        set /a "num = %~1"
-        set "hex="
-        set "hex.10=a"
-        set "hex.11=b"
-        set "hex.12=c"
-        set "hex.13=d"
-        set "hex.14=e"
-        set "hex.15=f"
-
-        :loop
-        set /a "hextmp = num %% 16"
-        if %hextmp% gtr 9 set hextmp=!hex.%hextmp%!
-        set /a "num /= 16"
-        set "hex=%hextmp%%hex%"
-        if %num% gtr 0 goto loop
-
-        :loop2
-        call:strLength !hex! len
-        if !len! LSS 16 set "hex=0!hex!" & goto:loop2
-
-        set "%2=!hex!"
-
-    goto:eof
-    REM : ------------------------------------------------------------------
-
     :updateSaveInfoFile
 
+        REM : workaround to FTP everywhere issue on dating files (timestamp not handled and equal to 0)   
+        set "hexValue=0000000000000000"
+    
         set "stmp=!saveInfo!tmp"
         del /F !stmp! > NUL 2>&1
             
@@ -773,7 +698,7 @@ REM : functions
             goto:eof
         )
         REM : if saveinfo.xml does not exist
-        echo ^<^?xml version=^"1^.0^" encoding=^"UTF-8^"^?^>^<info^>^<account persistentId=^"!folder!^"^>^<timestamp^>!hexValue!^<^/timestamp^>^<^/account^>^<^/info^> > !saveInfo!
+        echo ^<^?xml version=^"1^.0^" encoding=^"UTF-8^"^?^>^<info^>^<account persistentId=^"00000000^"^>^<timestamp^>!hexValue!^<^/timestamp^>^<^/account^>^<account persistentId=^"!folder!^"^>^<timestamp^>!hexValue!^<^/timestamp^>^<^/account^>^<^/info^> > !saveInfo!
 
     goto:eof
     REM : ------------------------------------------------------------------

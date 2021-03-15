@@ -147,17 +147,17 @@ REM : main
     echo =========================================================
     echo - CCERTS
     echo ---------------------------------------------------------
-    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!CCERTS_FOLDER!" /storage_mlc/sys/title/0005001b/10054000/content/ccerts" "exit"
+    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!CCERTS_FOLDER!" /storage_mlc/sys/title/0005001b/10054000/content/ccerts" "exit"
     echo.
     echo ---------------------------------------------------------
     echo - SCERTS
     echo ---------------------------------------------------------
-    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!SCERTS_FOLDER!" /storage_mlc/sys/title/0005001b/10054000/content/scerts" "exit"
+    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!SCERTS_FOLDER!" /storage_mlc/sys/title/0005001b/10054000/content/scerts" "exit"
     echo.
     echo ---------------------------------------------------------
     echo - MIIs Head
     echo ---------------------------------------------------------
-    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!MIIH_FOLDER!" /storage_mlc/sys/title/0005001b/10056000" "exit"
+    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!MIIH_FOLDER!" /storage_mlc/sys/title/0005001b/10056000" "exit"
     echo.
     echo ---------------------------------------------------------
     echo - Friend list
@@ -171,7 +171,7 @@ REM : main
     echo found JPN one
     rmdir /Q /S !JFL_FOLDER! > NUL 2>&1 
     mkdir !JFL_FOLDER! > NUL 2>&1
-    !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!JFL_FOLDER!" /storage_mlc/sys/title/00050030/1001500A" "exit"
+    !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!JFL_FOLDER!" /storage_mlc/sys/title/00050030/1001500A" "exit"
 
     :US
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "ls /storage_mlc/sys/title/00050030/1001510A" "exit" > !ftplogFile! 2>&1
@@ -182,7 +182,7 @@ REM : main
     echo found USA one
     rmdir /Q /S !UFL_FOLDER! > NUL 2>&1 
     mkdir !UFL_FOLDER! > NUL 2>&1
-    !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!UFL_FOLDER!" /storage_mlc/sys/title/00050030/1001510A" "exit"
+    !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!UFL_FOLDER!" /storage_mlc/sys/title/00050030/1001510A" "exit"
 
     :EU
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "ls /storage_mlc/sys/title/00050030/1001520A" "exit" > !ftplogFile! 2>&1
@@ -192,7 +192,7 @@ REM : main
     echo found EUR one
     rmdir /Q /S !EFL_FOLDER! > NUL 2>&1 
     mkdir !EFL_FOLDER! > NUL 2>&1
-    !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!EFL_FOLDER!" /storage_mlc/sys/title/00050030/1001520A" "exit"
+    !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!EFL_FOLDER!" /storage_mlc/sys/title/00050030/1001520A" "exit"
 
     :getAccounts
     echo.
@@ -203,7 +203,7 @@ REM : main
     rmdir /Q /S !ACCOUNTS_FOLDER! > NUL 2>&1 
     mkdir !ACCOUNTS_FOLDER! > NUL 2>&1
     
-    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local "!ACCOUNTS_FOLDER!" /storage_mlc/usr/save/system/act" "exit"
+    !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!ACCOUNTS_FOLDER!" /storage_mlc/usr/save/system/act" "exit"
 
     echo.
     echo ---------------------------------------------------------
