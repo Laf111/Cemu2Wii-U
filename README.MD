@@ -98,10 +98,7 @@ But use it only if you know what you are doing...
 
 **Scripts accept optionals arguments in order to be called from command line**.
 
-#
-## TODO : 
-
-- valid export feature (and so restoreBackup.bat when using a Wii-U backup)
+If you encounter any issue, feel free to pm me on reddit, Discord or GBATemp (to Laf111) and i'll gladly help you.
 
 
 # 
