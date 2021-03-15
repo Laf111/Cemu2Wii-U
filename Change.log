@@ -100,7 +100,7 @@ IMPORTANT :
 HISTORY : 
 ======================================================================================================
 
-03/03/2021 V1 : (fork of the code of BatchFw V22-3)
+15/03/2021 V1-0 : (fork of the code of BatchFw V22-3)
     > add : Use the scripts of BatchFw and remove all the dependencies to the project.
         - getOnlineFiles.bat : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
           (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
@@ -110,7 +110,7 @@ HISTORY :
           Backup existing save then replace files
         - createWiiuSDcard.bat : format large SDCard and istall HBL + apps (DDD, NANDDUMPER, dumpling, FTP-everywhere MOCHA & CHBC)
         - ftpSetWiiuFirmwareUpdateMode.bat : en/disable remotely the firmware auto-update feature on the Wii-U
-    > fix exportSavesToWiiu.bat
+    > fix : exportSavesToWiiu.bat
     
         The FTP server has an issue : it can't handle files timestamps (dates). I've tried using WinSCP and FileZilla, same date = 01/01/1970
 
