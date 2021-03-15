@@ -97,7 +97,7 @@ The last script will allow you to :
 
 But use it only if you know what you are doing...
 
-**Scripts accept optionals arguments in order to be called from command line**.
+**Scripts accept optionals arguments in order to be called from command line. Feel free to use or integrate in your scripts/API**.
 
 If you encounter any issue, feel free to pm me on reddit, Discord or GBATemp (to Laf111) and i'll gladly help you.
 
