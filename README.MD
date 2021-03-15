@@ -13,7 +13,7 @@ Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless 
 The FTP server has an issue : it can't handle files timestamps (dates).
 I've tried using WinSCP and FileZilla, same date = 01/01/1970
 
-Injecting "simple" saves (such as Fast Racing Neo one) will work but for some games using slots with dates (BOTW, WWHD) saves will be invalidated by the Wii-U because of incoherent timestamps on files.
+Injecting "simple" saves (such as "Fast Racing Neo" one) will work but for some games using slots with dates (BOTW, WWHD) saves will be invalidated by the Wii-U because of incoherent timestamps on files.
 
 A workaround consists in forcing the timestamp to 0 (=01/01/200).
 As files are injected with this date (0) they will not be rejected.
