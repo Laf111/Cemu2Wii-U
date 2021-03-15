@@ -8,6 +8,15 @@ Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisel
 
 Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
+**NOTE for FTP-Everywhere users :**
+The FTP server has an issue : it can't handle files timestamps (dates).
+I've tried using WinSCP and FileZilla, same date = 01/01/1970
+
+Injecting "simple" saves (such as Fast Racing Neo one) will work but for some games using slots with dates (BOTW, WWHD) saves will be invalidated by the Wii-U because of incoherent timestamps on files.
+
+A workaround consist in forcing the timestamp to 0 (=01/01/200) as the files will be injected with this date and will not be rejected.
+
+
 #
 ## Main features
 
