@@ -94,8 +94,6 @@ REM : main
     ) else (
         set "ftplogFile="!HERE:"=!\logs\ftpCheckBeforeSync_!DATE!.log""
 
-REM        !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "mkdir "!REMOTE_FOLDER!"" "option batch off" "exit" > !ftplogFile!
-REM        !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "rmdir "!REMOTE_FOLDER!"" "option batch off" "exit" > !ftplogFile!
         !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "mkdir "!REMOTE_FOLDER!"" "option batch off" "exit" > !ftplogFile!
         !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "ls "!REMOTE_FOLDER!"" "option batch off" "exit" > !ftplogFile!
         type !ftplogFile! | find /I "Could not retrieve directory listing" > NUL 2>&1 && (

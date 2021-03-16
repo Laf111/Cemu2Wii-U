@@ -82,8 +82,8 @@ REM : main
     
     set "SRC_ACCOUNT=!args[1]!"
     set "SRC_ACCOUNT=!SRC_ACCOUNT:"=!"    
-    set /A "srcAccValidity=0"
-    echo !SRC_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=1"
+    set /A "srcAccValidity=1"
+    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=0"
     if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
@@ -92,8 +92,8 @@ REM : main
     
     set "TGT_ACCOUNT=!args[2]!"
     set "TGT_ACCOUNT=!TGT_ACCOUNT:"=!"
-    set /A "tgtAccValidity=0"
-    echo !TGT_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=1"
+    set /A "tgtAccValidity=1"
+    echo !TGT_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
     if !tgtAccValidity! EQU 0 (
         echo ERROR^: !TGT_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         pause
@@ -131,13 +131,12 @@ REM : main
     REM : update last configuration
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
     
-    :getSrcAcc
     set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"    
-    
+    :getSrcAcc    
     echo.
     set /P "SRC_ACCOUNT=Please enter the source account Id (8XXXXXXX) : "
-    set /A "srcAccValidity=0"
-    echo !SRC_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=1"
+    set /A "srcAccValidity=1"
+    echo !SRC_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "srcAccValidity=0"
     if !srcAccValidity! EQU 0 (
         echo ERROR^: !SRC_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getSrcAcc
@@ -147,8 +146,8 @@ REM : main
     echo.
     set /P "TGT_ACCOUNT=Please enter the target account Id (8XXXXXXX) : "
     echo.
-    set /A "tgtAccValidity=0"
-    echo !TGT_ACCOUNT!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=1"
+    set /A "tgtAccValidity=1"
+    echo !TGT_ACCOUNT!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "tgtAccValidity=0"
     if !tgtAccValidity! EQU 0 (
         echo ERROR^: !TGT_ACCOUNT! does no match the expected patern ^(8XXXXXXX^)
         goto:getTgtAcc
@@ -168,33 +167,39 @@ REM : main
     set /A "srcAccountFound=0"
     dir /S /B "!SRC_ACCOUNT!" > NUL 2>&1 && set /A "srcAccountFound=1"
     if !srcAccountFound! EQU 0 (
-        echo WARNING^: !SRC_ACCOUNT! not found in !MLC01_FOLDER_PATH!
+        echo ERROR^: !SRC_ACCOUNT! not found in !MLC01_FOLDER_PATH!
         pause
         exit /b 5
     )
-
+ 
     set /A "tgtAccountFound=0"
     dir /S /B "!TGT_ACCOUNT!" > NUL 2>&1 && set /A "tgtAccountFound=1"
+
     if !tgtAccountFound! EQU 1 (
-        if !srcAccountFound! EQU 1 (        
-            echo WARNING^: !TGT_ACCOUNT! already found in !MLC01_FOLDER_PATH!
-            echo.
-            choice /C yn /N /M "As folder !SRC_ACCOUNT! was found, do you want to continue ? : "
-            if !ERRORLEVEL! EQU 1 timeout /T 3 > NUL 2>&1 exit /b 6
-            
-        ) else (
-            echo ERROR^: !TGT_ACCOUNT! already found in !MLC01_FOLDER_PATH!
-            echo.
-            dir /S /B "!TGT_ACCOUNT!"
+        echo.
+        echo !TGT_ACCOUNT! already exist
+
+        echo You can force the renaming process but all the saves for !TGT_ACCOUNT!
+        echo will be replaced by the ones created for !SRC_ACCOUNT!
+        echo.
+        
+        choice /C yn /N /M "Force renaming !SRC_ACCOUNT! to !TGT_ACCOUNT! ? (y, n) : "
+        if !ERRORLEVEL! EQU 2 (
+            echo Cancelled by user
             pause
             exit /b 6
         )
+        
+        for /F "delims=~" %%d in ('dir /S /B "!TGT_ACCOUNT!"') do rmdir /Q /S "%%d"
     )
     
     cls
     echo =========================================================
+    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
+    
     if %nbArgs% NEQ 0 goto:rename
     set "sf=!savesFolder:"=!"
+    
     choice /C yn /N /M "Rename all folders named !SRC_ACCOUNT! with !TGT_ACCOUNT! in !sf! ? (y, n) : "
     if !ERRORLEVEL! EQU 2 (
         echo WARNING^: cancelled by user
@@ -204,8 +209,20 @@ REM : main
     )
     
     :rename
-    call !brcPath! /DIR^:!savesFolder! /REPLACECI^:!SRC_ACCOUNT!^:!TGT_ACCOUNT! /EXECUTE /RECURSIVE > !changeAccountLog!
-
+    call !brcPath! /DIR^:!savesFolder! /REPLACECI^:!SRC_ACCOUNT!^:!TGT_ACCOUNT! /EXECUTE /RECURSIVE > !changeAccountLog! 2>&1
+    
+    type !changeAccountLog! | find "could not be renamed" > NUL 2>&1 && (
+        echo.
+        echo ERRORS detected in renaming process ^: 
+        echo.
+        type !changeAccountLog! | find "could not be renamed"
+        echo.
+        echo Please fix-it manually 
+        echo.
+        pause
+        
+    )
+    
     echo.
     echo.
     echo =========================================================
@@ -213,12 +230,14 @@ REM : main
     echo log file = !changeAccountLog!
     echo.
 
-    echo.
-    echo Create the account !TGT_ACCOUNT! in all versions of CEMU 
-    echo using the MLC path !MLC01_FOLDER_PATH!
-    echo ^(in ^'General Settings^' ^/ Accounts tab^)
-    echo.
-    echo Otherwise saves won^'t show up ^!
+    if !tgtAccountFound! EQU 0 (
+        echo.
+        echo Create the account !TGT_ACCOUNT! in all versions of CEMU 
+        echo that use the MLC path !MLC01_FOLDER_PATH!
+        echo ^(in ^'General Settings^' ^/ Accounts tab^)
+        echo.
+        echo Otherwise saves won^'t show up ^!
+    )
     pause
     exit /b 0
 
