@@ -306,6 +306,8 @@ REM : functions
         pushd !ACCOUNTS_FOLDER!
         for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
             for /F "delims=~" %%i in ("%%a") do (
+echo acc2=!account!
+pause
                 set "account=%%~nxi"
                 REM : check if it is listed in cemuAccountsList
                 echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "accListToCreateInCemu=!accListToCreateInCemu! !account!"
@@ -323,15 +325,15 @@ REM : functions
             for /F "delims=~" %%i in ("%%a") do (
                 set "account=%%~nxi"
                 set /A "accountValid=0"
-
-                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=1"
-
-                if !accountValid! EQU 1 (
-                    REM : add to to list if it maches the patern and if not already listed
-                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
-                )
+echo acc=!account!
+pause
+                REM : add to to list if it maches the patern and if not already listed
+                echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
             )
         )
+echo cemuAccountsList=!cemuAccountsList!
+pause
+        
 
     goto:eof
     REM : ------------------------------------------------------------------
