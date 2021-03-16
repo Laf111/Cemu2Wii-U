@@ -303,15 +303,13 @@ REM : functions
     
         pushd !ACCOUNTS_FOLDER!
         for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
-            for /F "delims=~" %%i in ("%%a") do (
-                set "account=%%~nxi"
-                set /A "accountValid=1"
-                echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+            set "account=%%a"
+            set /A "accountValid=1"
+            echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
 
-                if !accountValid! EQU 1 (
-                    REM : check if it is listed in cemuAccountsList
-                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "accListToCreateInCemu=!accListToCreateInCemu! !account!"
-                )
+            if !accountValid! EQU 1 (
+                REM : check if it is listed in cemuAccountsList
+                echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "accListToCreateInCemu=!accListToCreateInCemu! !account!"
             )
         )
     goto:eof

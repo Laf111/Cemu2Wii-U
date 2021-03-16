@@ -131,8 +131,28 @@ REM : main
     REM : update last configuration
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
     
+    :getSrcAcc
     set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"    
-    :getSrcAcc    
+
+    REM : checks on accounts given
+    pushd !savesFolder!
+    set "accountsList="
+    for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
+        for /F "delims=~" %%i in ("%%a") do (
+            set "account=%%~nxi"
+            
+            set /A "accountValid=1"
+            echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+
+            if !accountValid! EQU 1 (
+                REM : check if it is listed in cemuAccountsList
+                echo !accountsList! | find /V "!account!" > NUL 2>&1 && set "accountsList=!account! !accountsList!"
+            )
+        )
+    )
+    echo List of existing accounts ^:
+    echo !accountsList!
+    
     echo.
     set /P "SRC_ACCOUNT=Please enter the source account Id (8XXXXXXX) : "
     set /A "srcAccValidity=1"
@@ -161,7 +181,6 @@ REM : main
     REM : checks on accounts given
     pushd !MLC01_FOLDER_PATH!
     
-    
     if ["!SRC_ACCOUNT!"] == ["!TGT_ACCOUNT!"] echo Nothing to do !SRC_ACCOUNT!=!TGT_ACCOUNT! & pause & exit /b 0
     
     set /A "srcAccountFound=0"
@@ -180,7 +199,7 @@ REM : main
         echo !TGT_ACCOUNT! already exist
 
         echo You can force the renaming process but all the saves for !TGT_ACCOUNT!
-        echo will be replaced by the ones created for !SRC_ACCOUNT!
+        echo will be replaced by !SRC_ACCOUNT! ones
         echo.
         
         choice /C yn /N /M "Force renaming !SRC_ACCOUNT! to !TGT_ACCOUNT! ? (y, n) : "
