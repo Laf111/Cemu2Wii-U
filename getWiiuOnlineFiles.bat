@@ -13,20 +13,21 @@ REM : main
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
     pushd !HERE!
-    
+
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
+    set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
 
     set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
-    
+
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     REM : set current char codeset
     call:setCharSet
-    
+
     REM : create folders
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
@@ -66,11 +67,11 @@ REM : main
     REM : get the hostname
     set "ipRead="
     for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "HostName="') do set "ipRead=%%i"
-    if ["!ipRead!"] == [""] goto:getWiiuIp 
+    if ["!ipRead!"] == [""] goto:getWiiuIp
     REM : and the port
     set "portRead="
-    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"    
-    if ["!portRead!"] == [""] goto:getWiiuIp 
+    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"
+    if ["!portRead!"] == [""] goto:getWiiuIp
 
     echo Found an existing FTP configuration ^:
     echo.
@@ -94,7 +95,7 @@ REM : main
 
     :checkConnection
     cls
-   
+
     REM : check its state
     set /A "state=0"
     call:getHostState !wiiuIp! state
@@ -125,15 +126,12 @@ REM : main
     REM : (returning 1970-01-01:23:00:00 for all files)
     REM : use only an empty local folder
     set "CCERTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\0005001b\10054000\content\ccerts""
-    rmdir /Q /S !CCERTS_FOLDER! > NUL 2>&1 
     mkdir !CCERTS_FOLDER! > NUL 2>&1
 
     set "SCERTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\0005001b\10054000\content\scerts""
-    rmdir /Q /S !SCERTS_FOLDER! > NUL 2>&1 
     mkdir !SCERTS_FOLDER! > NUL 2>&1
 
     set "MIIH_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\0005001b\10056000""
-    rmdir /Q /S !MIIH_FOLDER! > NUL 2>&1 
     mkdir !MIIH_FOLDER! > NUL 2>&1
 
     set "JFL_FOLDER="!ONLINE_FOLDER:"=!\mlc01\sys\title\00050030\1001500A""
@@ -169,7 +167,6 @@ REM : main
     )
     echo.
     echo found JPN one
-    rmdir /Q /S !JFL_FOLDER! > NUL 2>&1 
     mkdir !JFL_FOLDER! > NUL 2>&1
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!JFL_FOLDER!" /storage_mlc/sys/title/00050030/1001500A" "exit"
 
@@ -180,7 +177,6 @@ REM : main
     )
     echo.
     echo found USA one
-    rmdir /Q /S !UFL_FOLDER! > NUL 2>&1 
     mkdir !UFL_FOLDER! > NUL 2>&1
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!UFL_FOLDER!" /storage_mlc/sys/title/00050030/1001510A" "exit"
 
@@ -190,7 +186,6 @@ REM : main
         goto:getAccounts
     )
     echo found EUR one
-    rmdir /Q /S !EFL_FOLDER! > NUL 2>&1 
     mkdir !EFL_FOLDER! > NUL 2>&1
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!EFL_FOLDER!" /storage_mlc/sys/title/00050030/1001520A" "exit"
 
@@ -199,10 +194,9 @@ REM : main
     echo ---------------------------------------------------------
     echo - WII-U accounts
     echo ---------------------------------------------------------
-    set "ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\usr\save\system\act""    
-    rmdir /Q /S !ACCOUNTS_FOLDER! > NUL 2>&1 
+    set "ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\usr\save\system\act""
     mkdir !ACCOUNTS_FOLDER! > NUL 2>&1
-    
+
     !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!ACCOUNTS_FOLDER!" /storage_mlc/usr/save/system/act" "exit"
 
     echo.
@@ -216,15 +210,15 @@ REM : main
     echo =========================================================
     choice /C yn /N /M "Do you want to install the files in a mlc01 folder (y, n)? : "
     if !ERRORLEVEL! EQU 2 goto:noMlcInstall
-    
-    set "config="!LOGS:"=!\lastConfig.ini""    
+
+    set "config="!LOGS:"=!\lastConfig.ini""
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
         if !ERRORLEVEL! EQU 1 goto:installFiles
     )
-    echo Please select a MLC folder ^(mlc01^)    
+    echo Please select a MLC folder ^(mlc01^)
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -245,51 +239,52 @@ REM : main
 
     :installFiles
     set "srcFolder="!ONLINE_FOLDER:"=!\mlc01""
-    
+
     REM : saves folder in the target mlc01 path
     set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
-    
+
     REM : get the list of the accounts existing in CEMU
     set "cemuAccountsList="
-    call:getCemuAccountsList 
-    
+    call:getCemuAccountsList
+
     REM : list of Wii-U accounts that do not exist in CEMU side
-    set "accListToCreateInCemu=" 
-    call:getUndefinedWiiuAccounts    
-    
+    set "accListToCreateInCemu="
+    call:getUndefinedWiiuAccounts
+
     pushd !HERE!
-    
+
+    robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT
+
+    echo.
     if not ["!accListToCreateInCemu!"] == [""] (
         echo WARNING ^: If needed^, create the following accounts in CEMU
         echo ^(accounts tab of ^'General Settings^'^)
         echo.
         for %%a in (!accListToCreateInCemu!) do echo ^> %%a
         echo.
-    )    
-    
-    robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
+    )
     goto:endMain
-    
+
     :noMlcInstall
     echo.
     echo.
     echo Don^'t forget to create the following accounts
-    echo and users in all your CEMU installs ^: 
+    echo and users in all your CEMU installs ^:
     echo.
     type !wiiuUsersLog! | find /V "#"
     echo.
     echo =========================================================
-    
+
     :endMain
     echo.
     echo Done
     echo.
-    
+
     echo Don^'t foget to add opt^.bin and seeprom^.bin ^(dumped from
     echo your Wii-U using NANDDUMPER)^ close to cemu^.exe to play
     echo online^.
     echo =========================================================
-    
+
 
     pause
     if !ERRORLEVEL! NEQ 0 exit /b !ERRORLEVEL!
@@ -307,18 +302,13 @@ REM : functions
 
     REM : check if Wii-U accounts need to be defined in CEMU
     :getUndefinedWiiuAccounts
-    
-        pusd !ACCOUNTS_FOLDER!
-        for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
-            for /F "delims=~" %i in ("%%a") do (
-                set "account=%%~nxi"
-                set /A "accountValid=0"
-                echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=1"
 
-                if !accountValid! EQU 1 (
-                    REM : check if it is listed in cemuAccountsList
-                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "accListToCreateInCemu=!accListToCreateInCemu! !account!"
-                )
+        pushd !ACCOUNTS_FOLDER!
+        for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
+            for /F "delims=~" %%i in ("%%a") do (
+                set "account=%%~nxi"
+                REM : check if it is listed in cemuAccountsList
+                echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "accListToCreateInCemu=!accListToCreateInCemu! !account!"
             )
         )
     goto:eof
@@ -329,11 +319,11 @@ REM : functions
     :getCemuAccountsList
 
         pushd !savesFolder!
-        
         for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
-            for /F "delims=~" %i in ("%%a") do (
+            for /F "delims=~" %%i in ("%%a") do (
                 set "account=%%~nxi"
                 set /A "accountValid=0"
+
                 echo !account!| findStr /R /I "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=1"
 
                 if !accountValid! EQU 1 (
@@ -342,7 +332,7 @@ REM : functions
                 )
             )
         )
-    
+
     goto:eof
     REM : ------------------------------------------------------------------
 
@@ -351,7 +341,7 @@ REM : functions
 
         REM : loop on all 800000XX folders found
         pushd !ACCOUNTS_FOLDER!
-        for /F "delims=~" %%d in ('dir /B /A:D 80000* 2^>NUL') do (
+        for /F "delims=~" %%d in ('dir /B /A:D 80* 2^>NUL') do (
 
             set "af="!ACCOUNTS_FOLDER:"=!\%%d\account.dat""
             for /F "delims=~= tokens=2" %%n in ('type !af! ^| find /I "IsPasswordCacheEnabled=0"') do (
@@ -368,8 +358,8 @@ REM : functions
                 pause
             )
 
-            echo Found %%d\account.dat for !accId!            
-            
+            echo Found %%d\account.dat for !accId!
+
             REM : fill/complete the wiiuUsersLog
             if exist !wiiuUsersLog! (
                 type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo !accId!=%%d >> !wiiuUsersLog!
@@ -377,7 +367,7 @@ REM : functions
                 echo # account=user > !wiiuUsersLog!
                 echo !accId!=%%d >> !wiiuUsersLog!
             )
-            
+
         )
         pushd !HERE!
 
