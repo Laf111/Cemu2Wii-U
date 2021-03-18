@@ -13,19 +13,19 @@ REM : main
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
     pushd !HERE!
-    
+
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
     set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     !cmdOw! @ /MAX > NUL 2>&1
-    
+
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
 
     REM : set current char codeset
     call:setCharSet
-    
+
     REM : create folders
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
     set "ONLINE_FOLDER="!WIIU_FOLDER:"=!\OnlineFiles""
@@ -65,11 +65,11 @@ REM : main
     REM : get the hostname
     set "ipRead="
     for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "HostName="') do set "ipRead=%%i"
-    if ["!ipRead!"] == [""] goto:getWiiuIp 
+    if ["!ipRead!"] == [""] goto:getWiiuIp
     REM : and the port
     set "portRead="
-    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"    
-    if ["!portRead!"] == [""] goto:getWiiuIp 
+    for /F "delims=~= tokens=2" %%i in ('type !winScpIni! ^| find "PortNumber="') do set "portRead=%%i"
+    if ["!portRead!"] == [""] goto:getWiiuIp
 
     echo Found an existing FTP configuration ^:
     echo.
@@ -93,7 +93,7 @@ REM : main
 
     :checkConnection
     cls
-   
+
     REM : check its state
     set /A "state=0"
     call:getHostState !wiiuIp! state
@@ -189,9 +189,9 @@ REM : main
     echo ---------------------------------------------------------
     echo - WII-U accounts
     echo ---------------------------------------------------------
-    set "ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\usr\save\system\act""    
+    set "ACCOUNTS_FOLDER="!ONLINE_FOLDER:"=!\mlc01\usr\save\system\act""
     mkdir !ACCOUNTS_FOLDER! > NUL 2>&1
-   
+
     !winScp! /command "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "synchronize local -mirror "!ACCOUNTS_FOLDER!" /storage_mlc/usr/save/system/act" "exit"
 
     echo.
@@ -199,21 +199,28 @@ REM : main
     echo - Identify Wii-U users and their accounts
     echo ---------------------------------------------------------
     set "wiiuUsersLog="!ONLINE_FOLDER:"=!\wiiuUsersList.log""
+    del /F /S !wiiuUsersLog! > NUL 2>&1
 
     call:getWiiuUsers
 
     echo =========================================================
     choice /C yn /N /M "Do you want to install the files in a mlc01 folder (y, n)? : "
     if !ERRORLEVEL! EQU 2 goto:noMlcInstall
-    
-    set "config="!LOGS:"=!\lastConfig.ini""    
+
+    set "config="!LOGS:"=!\lastConfig.ini""
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
-        if !ERRORLEVEL! EQU 1 goto:installFiles
+        if !ERRORLEVEL! EQU 2 goto:askMlc01Folder
+
+        if not exist !MLC01_FOLDER_PATH! (
+            echo !MLC01_FOLDER_PATH! not found ^?
+            goto:askMlc01Folder
+        )
+        goto:installFiles
     )
-    echo Please select a MLC folder ^(mlc01^)    
+    echo Please select a MLC folder ^(mlc01^)
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -234,18 +241,18 @@ REM : main
 
     :installFiles
     set "srcFolder="!ONLINE_FOLDER:"=!\mlc01""
-    
+
     REM : saves folder in the target mlc01 path
     set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
-    
+
     REM : get the list of the accounts existing in CEMU
     set "cemuAccountsList="
-    call:getCemuAccountsList 
-    
+    call:getCemuAccountsList
+
     REM : list of Wii-U accounts that do not exist in CEMU side
-    set "accListToCreateInCemu=" 
-    call:getUndefinedWiiuAccounts    
-    
+    set "accListToCreateInCemu="
+    call:getUndefinedWiiuAccounts
+
     pushd !HERE!
 
     echo.
@@ -256,10 +263,10 @@ REM : main
     echo ^> !cemuAccountsList!
     echo.
     if ["!accListToCreateInCemu!"] == [""] (
-        echo. 
+        echo.
         echo The following accounts will be updated ^:
         echo.
-        type !wiiuUsersLog! | find /V "#"        
+        type !wiiuUsersLog! | find /V "#"
         echo.
         choice /C yn /N /M "Continue (y, n)? : "
         if !ERRORLEVEL! EQU 2 (
@@ -267,23 +274,24 @@ REM : main
             goto:endMain
         )
         goto:overwriteFiles
-    ) 
-      
+    )
+
     echo The following Wii-U accounts does not exist on CEMU side ^:
     echo.
     for %%a in (!accListToCreateInCemu!) do echo ^> %%a
     echo.
     echo If you want to replace existing CEMU accounts with your Wii-U ones
+    echo ^(and overwrite your saves with the Wii-U ones^)
     echo Use ^'Rename an account in a MLC folder^' first to rename accounts in
     echo !MLC01_FOLDER_PATH!
-    echo with the Wii-U ones ^: 
-    echo.    
-    type !wiiuUsersLog! | find /V "#"        
+    echo with the Wii-U ones ^:
     echo.
-    echo OR^, 
+    type !wiiuUsersLog! | find /V "#"
+    echo.
+    echo OR^,
     echo.
     echo You can choose to import them anyway but in this case^, note
-    echo that you^ll be able to play online using Cemu and continue^/synchronize 
+    echo that you^'ll be able to play online using Cemu and continue^/synchronize
     echo your saves with the Wii-U ONLY with thoses accounts^!
     echo.
     echo.
@@ -293,28 +301,31 @@ REM : main
     echo Once the Wii-U accounts are created in CEMU^, relaunch
     echo this script to install online files^.
     echo.
-    
+
     goto:endMain
-    
+
     :overwriteFiles
     REM : Wii-U accounts exists in CEMU side
-    robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
-    
+    robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT
+
     :noMlcInstall
-    echo =========================================================
-    echo.
-    echo Don^'t forget to create the following accounts
-    echo and users in all your CEMU installs ^: 
-    echo.
-    type !wiiuUsersLog! | find /V "#"
-    echo.
-    
+    if not ["!accListToCreateInCemu!"] == [""] (
+        echo =========================================================
+        echo.
+        echo Don^'t forget to create the following accounts
+        echo and users in all your CEMU installs ^:
+        echo.
+        for %%a in (!accListToCreateInCemu!) do (
+            type !wiiuUsersLog! | find /V "#" | find /I "%%a"
+        )
+        echo.
+
     :endMain
     echo =========================================================
     echo.
     echo Done
     echo.
-    
+
     echo Don^'t foget to add opt^.bin and seeprom^.bin ^(dumped from
     echo your Wii-U using NANDDUMPER)^ close to cemu^.exe to play
     echo online^.
@@ -335,7 +346,7 @@ REM : functions
 
     REM : check if Wii-U accounts need to be defined in CEMU
     :getUndefinedWiiuAccounts
-    
+
         pushd !ACCOUNTS_FOLDER!
         for /F "delims=~" %%a in ('dir /B /A:D "80*" 2^>NUL') do (
             set "account=%%a"
@@ -355,13 +366,13 @@ REM : functions
     :getCemuAccountsList
 
         pushd !savesFolder!
-        
+
         for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
             set "folder="%%a""
             for /F "delims=~" %%i in (!folder!) do (
                 set "account=%%~nxi"
                 set /A "accountValid=1"
-                
+
                 echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
 
                 if !accountValid! EQU 1 (
@@ -370,7 +381,7 @@ REM : functions
                 )
             )
         )
-    
+
     goto:eof
     REM : ------------------------------------------------------------------
 
@@ -399,8 +410,8 @@ REM : functions
                 pause
             )
 
-            echo Found %%d\account.dat for !accId!            
-            
+            echo Found %%d\account.dat for !accId!
+
             REM : fill/complete the wiiuUsersLog
             if exist !wiiuUsersLog! (
                 type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo !accId!=%%d >> !wiiuUsersLog!
@@ -408,7 +419,7 @@ REM : functions
                 echo # account=user > !wiiuUsersLog!
                 echo !accId!=%%d >> !wiiuUsersLog!
             )
-            
+
         )
         pushd !HERE!
 
