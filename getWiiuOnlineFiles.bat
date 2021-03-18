@@ -247,21 +247,58 @@ REM : main
     call:getUndefinedWiiuAccounts    
     
     pushd !HERE!
-    
-    robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
-    
-    if not ["!accListToCreateInCemu!"] == [""] (
+
+    echo.
+    echo =========================================================
+    echo.
+    echo Accounts found in !MLC01_FOLDER_PATH! ^:
+    echo.
+    echo ^> !cemuAccountsList!
+    echo.
+    if ["!accListToCreateInCemu!"] == [""] (
+        echo. 
+        echo The following accounts will be updated ^:
         echo.
-        echo =========================================================
-        echo WARNING ^: If needed^, create the following accounts in CEMU
-        echo ^(accounts tab of ^'General Settings^'^)
+        type !wiiuUsersLog! | find /V "#"        
         echo.
-        for %%a in (!accListToCreateInCemu!) do echo ^> %%a
-        echo.
-        pause
-    )    
+        choice /C yn /N /M "Continue (y, n)? : "
+        if !ERRORLEVEL! EQU 2 (
+            echo Cancelled by user
+            goto:endMain
+        )
+        goto:overwriteFiles
+    ) 
+      
+    echo The following Wii-U accounts does not exist on CEMU side ^:
+    echo.
+    for %%a in (!accListToCreateInCemu!) do echo ^> %%a
+    echo.
+    echo If you want to replace existing CEMU accounts with your Wii-U ones
+    echo Use ^'Rename an account in a MLC folder^' first to rename accounts in
+    echo !MLC01_FOLDER_PATH!
+    echo with the Wii-U ones ^: 
+    echo.    
+    type !wiiuUsersLog! | find /V "#"        
+    echo.
+    echo OR^, 
+    echo.
+    echo You can choose to import them anyway but in this case^, note
+    echo that you^ll be able to play online using Cemu and continue^/synchronize 
+    echo your saves with the Wii-U ONLY with thoses accounts^!
+    echo.
+    echo.
+    choice /C yn /N /M "Import them anyway in CEMU (y, n)? : "
+    if !ERRORLEVEL! EQU 1 goto:overwriteFiles
+
+    echo Once the Wii-U accounts are created in CEMU^, relaunch
+    echo this script to install online files^.
+    echo.
     
     goto:endMain
+    
+    :overwriteFiles
+    REM : Wii-U accounts exists in CEMU side
+    robocopy !srcFolder! !MLC01_FOLDER_PATH! /S /MT:32 /IS /IT 
     
     :noMlcInstall
     echo =========================================================
@@ -282,8 +319,6 @@ REM : main
     echo your Wii-U using NANDDUMPER)^ close to cemu^.exe to play
     echo online^.
     echo =========================================================
-    
-
     pause
     if !ERRORLEVEL! NEQ 0 exit /b !ERRORLEVEL!
     exit /b 0
@@ -349,8 +384,11 @@ REM : functions
             set "af="!ACCOUNTS_FOLDER:"=!\%%d\account.dat""
             for /F "delims=~= tokens=2" %%n in ('type !af! ^| find /I "IsPasswordCacheEnabled=0"') do (
                 echo WARNING^: this account seems to not have "Save password" option checked ^(auto login^) ^!
-                echo it might be unusable with CEMU
+                echo it might be unusable with CEMU^!
                 echo.
+                echo Check "Save password" option for %%d account on the Wii-U and relaunch this script
+                echo.
+                pause
             )
 
             REM : get AccountId from account.dat

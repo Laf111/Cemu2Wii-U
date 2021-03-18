@@ -8,7 +8,7 @@ REM : main
 
     REM : Cemu2Wii-U Version
     set "VERSION=V1"
-    title Cemu2Wii-U !VERSION!
+    title Install Cemu2Wii-U !VERSION!
 
     color 4F
     set "THIS_SCRIPT=%~0"
@@ -201,6 +201,13 @@ REM : main
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !GAMES_FOLDER!
     )
 
+    choice /C yn /N /M "Get online files from your WiiU now? : "
+    if !ERRORLEVEL! EQU 2 goto:openShortcuts
+
+    pushd !HERE!
+    call "getWiiuOnlineFiles.bat"
+    
+    :openShortcuts
     echo.
     echo =========================================================
     echo.

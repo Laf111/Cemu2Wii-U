@@ -16,6 +16,8 @@ REM : main
     set "RESOURCES_PATH="!HERE:"=!\resources""
     set "browseFolder="!RESOURCES_PATH:"=!\vbs\BrowseFolderDialog.vbs""
     set "brcPath="!RESOURCES_PATH:"=!\BRC_Unicode_64\BRC64.exe""
+    set "fnrPath="!RESOURCES_PATH:"=!\fnr.exe""
+    set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
         
     set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
@@ -239,9 +241,29 @@ REM : main
         echo Please fix-it manually 
         echo.
         pause
+        goto:endMain
         
     )
     
+    REM : treating PersitentId in account.dat
+    set "ACCOUNT_FOLDER="!MLC01_FOLDER_PATH:"=!\usr\save\system\act""
+    
+    set "accountFile="!ACCOUNT_FOLDER:"=!\!TGT_ACCOUNT!\account.dat""    
+    if not exist !accountFile! goto:endSuccess
+
+
+    type !accountFile! | find /I "!SRC_ACCOUNT!" > NUL 2>&1 && goto:endSuccess
+    
+    echo.
+    echo Changing persitentId in accound^.dat
+    
+    set "fnrLog="!LOGS:"=!\fnr_Change_!SRC_ACCOUNT!-to-!TGT_ACCOUNT!.log""    
+    REM : replace persistentId in accountFile
+    !StartHiddenWait! !fnrPath! --cl --dir !ACCOUNT_FOLDER! --fileMask "account.dat" --find "PersistentId=!SRC_ACCOUNT!" --replace "PersistentId=!TGT_ACCOUNT!" --logFile !fnrLog!
+    
+
+    
+    :endSuccess
     echo.
     echo.
     echo =========================================================
@@ -258,6 +280,7 @@ REM : main
         echo Otherwise saves won^'t show up ^!
     )
     pause
+    :endMain
     exit /b 0
 
     goto:eof
