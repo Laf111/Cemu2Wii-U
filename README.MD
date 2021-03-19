@@ -3,7 +3,7 @@
 Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisely a mlc01 folder : MLC_FOLDER). 
 
 It allows you to **automatically** :
-- dump/update all files needed to play online with CEMU (for all acounts : Mii head, Friends list, certificates and account.dat)
+- dump/update all files needed to play online with CEMU (for all accounts : Mii head, Friends list, certificates and account.dat)
 - synchronize saves between CEMU and the Wii-U
 
 And bring other features to comnicate with the Wii-U, see shortcuts created once installed :
@@ -27,13 +27,13 @@ The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml)
 #
 ## Main features
 
-- **dump wii-u onlines files needed for CEMU** (for all acounts : Mii head, Friends list, certificates and account.dat). You'll only **have to dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
+- **dump wii-u onlines files needed for CEMU**. You'll only **have to dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
 
 - **format (even large) SD card** for the Wii-U containing HBL and essentials apps
 
 - **en/disable remotely the firmware auto-update** feature on the Wii-U
 
-- **change a CEMU's account** (8000000X) used (remane folders in a MLC_PATH)
+- **change a CEMU's account** (8000000X) used (remane folder account and patch account.dat in a MLC_PATH)
 
 - **create Wii-U and Cemu backups of your saves**
 
@@ -43,11 +43,11 @@ The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml)
 
 - **export CEMU saves** to Wii-U
 
-Import/Exporting/restoring saves concern only your **selection of the games installed on both sides** (CEMU and Wii-U).
+Import/Exporting/restoring saves concern only your **selection** of **games installed on both sides** (CEMU and Wii-U).
 
-You can choose to treat all games that exist in both side as well.
+You can choose to treat **all games** that exist in both side as well.
 
-Then, you can choose to **select wich account** will be concerned for each game **or treat all accounts**.
+Then, you can choose to **select wich account** will be concerned for each game or **treat all accounts**.
 
 Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side.
 
