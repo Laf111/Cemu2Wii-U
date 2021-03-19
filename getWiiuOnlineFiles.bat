@@ -25,7 +25,7 @@ REM : main
 
     REM : set current char codeset
     call:setCharSet
-    
+
     REM : search if Cemu2Wii-U is not already running
     set /A "nbI=0"
     for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
@@ -35,7 +35,7 @@ REM : main
         pause
         exit /b 100
     )
-    
+
     REM : search if CEMU is not already running
     set /A "nbI=0"
     for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
@@ -332,7 +332,7 @@ REM : main
     if not ["!accListToCreateInCemu!"] == [""] (
         echo =========================================================
         echo.
-        echo Don^'t forget to create the following accounts
+        echo Don^'t forget to enable online mode for the following accounts
         echo and users in all your CEMU installs ^:
         echo.
         for %%a in (!accListToCreateInCemu!) do (
@@ -346,7 +346,9 @@ REM : main
     echo Done
     echo.
 
-    echo Don^'t foget to add opt^.bin and seeprom^.bin ^(dumped from
+    echo Don^'t foget to ^:
+    echo - enable online mode for new accounts
+    echo - add opt^.bin and seeprom^.bin ^(dumped from
     echo your Wii-U using NANDDUMPER)^ close to cemu^.exe to play
     echo online^.
     echo =========================================================
@@ -386,11 +388,11 @@ REM : functions
     :getCemuAccountsList
 
         REM : search in usr\save\system\act
-        set "ACCOUNTS_FOLDER="!MLC01_FOLDER_PATH:"=!\usr\save\system\act""
-    
-        if exist !ACCOUNTS_FOLDER! (
+        set "CemuAccountsFolder="!MLC01_FOLDER_PATH:"=!\usr\save\system\act""
 
-            pushd !ACCOUNTS_FOLDER!
+        if exist !CemuAccountsFolder! (
+
+            pushd !CemuAccountsFolder!
 
             for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
                 for /F "delims=~" %%i in ("%%a") do (
@@ -404,23 +406,6 @@ REM : functions
                         REM : add to to list if it maches the patern and if not already listed
                         echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
                     )
-                )
-            )
-        )
-        
-        pushd !savesFolder!
-
-        for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
-            set "folder="%%a""
-            for /F "delims=~" %%i in (!folder!) do (
-                set "account=%%~nxi"
-                set /A "accountValid=1"
-
-                echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
-
-                if !accountValid! EQU 1 (
-                    REM : add to to list if it maches the patern and if not already listed
-                    echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
                 )
             )
         )
