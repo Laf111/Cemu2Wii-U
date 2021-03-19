@@ -319,7 +319,7 @@ REM : main
             type !wiiuUsersLog! | find /V "#" | find /I "%%a"
         )
         echo.
-
+    )
     :endMain
     echo =========================================================
     echo.
@@ -416,7 +416,7 @@ REM : functions
             if exist !wiiuUsersLog! (
                 type !wiiuUsersLog! | find /V /I "%%d" > NUL 2>&1 && echo !accId!=%%d >> !wiiuUsersLog!
             ) else (
-                echo # account=user > !wiiuUsersLog!
+                echo # user=account > !wiiuUsersLog!
                 echo !accId!=%%d >> !wiiuUsersLog!
             )
 
