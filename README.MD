@@ -28,7 +28,7 @@ Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-
 
 
 **Every import or export process** :
-- **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and **can be restored (to Wii-U or CEMU)**.
+- **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves (they **can be restored to the Wii-U or CEMU earlier** using the dedicated scripts).
 
 - checks are done for accounts on both sides to : 
   - see if the account need to be added in CEMU UI (import Wii-U account)
