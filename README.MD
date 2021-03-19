@@ -57,7 +57,7 @@ Launch setup.bat to create shortcuts on your desktop (or any location).
 
 - **createWiiuSDcard.bat** : format (using Fat32Format.exe) an prepare a SD card for the Wii-U containing HBL and essentials apps
 - **ftpSetWiiuFirmwareUpdateMode.bat** : en/disable remotely the firmware auto-update feature on the Wii-U
-- **getOnlineFiles.bat** : get and save under .\WiiuFiles\OnlineFiles online files needed for CEMU for all users found
+- **getOnlineFiles.bat** : get and install in a mlc folder, online files needed for CEMU for all accounts found
   (except opt.bin and seeprom.bin that you need to dump manually from the Wii-U using NANDDUMPER)
 - **importWiiuSaves.bat** : get saves from the Wii-U for games that also exist in MLC_FOLDER (backup existing CEMU saves before overwrite files)
 - **exportSavesToWiiu.bat** : inject saves to the Wii-U for games that exist in MLC_FOLDER and on the Wii-U filesystem (backup existing Wii-U saves before overwrite files)
