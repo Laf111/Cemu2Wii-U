@@ -3,8 +3,8 @@
 Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisely a mlc01 folder : MLC_FOLDER). 
 
 It allows you to **automatically** :
-- dump/update all files needed to play online with CEMU (for all accounts : Mii head, Friends list, certificates and account.dat)
-- synchronize saves between CEMU and the Wii-U
+- **dump/update all files needed to play online with CEMU (for all accounts : Mii head, Friends list, certificates and account.dat)**
+- **synchronize saves between CEMU and the Wii-U**
 
 And bring other features to comnicate with the Wii-U, see shortcuts created once installed :
 
