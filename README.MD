@@ -28,15 +28,12 @@ The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml)
 
 
 #
-## Main features
 
 To play online with CEMU : 
-- you'll only **have to dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
+- you'll only have to **dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
 - enable the online mode in CEMU account's settings
 
-Import/Exporting/restoring saves concern only your **selection** of **games installed on both sides** (CEMU and Wii-U).
-
-You can choose to treat **all games** that exist in both side as well.
+Import/Exporting/restoring saves process concern only your **selection** of **games installed on both sides** (CEMU and Wii-U). You can choose to treat **all games** that exist in both side as well.
 
 Then, you can choose to **select wich account** will be concerned for each game or **treat all accounts**.
 
