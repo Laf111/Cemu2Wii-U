@@ -95,7 +95,7 @@ Launch setup.bat to create shortcuts on your desktop (or any location).
 
 The last script will allow you to : 
 - keep only one save for each games by using the same account in CEMU and on the Wii-U (and synchronize CEMU <-> Wii-U game's progression)
-- rename existant CEMU's accounts
+- rename an existant CEMU's account (PersitentId in account.dat is replaced as well)
 - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 
 But use it only if you know what you are doing...
