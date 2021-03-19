@@ -56,7 +56,7 @@ Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framewor
 
 Cemu2Wii-U does not have access to the settings.xml file of CEMU install since the input mlc folder could be an "external" one (not included in a CEMU install's folder and eventually shared by multiple CEMU's versions)
 
-So you'll have to **activate manually** (if it's not already done) the onlie play mode in CEMU configuration (General Settings / Accounts tab)**.
+So you'll have to **activate manually the online play mode** in CEMU configuration (General Settings / Accounts tab)**.
 
 **Every import or export process** :
 - **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and **can be restored (to Wii-U or CEMU)**.
