@@ -16,19 +16,6 @@ Version of CEMU supported >= **1.15.19** (supporting Wii-U accounts handling unl
 
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
-
-#
-**NOTE for FTP-Everywhere users who already experienced issues with saves injection :**
-The FTP server has an issue : it can't handle files timestamps (dates).
-I've tried using WinSCP and FileZilla, same date = 01/01/1970
-
-Injecting "simple" saves (such as "Fast Racing Neo" one) will work but for some games (BOTW, WWHD, MK8...) saves will be invalidated by the Wii-U because of incoherents timestamps (dates) on files. Leading in starting a new save or hanging on the splash screen (MK8).
-
-The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml) : files are injected with this date (0) and so as they are not anteriors to the timestamp value (0), will not be rejected.
-
-
-#
-
 To play online with CEMU : 
 - you'll only have to **dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
 - enable the online mode in CEMU account's settings
@@ -51,7 +38,17 @@ Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-
 
 All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
 
+#
+**NOTE for FTP-Everywhere users who already experienced issues with saves injection :**
+The FTP server has an issue : it can't handle files timestamps (dates).
+I've tried using WinSCP and FileZilla, same date = 01/01/1970
 
+Injecting "simple" saves (such as "Fast Racing Neo" one) will work but for some games (BOTW, WWHD, MK8...) saves will be invalidated by the Wii-U because of incoherents timestamps (dates) on files. Leading in starting a new save or hanging on the splash screen (MK8).
+
+The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml) : files are injected with this date (0) and so as they are not anteriors to the timestamp value (0), will not be rejected.
+
+
+#
 
 #
 ## Install (optional):
