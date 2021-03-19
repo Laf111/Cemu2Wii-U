@@ -47,9 +47,6 @@ Injecting "simple" saves (such as "Fast Racing Neo" one) will work but for some 
 
 The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml) : files are injected with this date (0) and so as they are not anteriors to the timestamp value (0), will not be rejected.
 
-
-#
-
 #
 ## Install (optional):
 
