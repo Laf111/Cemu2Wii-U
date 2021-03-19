@@ -201,6 +201,9 @@ REM : main
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !GAMES_FOLDER!
     )
 
+    echo.
+    echo =========================================================
+    echo.
     choice /C yn /N /M "Get online files from your WiiU now? : "
     if !ERRORLEVEL! EQU 2 goto:openShortcuts
 

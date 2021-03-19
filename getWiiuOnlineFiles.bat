@@ -25,6 +25,26 @@ REM : main
 
     REM : set current char codeset
     call:setCharSet
+    
+    REM : search if Cemu2Wii-U is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 2 (
+        echo ERROR^: Cemu2Wii-U is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find"
+        pause
+        exit /b 100
+    )
+    
+    REM : search if CEMU is not already running
+    set /A "nbI=0"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cemu.exe" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    if %nbI% GEQ 1 (
+        echo ERROR^: CEMU is already^/still running^! Aborting^!
+        wmic process get Commandline 2>NUL | find /I "CEMU.exe" | find /I /V "find"
+        pause
+        exit /b 100
+    )
 
     REM : create folders
     set "WIIU_FOLDER="!HERE:"=!\WiiuFiles""
@@ -365,6 +385,29 @@ REM : functions
     REM : scan MLC01_FOLDER_PATH to get accounts defined in CEMU
     :getCemuAccountsList
 
+        REM : search in usr\save\system\act
+        set "ACCOUNTS_FOLDER="!MLC01_FOLDER_PATH:"=!\usr\save\system\act""
+    
+        if exist !ACCOUNTS_FOLDER! (
+
+            pushd !ACCOUNTS_FOLDER!
+
+            for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
+                for /F "delims=~" %%i in ("%%a") do (
+                    set "account=%%~nxi"
+                    set "account=!account: =!"
+
+                    set /A "accountValid=1"
+                    echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+
+                    if !accountValid! EQU 1 (
+                        REM : add to to list if it maches the patern and if not already listed
+                        echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
+                    )
+                )
+            )
+        )
+        
         pushd !savesFolder!
 
         for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (

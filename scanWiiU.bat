@@ -135,7 +135,6 @@ REM : main
         pause
         goto:checkConnection
     )
-    cls
     
     REM : ok so far, create scan folder
     mkdir !wiiuScanFolder!

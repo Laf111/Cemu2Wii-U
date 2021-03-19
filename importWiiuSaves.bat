@@ -440,6 +440,29 @@ REM : functions
     REM : scan MLC01_PATH_FOLDER to get accounts defined in CEMU
     :getCemuAccountsList
 
+        REM : search in usr\save\system\act
+        set "ACCOUNTS_FOLDER="!MLC01_FOLDER_PATH:"=!\usr\save\system\act""
+    
+        if exist !ACCOUNTS_FOLDER! (
+
+            pushd !ACCOUNTS_FOLDER!
+
+            for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
+                for /F "delims=~" %%i in ("%%a") do (
+                    set "account=%%~nxi"
+                    set "account=!account: =!"
+
+                    set /A "accountValid=1"
+                    echo !account!| findStr /R /V "^[8][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$" > NUL 2>&1 && set /A "accountValid=0"
+
+                    if !accountValid! EQU 1 (
+                        REM : add to to list if it maches the patern and if not already listed
+                        echo !cemuAccountsList! | find /V "!account!" > NUL 2>&1 && set "cemuAccountsList=!cemuAccountsList! !account!"
+                    )
+                )
+            )
+        )
+    
         pushd !savesFolder!
 
         for /F "delims=~" %%a in ('dir /S /B /A:D "80*" 2^>NUL') do (
@@ -515,6 +538,7 @@ REM : functions
 
         REM : CEMU save for the current user
         set "cemuUserSaveFolder="!cemuUserGameFolder:"=!\!folder!""
+        
         REM : existance flag
         set /A "accExistOnCemu=1"
         if not exist !cemuUserSaveFolder! (
@@ -523,7 +547,7 @@ REM : functions
             REM : check if it is listed in cemuAccountsList
             echo !cemuAccountsList! | find /V "!folder!" > NUL 2>&1 && (
 
-                choice /C yn /N /M "Account !tobeDisplayed! does not exist in CEMU, import it anyway ? (y, n)? : "
+                choice /C yn /N /M "Saves of !tobeDisplayed! does not exist in CEMU, import it anyway ? (y, n)? : "
                 if !ERRORLEVEL! EQU 2 goto:eof
                 
                 echo !accListToCreateInCemu! | find /V "!folder!" > NUL 2>&1 && (
@@ -549,7 +573,7 @@ REM : functions
         
         REM : sync folders
         set "syncUserSaveFolder="!syncUserGameFolder:"=!\!folder!""
-        robocopy !syncUserGameFolder! !cemuUserSaveFolder! /MT:32 /MIR > NUL 2>&1
+        robocopy !syncUserSaveFolder! !cemuUserSaveFolder! /MT:32 /MIR > NUL 2>&1
 
     goto:eof
     REM : ------------------------------------------------------------------
