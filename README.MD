@@ -58,12 +58,13 @@ Cemu2Wii-U does not have access to the settings.xml file of CEMU install since t
 
 So you'll have to **activate manually** (if it's not already done) the onlie play mode in CEMU configuration (General Settings / Accounts tab)**.
 
-Every import or export process :
+**Every import or export process** :
+- **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and **can be restored (to Wii-U or CEMU)**.
+
 - checks are done for accounts on both sides to : 
   - see if the account need to be added in CEMU UI (import Wii-U account)
   - verify that the account exist on the Wii-U
 
-- **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and **can be restored (to Wii-U or CEMU)**.
 
 
 All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
