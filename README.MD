@@ -6,7 +6,7 @@ It allows you to **automatically** :
 - dump/update all files needed to play online with CEMU (for all acounts : Mii head, Friends list, certificates and account.dat)
 - synchronize saves between CEMU and the Wii-U
 
-And bring other features : see shortcuts created once installed :
+And bring other features to comnicate with yje Wii-U, see shortcuts created once installed :
 
 <p align="center">
   <img src="resources/Cemu2Wii-U.png">
