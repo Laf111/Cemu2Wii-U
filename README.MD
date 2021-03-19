@@ -24,7 +24,7 @@ Import/Exporting/restoring saves process concern only your **selection** of **ga
 
 Then, you can choose to **select wich account** will be concerned for each game or **treat all accounts**.
 
-Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side.
+Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side are taken into account.
 
 
 **Every import or export process** :
