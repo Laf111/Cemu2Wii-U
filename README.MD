@@ -12,7 +12,10 @@ And bring other features to communicate with the Wii-U, see shortcuts created on
   <img src="resources/Cemu2Wii-U.png">
 </p>
 
-Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
+Version of CEMU supported >= **1.15.19** (supporting Wii-U accounts handling unless you force to use the 80000001 account)
+
+Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
+
 
 #
 **NOTE for FTP-Everywhere users who already experienced issues with saves injection :**
@@ -27,21 +30,9 @@ The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml)
 #
 ## Main features
 
-- **dump wii-u onlines files needed for CEMU**. You'll only **have to dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
-
-- **format (even large) SD card** for the Wii-U containing HBL and essentials apps
-
-- **en/disable remotely the firmware auto-update** feature on the Wii-U
-
-- **change a CEMU's account** (8000000X) used (remane folder account and patch account.dat in a MLC_PATH)
-
-- **create Wii-U and Cemu backups of your saves**
-
-- **restore backups of saves** (on CEMU and Wii-U)
-
-- **import Wii-U saves** to a MLC folder
-
-- **export CEMU saves** to Wii-U
+To play online with CEMU : 
+- you'll only **have to dump opt.bin and seeprom.bin** using NANDDUMPER **manually** and put them close to CEMU.exe to play online.
+- enable the online mode in CEMU account's settings
 
 Import/Exporting/restoring saves concern only your **selection** of **games installed on both sides** (CEMU and Wii-U).
 
@@ -51,14 +42,6 @@ Then, you can choose to **select wich account** will be concerned for each game 
 
 Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side.
 
-
-#
-
-Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
-
-Cemu2Wii-U does not have access to the settings.xml file of CEMU install since the input mlc folder could be an "external" one (not included in a CEMU install's folder and eventually shared by multiple CEMU's versions)
-
-So you'll have to **activate manually the online play mode** in CEMU configuration (General Settings / Accounts tab)**.
 
 **Every import or export process** :
 - **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and **can be restored (to Wii-U or CEMU)**.
