@@ -43,9 +43,11 @@ All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
 The FTP server has an issue : it can't handle files timestamps (dates).
 I've tried using WinSCP and FileZilla, same date = 01/01/1970
 
-Injecting "simple" saves (such as "Fast Racing Neo" one) will work but for some games (BOTW, WWHD, MK8...) saves will be invalidated by the Wii-U because of incoherents timestamps (dates) on files. Leading in starting a new save or hanging on the splash screen (MK8).
+Injecting "simple" saves (such as "Fast Racing Neo" one) will work but for some games (BOTW, MK8...) saves will be invalidated by the Wii-U because of incoherents timestamps (dates) on files. Leading in starting a new save or hanging on the splash screen (MK8).
 
 The workaround consists in forcing the timestamp to 0 (in the meta/saveinfo.xml) : files are injected with this date (0) and so as they are not anteriors to the timestamp value (0), will not be rejected.
+
+For WWHD, rights on files invalidate saves. You have to use https://github.com/Laf111/WiiUFtpServer to fix it.
 
 #
 ## Install (optional):
