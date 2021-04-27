@@ -16,6 +16,16 @@ REM : main
     REM : directory of this script
     set "SCRIPT_FOLDER="%~dp0"" && set "HERE=!SCRIPT_FOLDER:\"="!"
 
+    REM : check if not Linux tools are defined in the environnement
+    echo test | find /I "test" > NUL
+    if !ERRORLEVEL! NEQ 0 (
+        echo Found linux tools in your environnement
+        echo Please define them add the end of your path if you
+        echo want to launch BatchFw
+        pause
+        exit 99
+    )
+    
     pushd !HERE!
 
     set "RESOURCES_PATH="!HERE:"=!\resources""
