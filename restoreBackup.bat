@@ -387,6 +387,7 @@ REM : functions
         if exist !gamesFolder! (
             call:getCemuTitles !gamesFolder!
         ) else (    
+            REM old update location but also new location of games when installing games with CEMU title manager
             set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
             if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
 

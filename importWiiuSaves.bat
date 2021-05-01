@@ -277,6 +277,7 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     if exist !gamesFolder! (
         call:getCemuTitles !gamesFolder!
     ) else (
+        REM old update location but also new location of games when installing games with CEMU title manager    
         set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
         if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
 
@@ -410,6 +411,8 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     rmdir /Q /S !zipSrc! > NUL 2>&1
 
     echo Done
+    echo.
+    echo Wii-U saves were backup to !WIIU_BACKUP! 
     echo.
 
     if not ["!accListToCreateInCemu!"] == [""] (

@@ -280,6 +280,7 @@ REM : userSaveMode = all)
     if exist !gamesFolder! (
         call:getCemuTitles !gamesFolder!
     ) else (
+        REM old update location but also new location of games when installing games with CEMU title manager
         set "oldUpFolder="!MLC01_FOLDER_PATH:"=!\usr\title\00050000""
         if exist !oldUpFolder! call:getCemuTitles !oldUpFolder!
 
@@ -406,6 +407,8 @@ REM : userSaveMode = all)
     rmdir /Q /S !zipSrc! > NUL 2>&1
     echo Done
     echo.
+    echo Wii-U saves were backup to !WIIU_BACKUP! 
+    echo.
 
     echo =========================================================
     echo Now you can stop FTPiiU server
@@ -486,8 +489,6 @@ REM : functions
         REM : existance flag
         set /A "accExistOnWiiu=0"
 
-echo saveInfo=!saveinfo!
-type !saveinfo!
         type !saveinfo! | find /I "!folder!" > NUL 2>&1 && set /A "accExistOnWiiu=1"
         REM : if account is not found, exit
         if !accExistOnWiiu! EQU 0 goto:eof
@@ -694,10 +695,73 @@ type !saveinfo!
     goto:eof
     REM : ------------------------------------------------------------------
 
+
+    :getTs1970
+
+        set "arg=%~2"
+
+        set "ts="
+        if not ["!arg!"] == [""] set "ts=%arg%"
+
+        REM : if ts is not given : compute timestamp of the current date
+        if ["%ts%"] == [""] for /F "delims=~= tokens=2" %%t in ('wmic os get localdatetime /value') do set "ts=%%t"
+
+        set /A "yy=10000%ts:~0,4% %% 10000, mm=100%ts:~4,2% %% 100, dd=100%ts:~6,2% %% 100"
+        set /A "dd=dd-2472663+1461*(yy+4800+(mm-14)/12)/4+367*(mm-2-(mm-14)/12*12)/12-3*((yy+4900+(mm-14)/12)/100)/4"
+        set /A "ss=(((1%ts:~8,2%*60)+1%ts:~10,2%)*60)+1%ts:~12,2%-366100-%ts:~21,1%((1%ts:~22,3%*60)-60000)"
+
+        set /A "%1+=dd*86400"
+
+    goto:eof
+    REM : ------------------------------------------------------------------
+
+    :strLength
+        Set "s=#%~1"
+        Set "len=0"
+        For %%N in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
+          if "!s:~%%N,1!" neq "" (
+            set /a "len+=%%N"
+            set "s=!s:~%%N!"
+          )
+        )
+        set /A "%2=%len%"
+    goto:eof
+    REM : ------------------------------------------------------------------
+
+    REM : number to hexa with 16 digits
+    :num2hex
+
+        set /a "num = %~1"
+        set "hex="
+        set "hex.10=a"
+        set "hex.11=b"
+        set "hex.12=c"
+        set "hex.13=d"
+        set "hex.14=e"
+        set "hex.15=f"
+
+        :loop
+        set /a "hextmp = num %% 16"
+        if %hextmp% gtr 9 set hextmp=!hex.%hextmp%!
+        set /a "num /= 16"
+        set "hex=%hextmp%%hex%"
+        if %num% gtr 0 goto loop
+
+        :loop2
+        call:strLength !hex! len
+        if !len! LSS 16 set "hex=0!hex!" & goto:loop2
+
+        set "%2=!hex!"
+
+    goto:eof
+    REM : ------------------------------------------------------------------
+
     :updateSaveInfoFile
 
-        REM : workaround to FTP everywhere issue on dating files (timestamp not handled and equal to 0)
-        set "hexValue=0000000000000000"
+        REM : init the value with now (J2000)
+        call:getTs1970 now
+        set /A "nowJ2K=!now!-j2000"
+        call:num2hex !nowJ2K! hexValue
 
         set "stmp=!saveInfo!tmp"
         del /F !stmp! > NUL 2>&1
