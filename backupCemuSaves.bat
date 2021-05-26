@@ -97,7 +97,13 @@ REM : main
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
-        if !ERRORLEVEL! EQU 1 goto:inputsAvailable
+        if !ERRORLEVEL! EQU 1 (
+            if exist !MLC01_FOLDER_PATH! (
+                goto:inputsAvailable
+            ) else (
+                echo Well^.^.^. !MLC01_FOLDER_PATH! does not exist anymore^!
+            )
+        )
     )
     echo Please select a MLC folder ^(mlc01^)
     :askMlc01Folder

@@ -39,8 +39,7 @@ REM : main
     echo       ^* HBL ^(HomeBrew Launcher^)
     echo       ^* appStore ^(HomeBrew AppStore^)
     echo       ^* DDD ^(WiiU Disk itle Dumper^)
-    echo       ^* FTP everywhere for MOCHA ^(ftpiiu^)
-    echo       ^* FTP everywhere for CBHC ^(ftpiiu^)
+    echo       ^* WiiU FTP Server
     echo       ^* nanddumper ^(to dump your NAND and get online files^)
     echo       ^* dumpling ^(dump your games^)
     echo.

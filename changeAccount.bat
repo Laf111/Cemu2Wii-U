@@ -113,7 +113,13 @@ REM : main
         set "folder=!MLC01_FOLDER_PATH:"=!"
 
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
-        if !ERRORLEVEL! EQU 1 goto:getSrcAcc
+        if !ERRORLEVEL! EQU 1 (
+            if exist !MLC01_FOLDER_PATH! (
+                goto:getSrcAcc
+            ) else (
+                echo Well^.^.^. !MLC01_FOLDER_PATH! does not exist anymore^!
+            )
+        )
     )
     echo Please select a MLC folder ^(mlc01^)    
     :askMlc01Folder

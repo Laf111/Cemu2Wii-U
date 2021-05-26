@@ -60,12 +60,7 @@ REM : main
     echo To download files throught FTP^, on your Wii-U^ you need to ^:
     echo.
     echo - disable the sleeping^/shutdown features
-    echo - if you^'re using a permanent hack ^(CBHC^)^:
-    echo    ^* launch HomeBrewLauncher
-    echo    ^* then ftp-everywhere for CBHC
-    echo - if you^'re not^:
-    echo    ^* first run Mocha CFW HomeBrewLauncher
-    echo    ^* then ftp-everywhere for MOCHA
+    echo - launched WiiU FTP Server
     echo - get the IP adress displayed on Wii-U gamepad
     echo.
     echo Make sure the Wii U account you want to dump^/use has
@@ -128,13 +123,13 @@ REM : main
     set "ftplogFile="!LOGS:"=!\ftpCheck_gwof.log""
     !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "ls /storage_mlc/usr/save/system/act" "exit" > !ftplogFile! 2>&1
     type !ftplogFile! | find /I "Connection failed" > NUL 2>&1 && (
-        echo ERROR ^: unable to connect^, check that your Wii-U is powered on and that FTP_every_where is launched
+        echo ERROR ^: unable to connect^, check that your Wii-U is powered on and that WiiuFtpServer is launched
         echo Pause this script until you fix it ^(CTRL-C to abort^)
         pause
         goto:checkConnection
     )
     type !ftplogFile! | find /I "Could not retrieve directory listing" > NUL 2>&1 && (
-        echo ERROR ^: unable to list games on NAND^, launch MOCHA CFW before FTP_every_where on the Wii-U
+        echo ERROR ^: unable to list games on NAND^, launch MOCHA CFW before WiiuFtpServer on the Wii-U
         echo Pause this script until you fix it ^(CTRL-C to abort^)
         pause
         goto:checkConnection
@@ -234,11 +229,11 @@ REM : main
         choice /C yn /N /M "Use '!folder!' as MLC folder ? (y, n) : "
         if !ERRORLEVEL! EQU 2 goto:askMlc01Folder
 
-        if not exist !MLC01_FOLDER_PATH! (
-            echo !MLC01_FOLDER_PATH! not found ^?
-            goto:askMlc01Folder
+        if exist !MLC01_FOLDER_PATH! (
+            goto:installFiles
+        ) else (
+            echo Well^.^.^. !MLC01_FOLDER_PATH! does not exist anymore^!
         )
-        goto:installFiles
     )
     echo Please select a MLC folder ^(mlc01^)
     :askMlc01Folder
