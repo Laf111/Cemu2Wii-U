@@ -184,7 +184,7 @@ PreserveRights=0
 IgnorePermErrors=1
 Text=rwxrwxrwx
 TransferMode=0
-ResumeSupport=0
+ResumeSupport=1
 ResumeThreshold=102400
 ReplaceInvalidChars=1
 LocalInvalidChars=/%5C:*%3F"<>|
@@ -200,8 +200,8 @@ ExcludeHiddenFiles=0
 ExcludeEmptyDirectories=0
 Queue=1
 QueueNoConfirmation=1
-QueueParallel=0
-CopyParamList=-1
+QueueParallel=1
+CopyParamList=8
 
 [Configuration\Interface\NewDirectory2]
 Valid=00
