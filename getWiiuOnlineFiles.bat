@@ -310,11 +310,10 @@ REM : main
     echo your saves with the Wii-U ONLY with thoses accounts^!
     echo.
     echo.
-    choice /C yn /N /M "Import them anyway in CEMU (y, n)? : "
+    choice /C yn /N /M "Import Wii-U accounts in CEMU (y, n)? : "
     if !ERRORLEVEL! EQU 1 goto:overwriteFiles
 
-    echo Once the Wii-U accounts are created in CEMU^, relaunch
-    echo this script to install online files^.
+    echo Use ^'Rename an account in a MLC folder^' and relaunch this script^.
     echo.
 
     goto:endMain
