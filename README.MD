@@ -17,7 +17,7 @@ Version of CEMU supported >= **1.15.19** (supporting Wii-U accounts handling unl
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
 To play online with CEMU : 
-- you'll only have to **dump opt.bin and seeprom.bin MANUALLY** (you can use using NANDDUMPER or other HB App) and put them close to CEMU.exe to play online.
+- you'll only have to **dump opt.bin and seeprom.bin MANUALLY** (you can use NANDDUMPER or other HB App) and put them close to CEMU.exe to play online.
 - enable the online mode in CEMU account's settings
 
 Import/Exporting/restoring saves process concern only your **selection** of **games installed on both sides** (CEMU and Wii-U). You can choose to treat **all games** that exist in both side as well.
