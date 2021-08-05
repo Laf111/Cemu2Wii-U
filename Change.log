@@ -113,3 +113,9 @@ HISTORY :
     > fix : exportSavesToWiiu.bat
         - i fixed files injection failure in FTPiiU-Everywhere, you have to use : WII-U FTP SERVER        
     > add : creation of other scripts
+
+23/07/2021 V1-1 : 
+    > update "resources\WiiuSDcard.zip" with WiiuFtpServer V4-3
+
+05/08/2021 V1-2 : 
+    > update "resources\WiiuSDcard.zip" with WiiuFtpServer V4-4
