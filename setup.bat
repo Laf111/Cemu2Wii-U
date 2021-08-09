@@ -7,7 +7,7 @@ REM : main
 
 
     REM : Cemu2Wii-U Version
-    set "VERSION=V1"
+    set "VERSION=V1-1"
     title Install Cemu2Wii-U !VERSION!
 
     color 4F

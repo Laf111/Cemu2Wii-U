@@ -95,6 +95,7 @@ REM : main
         set "ftplogFile="!HERE:"=!\logs\ftpCheckBeforeSync_!DATE!.log""
 
         REM : if FTP server allow set rights on folder, delete folder first
+        !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "rm "!REMOTE_FOLDER!"" "option batch off" "exit"  > !ftplogFile! 2>&1        
         !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "mkdir "!REMOTE_FOLDER!"" "option batch off" "exit" > !ftplogFile!
         !winScp! /command "option batch on" "open ftp://USER:PASSWD@!wiiuIp!/ -timeout=5 -rawsettings FollowDirectorySymlinks=1 FtpForcePasvIp2=0 FtpPingType=0" "ls "!REMOTE_FOLDER!"" "option batch off" "exit" > !ftplogFile!
         type !ftplogFile! | find /I "Could not retrieve directory listing" > NUL 2>&1 && (
