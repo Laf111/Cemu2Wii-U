@@ -1,10 +1,20 @@
 # Cemu2Wii-U
 
+
 Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisely a mlc01 folder : MLC_FOLDER). 
 
-It allows you to **automatically** :
-- **dump/update all files needed to play online with CEMU (for all accounts : Mii head, Friends list, certificates and account.dat)**
-- **synchronize saves between CEMU and the Wii-U**
+
+**[WII-U FTP SERVER](https://github.com/Laf111/WiiUFtpServer)** has to run on your Wii-U
+(It is available in ./resources/WiiuSDcard.zip)
+
+
+
+Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
+
+#
+It allows you to automatically :
+- **dump/update all files needed to play online with CEMU** (for all accounts : Mii head, Friends list, certificates and account.dat)
+- **inject/synchronize/backup saves** data between games installed on both side
 
 And bring other features to communicate with the Wii-U, see shortcuts created once installed :
 
@@ -12,8 +22,7 @@ And bring other features to communicate with the Wii-U, see shortcuts created on
   <img src="resources/Cemu2Wii-U.png">
 </p>
 
-**Version of CEMU supported >= 1.15.19** (supporting Wii-U accounts handling unless you force to use the 80000001 account)
-
+#
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
 To play online with CEMU : 
@@ -38,12 +47,6 @@ Every import or export process :
 
 
 All scripts verify if CEMU or other Cemu2Wii-U scripts is not already running.
-
-#
-**NOTE : i fixed files injection failure in FTPiiU-Everywhere, you have to use :
-[WII-U FTP SERVER](https://github.com/Laf111/WiiUFtpServer)**
-
-It is available in ./resources/WiiuSDcard.zip
 
 #
 ## Install (optional):
