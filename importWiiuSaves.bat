@@ -154,9 +154,9 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     echo.
     echo ---------------------------------------------------------
     set "userSaveMode="select""
-    choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
+    choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat ALL)? : "
     if !ERRORLEVEL! EQU 2 (
-        choice /C yn /N /M "Please confirm, treat all accounts? : "
+        choice /C yn /N /M "Please confirm, treat ALL accounts (CEMU saves of other users will be overwritten as well !) ? : "
         if !ERRORLEVEL! EQU 1 set "userSaveMode="all""
     )
 
@@ -412,7 +412,7 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
 
     echo Done
     echo.
-    echo Wii-U saves were backup to !WIIU_BACKUP! 
+    echo CEMU saves were backup to !WIIU_BACKUP! 
     echo.
 
     if not ["!accListToCreateInCemu!"] == [""] (
@@ -578,7 +578,7 @@ REM : functions
         set "cemuSaveFolder="!savesFolder:"=!\!endTitleId!""
         REM : cemuSaveFolder exist because it was listed in localTid
 
-        REM : backup CEMU saves for this game to CEMU_BACKUP_PATH
+        REM : backup CEMU saves for this game to CEMU_BACKUP_PATH for ALL ACCOUNTS
         echo.
         echo Backup Cemu !gameTitle! saves^.^.^.
 

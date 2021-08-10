@@ -143,9 +143,9 @@ REM : main
     echo.    
     echo ---------------------------------------------------------
     set "userSavesMode=select"    
-    choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat all)? : "
+    choice /C yn /N /M "Do you want to choose which accounts to be treated (y = select, n = treat ALL)? : "
     if !ERRORLEVEL! EQU 2 (
-        choice /C yn /N /M "Please confirm, treat all accounts? : "
+        choice /C yn /N /M "Please confirm, treat ALL accounts (saves of other users will be overwritten as well !) ? : "
         if !ERRORLEVEL! EQU 1 set "userSavesMode=all"
     )
     
@@ -170,9 +170,9 @@ REM : main
 
         echo.    
         set "gamesMode=select"    
-        choice /C yn /N /M "Do you want to choose which games to be treated (y = select, n = treat all)? : "
+        choice /C yn /N /M "Do you want to choose which games to be treated (y = select, n = treat ALL)? : "
         if !ERRORLEVEL! EQU 2 (
-            choice /C yn /N /M "Please confirm, treat all games? : "
+            choice /C yn /N /M "Please confirm, treat ALL games? : "
             if !ERRORLEVEL! EQU 1 set "gamesMode=all"
         )
         goto:CemuBackup

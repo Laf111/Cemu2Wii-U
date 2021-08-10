@@ -49,7 +49,8 @@ Main features :
             - see if an account need to be created in CEMU UI (import Wii-U account)
             - verify that the account exist on the Wii-U (export only existing accounts on the Wii-U)
 
-        - backups of saves are done under ./WiiuFiles/Backups/%DATE%_[CEMU|WiiU]_saves and can be restored (to Wii-U or CEMU).
+        - backups of saves are done under ./WiiuFiles/Backups/%DATE%_[CEMU|WiiU]_saves and can be restored using the dedicated script
+          for selected games and accounts.
 
     Scripts check if CEMU is not running before launching treaments.
 
@@ -75,15 +76,15 @@ Scripts available to user :
           install/move/delete games operation on your Wii-U
         - backupCemuSaves.bat : backup only saves in a mlc folder
         - backupWiiuSaves.bat : backup ALL saves from the Wii-U
-        - restoreBackup.bat : restore CEMU or Wii-U backups
+        - restoreBackup.bat : restore CEMU or Wii-U backups for selected games and accounts
         - changeAccount.bat : change the account (8000000X) used (remane folders in a MLC_PATH).
 
-    The last script will allow you to :
-
+        
+    The last script will allow you to rename an existant CEMU's account (PersitentId in account.dat is replaced as well) and so :
+        - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (by changing the 
+          desired account in 80000001, the only one supported on CEMU < 1.15.19) 
+    OR
         - keep only one save for each games by using the same account in CEMU and on the Wii-U (and synchronize CEMU <-> Wii-U game's progression)
-        - rename existant CEMU's accounts (you'll need to setup the new accounts manually in CEMU UI)
-        - bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change 
-          the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 
     But use it only if you know what you are doing...
 
@@ -119,3 +120,6 @@ HISTORY :
 
 10/08/2021 V1-2 : 
     > update "resources\WiiuSDcard.zip" with WiiuFtpServer V5
+
+10/08/2021 V2 : 
+    > fix wrong comments, added missing ones
