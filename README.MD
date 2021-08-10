@@ -3,6 +3,16 @@
 
 Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisely a mlc01 folder : MLC_FOLDER). 
 
+It allows you to automatically (trought your local network) to :
+- **dump/update all files needed to play online with CEMU** (for all accounts : Mii head, Friends list, certificates and account.dat)
+- **inject/synchronize/backup saves** data for selected games installed on both sides for the choosen accounts 
+
+And bring other features to communicate with the Wii-U, see shortcuts created once installed :
+
+<p align="center">
+  <img src="resources/Cemu2Wii-U.png">
+</p>
+
 
 **[WII-U FTP SERVER](https://github.com/Laf111/WiiUFtpServer)** has to run on your Wii-U
 (It is available in ./resources/WiiuSDcard.zip)
@@ -11,16 +21,6 @@ Cemu2Wii-U is an **automated FTP interface** between the WiiU and CEMU (precisel
 
 Version of CEMU supported >= 1.15.19 (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
-#
-It allows you to automatically :
-- **dump/update all files needed to play online with CEMU** (for all accounts : Mii head, Friends list, certificates and account.dat)
-- **inject/synchronize/backup saves** data between games installed on both side
-
-And bring other features to communicate with the Wii-U, see shortcuts created once installed :
-
-<p align="center">
-  <img src="resources/Cemu2Wii-U.png">
-</p>
 
 #
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
@@ -29,9 +29,6 @@ To play online with CEMU :
 - you'll only have to **dump opt.bin and seeprom.bin MANUALLY** (you can use NANDDUMPER or other HB App) and put them close to CEMU.exe to play online.
 - enable the online mode in CEMU account's settings
 
-Import/Exporting/restoring saves process concern only your **selection** of **games installed on both sides** (CEMU and Wii-U). You can choose to treat **all games** that exist in both side as well.
-
-Then, you can choose to **select wich account** will be concerned for each game or **treat all accounts**.
 
 Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side are treated unless user demands it.
 (So you can still force to install a saves created under CEMU on the Wii-U. The meta/saveinfo.xml file is updated when exporting CEMU saves)
