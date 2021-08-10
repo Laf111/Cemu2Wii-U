@@ -12,7 +12,7 @@ And bring other features to communicate with the Wii-U, see shortcuts created on
   <img src="resources/Cemu2Wii-U.png">
 </p>
 
-Version of CEMU supported >= **1.15.19** (supporting Wii-U accounts handling unless you force to use the 80000001 account)
+**Version of CEMU supported >= 1.15.19** (supporting Wii-U accounts handling unless you force to use the 80000001 account)
 
 Scripts are adapted from [BatchFw](https://github.com/Laf111/CEMU-Batch-Framework) with more restrictions. 
 
@@ -24,11 +24,12 @@ Import/Exporting/restoring saves process concern only your **selection** of **ga
 
 Then, you can choose to **select wich account** will be concerned for each game or **treat all accounts**.
 
-Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side are taken into account.
+Note that when exporting CEMU saves to the Wii-U, only existing accounts on Wii-U side are treated unless user demands it.
+(So you can still force to install a saves created under CEMU on the Wii-U. The meta/saveinfo.xml file is updated when exporting CEMU saves)
 
 
-**Every import or export process** :
-- **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves (they **can be restored to the Wii-U or CEMU earlier** using the dedicated scripts).
+Every import or export process :
+- **backups of saves are done automatically** under ./WiiuFiles/Backups/\%DATE\%\_[CEMU|WiiU]\_saves and **can be restored** using the dedicated script **for selected games and accounts**.
 
 - checks are done for accounts on both sides to : 
   - see if the account need to be added in CEMU UI (import Wii-U account)
@@ -61,13 +62,15 @@ Launch setup.bat to create shortcuts on your desktop (or any location).
 - **scanWiiU.bat** : take a snapshot of your Wii-U install (games and location mlc/usb). You need to create a new one on every install/move/delete games operation on your Wii-U
 - **backupCemuSaves.bat** : backup only saves in a mlc folder
 - **backupWiiuSaves.bat** : backup ALL saves from the Wii-U
-- **restoreBackup.bat** : restore CEMU or Wii-U backups
+- **restoreBackup.bat** : restore CEMU or Wii-U backups for selected games and accounts
 - **changeAccount.bat** : change the account (8000000X) used (remane folders in a MLC_PATH). 
 
-The last script will allow you to : 
+The last script will allow you to rename an existant CEMU's account (PersitentId in account.dat is replaced as well) and so :
+- bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19) 
+
+    OR
+
 - keep only one save for each games by using the same account in CEMU and on the Wii-U (and synchronize CEMU <-> Wii-U game's progression)
-- rename an existant CEMU's account (PersitentId in account.dat is replaced as well)
-- bypass the CEMU version's limitation above (accounts handling) to play your Wii-U saves on earlier versions of CEMU (change the desired account in 80000001, the only one supported on CEMU < 1.15.19)
 
 But use it only if you know what you are doing...
 
