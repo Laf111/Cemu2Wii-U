@@ -63,7 +63,8 @@ REM : main
 
     echo On your Wii-U^, you need to ^:
     echo - disable the sleeping^/shutdown features
-    echo - launched WiiU FTP Server
+    echo - launch WiiU FTP Server and press B to mount NAND paths
+    echo   if you have games on NAND
     echo.
     echo - get the IP adress displayed on Wii-U gamepad
     echo.

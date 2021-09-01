@@ -60,7 +60,8 @@ REM : main
     echo To download files throught FTP^, on your Wii-U^ you need to ^:
     echo.
     echo - disable the sleeping^/shutdown features
-    echo - launched WiiU FTP Server
+    echo - launch WiiU FTP Server and press B to mount NAND paths
+    echo   if you have games on NAND
     echo - get the IP adress displayed on Wii-U gamepad
     echo.
     echo Make sure the Wii U account you want to dump^/use has

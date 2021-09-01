@@ -165,7 +165,8 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     echo ---------------------------------------------------------
     echo On your Wii-U^, you need to ^:
     echo - have your SDCard plugged in your Wii-U
-    echo - launch WiiU FTP Server
+    echo - launch WiiU FTP Server and press B to mount NAND paths
+    echo   if you have games on NAND
     echo - get the IP adress displayed on Wii-U gamepad
     echo.
     echo Press any key to continue when you^'re ready

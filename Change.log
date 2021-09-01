@@ -121,5 +121,8 @@ HISTORY :
 10/08/2021 V1-2 : 
     > update "resources\WiiuSDcard.zip" with WiiuFtpServer V5
 
-10/08/2021 V2 : 
+01/09/2021 V2 : 
     > fix wrong comments, added missing ones
+    > update WiiuFtpServer to V5-2 in .\resources\WiiuSDcard.rar
+    > comments for WiiuFtpServer when NAND acces is requiered
+
