@@ -30,6 +30,7 @@ REM : userSaveMode = all)
 
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
+    set "config="!LOGS:"=!\lastConfig.ini""
 
     set "ftpSyncFolders="!HERE:"=!\ftpSyncFolders.bat""
 
@@ -38,10 +39,10 @@ REM : userSaveMode = all)
 
     REM : search if Cemu2Wii-U is not already running
     set /A "nbI=0"
-    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "restoreBackup" ^| find /I /V "find" /C') do set /A "nbI=%%f"
     if %nbI% GEQ 2 (
         echo ERROR^: Cemu2Wii-U is already^/still running^! Aborting^!
-        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find"
+        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find" ^| find /I /V "restoreBackup"
         pause
         exit /b 100
     )
@@ -99,9 +100,9 @@ REM : userSaveMode = all)
         exit /b 91
     )
 
-    set savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000"
-    if not exist !savesFolder! (
-        echo ERROR^: !savesFolder! not found ^?
+    set checkFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050010"
+    if not exist !checkFolder! (
+        echo ERROR^: !checkFolder! not found ^?
         pause
         exit /b 92
     )
@@ -120,7 +121,6 @@ REM : userSaveMode = all)
     :getInputs
     REM : when called with no args
 
-    set "config="!LOGS:"=!\lastConfig.ini""
     if exist !config! (
         for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
         set "folder=!MLC01_FOLDER_PATH:"=!"
@@ -130,10 +130,11 @@ REM : userSaveMode = all)
                 goto:getSavesMode
             ) else (
                 echo Well^.^.^. !MLC01_FOLDER_PATH! does not exist anymore^!
+                call:cleanConfigFile MLC01_FOLDER_PATH
             )
         )
     )
-    echo Please select a MLC folder ^(mlc01^)
+    echo Please select a MLC folder ^(mlc01^)^.^.^.
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -144,12 +145,13 @@ REM : userSaveMode = all)
     )
 
     REM : check if a usr/save exist
-    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
-    if not exist !savesFolder! (
-        echo !savesFolder! not found ^?
+    set "checkFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050010""
+    if not exist !checkFolder! (
+        echo !checkFolder! not found ^?
         goto:askMlc01Folder
     )
     REM : update last configuration
+    call:cleanConfigFile MLC01_FOLDER_PATH
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
 
     :getSavesMode
@@ -426,6 +428,24 @@ REM : userSaveMode = all)
 
 REM : ------------------------------------------------------------------
 REM : functions
+
+    :cleanConfigFile
+        REM : pattern to search in log file
+        set "pat=%~1"
+        set "configTmp="!config:"=!.tmp""
+        if exist !configTmp! (
+            del /F !config! > NUL 2>&1
+            move /Y !configTmp! !config! > NUL 2>&1
+        )
+
+        type !config! | find /I /V "!pat!" > !configTmp!
+
+        del /F /S !config! > NUL 2>&1
+        move /Y !configTmp! !config! > NUL 2>&1
+
+    goto:eof
+    REM : ------------------------------------------------------------------
+
 
     REM : faster than using xmlStarlet
     :getFromMetaXml

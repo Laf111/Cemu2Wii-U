@@ -125,4 +125,5 @@ HISTORY :
     > fix wrong comments, added missing ones
     > update WiiuFtpServer to V5-2 in .\resources\WiiuSDcard.rar
     > comments for WiiuFtpServer when NAND acces is requiered
-
+    > replace check on mlc01 (fail if no game was already installed), use usr\save\00050010 instead
+    > flush config file when re-enter new paths

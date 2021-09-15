@@ -86,18 +86,14 @@ REM : main
         call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
-    set "scansFolder="!HERE:"=!\WiiuFiles\Scans""
-    if exist !scansFolder! (
-        REM : create a shortcut to explore scans saved
-        set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Scans results^.lnk""
-        set "LINK_DESCRIPTION="Explore existing Wii-U scan results""
-        set "TARGET_PATH=!scansFolder!"
-        set "ICO_PATH="!RESOURCES_PATH:"=!\icons\scanResults.ico""
-
-        if not exist !LINK_PATH! (
-        echo Creating a shortcut to access to Wii-U scans results
-            call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
-        )
+    REM : create a shortcut to dumpGamesFromWiiu.bat (if needed)
+    set "LINK_PATH="!SHORTCUTS_FOLDER:"=!\Dump games from my Wii-U^.lnk""
+    set "LINK_DESCRIPTION="Dump a list of games ^(including saves^, updates and DLC^)""
+    set "TARGET_PATH="!HERE:"=!\dumpGamesFromWiiu.bat""
+    set "ICO_PATH="!RESOURCES_PATH:"=!\icons\DumpGames.ico""
+    if not exist !LINK_PATH! (
+        echo Creating a shortcut to dumpGamesFromWiiu^.bat
+        call:shortcut  !TARGET_PATH! !LINK_PATH! !LINK_DESCRIPTION! !ICO_PATH! !HERE!
     )
 
     REM : create a shortcut to getWiiuOnlineFiles.bat (if needed)

@@ -24,6 +24,7 @@ REM : main
     
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
+    set "config="!LOGS:"=!\lastConfig.ini""    
 
     REM : set current char codeset
     call:setCharSet
@@ -295,7 +296,6 @@ REM : functions
     REM : function to get and set char set code for current host
     :getMlcTarget
         echo.
-        set "config="!LOGS:"=!\lastConfig.ini""    
         if exist !config! (
             for /F "delims=~= tokens=2" %%c in ('type !config! ^| find /I "MLC01_FOLDER_PATH" 2^>NUL') do set "MLC01_FOLDER_PATH=%%c"
             set "folder=!MLC01_FOLDER_PATH:"=!"
@@ -305,12 +305,13 @@ REM : functions
                     goto:eof
                 ) else (
                     echo Well^.^.^. !MLC01_FOLDER_PATH! does not exist anymore^!
+                    call:cleanConfigFile MLC01_FOLDER_PATH
                 )
             )
         )
         
         :askMlc01Folder
-        echo Please select a MLC folder ^(mlc01^)    
+        echo Please select a MLC folder ^(mlc01^)^.^.^.    
         for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
         if [!MLC01_FOLDER_PATH!] == ["NONE"] (
@@ -320,12 +321,13 @@ REM : functions
         )
 
         REM : check if a usr/save exist
-        set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
-        if not exist !savesFolder! (
-            echo !savesFolder! not found ^?
+        set "checkFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050010""
+        if not exist !checkFolder! (
+            echo !checkFolder! not found ^?
             goto:askMlc01Folder
         )
         REM : update last configuration
+        call:cleanConfigFile MLC01_FOLDER_PATH
         echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
         
     goto:eof

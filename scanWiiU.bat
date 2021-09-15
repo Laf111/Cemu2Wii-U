@@ -25,6 +25,7 @@ REM : main
 
     set "StartWait="!RESOURCES_PATH:"=!\vbs\StartWait.vbs""
     set "StartHiddenWait="!RESOURCES_PATH:"=!\vbs\StartHiddenWait.vbs""
+    set "wiiTitlesDataBase="!RESOURCES_PATH:"=!\WiiU-Titles-Library.csv""
 
     set "cmdOw="!RESOURCES_PATH:"=!\cmdOw.exe""
     !cmdOw! @ /MAX > NUL 2>&1
@@ -64,7 +65,6 @@ REM : main
     echo On your Wii-U^, you need to ^:
     echo - disable the sleeping^/shutdown features
     echo - launch WiiU FTP Server and press B to mount NAND paths
-    echo.
     echo - get the IP adress displayed on Wii-U gamepad
     echo.
     echo Press any key to continue when you^'re ready
@@ -178,12 +178,18 @@ REM : main
         REM : parsing the %src%GamesList.txt and get the titleIds
         for /F "tokens=9" %%j in ('type !gamesListSrc! ^| find "Drwxr"') do (
 
-            set "endTitlesId[!nbGames!]=%%j"
-            set "titlesSrc[!nbGames!]=!src!"
+            REM : get title using endTitleId
+            set "title=NOT_FOUND"
+            for /F "delims=~; tokens=2" %%t in ('type !wiiTitlesDataBase! ^| findStr /R /I "^'00050000%%j';"') do set "title=%%t"
 
-            set /A "nbGames+=1"
-            if ["!src!"] == ["mlc"] set /A "nbGamesMlc+=1"
-            if ["!src!"] == ["usb"] set /A "nbGamesUsb+=1"
+            if not ["!title!"] == ["NOT_FOUND"] (
+                set "titles[!nbGames!]=!title!"
+                set "endTitlesId[!nbGames!]=%%j"
+                set "titlesSrc[!nbGames!]=!src!"
+
+                set /A "nbGames+=1"
+                if ["!src!"] == ["mlc"] set /A "nbGamesMlc+=1"
+                if ["!src!"] == ["usb"] set /A "nbGamesUsb+=1"
              )
         )
     )
@@ -221,7 +227,7 @@ REM : main
 
     for /L %%i in (0,1,!nbg!) do (
 
-        echo !endTitlesId[%%i]! found on !titlesSrc[%%i]!
+        echo !titles[%%i]! [!endTitlesId[%%i]!] found on !titlesSrc[%%i]!
 
         set "save="
         set "file=!remoteSaves:SRC=!"
@@ -235,11 +241,11 @@ REM : main
         set "dlc="
         type !file! | find /I "!endTitlesId[%%i]!" > NUL 2>&1 && set "dlc=X"
 
-        echo !endTitlesId[%%i]!;!titlesSrc[%%i]!;!save!;!update!;!dlc! >> !tmpFile!
+        echo !titles[%%i]!;^'!endTitlesId[%%i]!^';!titlesSrc[%%i]!;!save!;!update!;!dlc! >> !tmpFile!
     )
 
     REM : create gamesList
-    echo endTitleId;source;save;update;dlc > !gamesList!
+    echo title;endTitleId;source;save;update;dlc > !gamesList!
     type !tmpFile! | sort >> !gamesList!
     del /F !tmpFile!
 

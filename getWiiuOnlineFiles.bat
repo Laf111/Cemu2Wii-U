@@ -22,16 +22,17 @@ REM : main
 
     set "LOGS="!HERE:"=!\logs""
     if not exist !LOGS! mkdir !LOGS! > NUL 2>&1
+    set "config="!LOGS:"=!\lastConfig.ini""    
 
     REM : set current char codeset
     call:setCharSet
 
     REM : search if Cemu2Wii-U is not already running
     set /A "nbI=0"
-    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
+    for /F "delims=~=" %%f in ('wmic process get Commandline 2^>NUL ^| find /I "cmd.exe" ^| find /I /V "setup" ^| find /I "Cemu2Wii-U" ^| find /I /V "find" /C') do set /A "nbI=%%f"
     if %nbI% GEQ 2 (
         echo ERROR^: Cemu2Wii-U is already^/still running^! Aborting^!
-        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find"
+        wmic process get Commandline 2>NUL | find /I "cmd.exe" | find /I "Cemu2Wii-U" | find /I /V "find" ^| find /I /V "setup"
         pause
         exit /b 100
     )
@@ -234,9 +235,10 @@ REM : main
             goto:installFiles
         ) else (
             echo Well^.^.^. !MLC01_FOLDER_PATH! does not exist anymore^!
+            call:cleanConfigFile MLC01_FOLDER_PATH
         )
     )
-    echo Please select a MLC folder ^(mlc01^)
+    echo Please select a MLC folder ^(mlc01^)^.^.^.
     :askMlc01Folder
     for /F %%b in ('cscript /nologo !browseFolder! "Select a MLC folder"') do set "folder=%%b" && set "MLC01_FOLDER_PATH=!folder:?= !"
 
@@ -247,12 +249,13 @@ REM : main
     )
 
     REM : check if a usr/save exist
-    set "savesFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050000""
-    if not exist !savesFolder! (
-        echo !savesFolder! not found ^?
+    set "checkFolder="!MLC01_FOLDER_PATH:"=!\usr\save\00050010""
+    if not exist !checkFolder! (
+        echo !checkFolder! not found ^?
         goto:askMlc01Folder
     )
     REM : update last configuration
+    call:cleanConfigFile MLC01_FOLDER_PATH
     echo MLC01_FOLDER_PATH=!MLC01_FOLDER_PATH!>!config!
 
     :installFiles
@@ -359,6 +362,22 @@ REM : main
 REM : ------------------------------------------------------------------
 REM : functions
 
+    :cleanConfigFile
+        REM : pattern to search in log file
+        set "pat=%~1"
+        set "configTmp="!config:"=!.tmp""
+        if exist !configTmp! (
+            del /F !config! > NUL 2>&1
+            move /Y !configTmp! !config! > NUL 2>&1
+        )
+
+        type !config! | find /I /V "!pat!" > !configTmp!
+
+        del /F /S !config! > NUL 2>&1
+        move /Y !configTmp! !config! > NUL 2>&1
+
+    goto:eof
+    REM : ------------------------------------------------------------------
 
 
     REM : check if Wii-U accounts need to be defined in CEMU
