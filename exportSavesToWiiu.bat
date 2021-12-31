@@ -305,19 +305,22 @@ REM : userSaveMode = all)
 
     cls
     echo =========================================================
-
+    
     set "completeList="
-    for /F "delims=~; tokens=1-2" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
+    for /F "delims=~; tokens=1-3" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
 
-        set "endTitleId=%%i"
+        set "endTitleId=%%j"
+        set "endTitleId=!endTitleId:'=!"
+        
         REM : if the game is also installed on your PC in !MLC01_FOLDER_PATH!
         type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
 
             REM : get the title from !localTid!
             for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
+            
             set "titles[!nbGames!]=!title!"
-            set "endTitlesId[!nbGames!]=%%i"
-            set "titlesSrc[!nbGames!]=%%j"
+            set "endTitlesId[!nbGames!]=!endTitleId!"
+            set "titlesSrc[!nbGames!]=%%k"
             echo !nbGames!	: !title!
 
             set "completeList=!nbGames! !completeList!"
@@ -414,7 +417,7 @@ REM : userSaveMode = all)
     echo.
 
     echo =========================================================
-    echo Now you can stop FTPiiU server
+    echo Now you can stop WiiuFtpServer
     echo.
     pause
 
@@ -476,7 +479,9 @@ REM : functions
 
             if not ["!title!"] == ["NOT_FOUND"] if not ["!titleId!"] == ["NOT_FOUND"] (
                 if exist !localTid! (
-                    type !localTid! | find /I /V "!titleId!" > NUL 2>&1 && echo !titleId!;!title! >> !localTid!
+                    set /A "found=0"
+                    type !localTid! | find /I "!titleId:~8,8!" > NUL 2>&1 && set /A "found=1"
+                    if !found! EQU 0 echo !titleId!;!title! >> !localTid!
                 ) else (
                     echo !titleId!;!title! > !localTid!
                 )

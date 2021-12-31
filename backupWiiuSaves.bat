@@ -227,7 +227,7 @@ REM : main
     )
 
     echo =========================================================
-    echo Now you can stop FTPiiU server
+    echo Now you can stop wwiUFtpServer
     echo.
     pause
 

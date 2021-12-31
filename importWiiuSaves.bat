@@ -428,7 +428,7 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     )
 
     echo =========================================================
-    echo Now you can stop FTPiiU server
+    echo Now you can stop WiiuFtpServer
     echo.
     pause
 

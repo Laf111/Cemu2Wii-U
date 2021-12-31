@@ -50,7 +50,7 @@ REM : main
 
 
     echo.
-    choice /C yn /N /M "Do you want to enable the firmware update on you Wii-U (y, n)? : "
+    choice /C yn /N /M "Do you want to enable the firmware update on your wii-U (y, n)? : "
     if !ERRORLEVEL! EQU 1 set /A "wfum=1
 
     if !wfum! EQU 1 (

@@ -346,7 +346,7 @@ REM    cls
     set "DATE=%ldt%"
     
     echo =========================================================
-    echo Now you can stop FTPiiU server on you wii-U
+    echo Now you can stop WiiuFtpServer on your wii-U
     echo All transferts ended^, done
     echo - start ^: !START_DATE!
     echo - end   ^: !DATE!
@@ -496,8 +496,8 @@ REM : functions
 
         call:waitEndOfTransfers
 
-        REM : get saves only the first pass
-        if !nbPass! GTR 1 (
+        REM : get saves only the second pass
+        if !nbPass! GTR 2 (
 
             REM : compute the game size (waitEndOfTransfers already call for game files)
             set /A "dumpSize=0"
