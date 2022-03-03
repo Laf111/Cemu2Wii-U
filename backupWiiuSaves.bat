@@ -54,7 +54,7 @@ REM : main
     echo.
     echo On your Wii-U^, you need to ^:
     echo - have your SDCard plugged in your Wii-U
-    echo - launch WiiU STP Server
+    echo - launch WiiU FTP Server and press B to mount NAND paths
     echo - get the IP adress displayed on Wii-U gamepad
     echo.
     echo Press any key to continue when you^'re ready
@@ -164,11 +164,12 @@ REM : main
     cls
     echo =========================================================
 
-    for /F "delims=~; tokens=1-2" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
+    for /F "delims=~; tokens=1-3" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
 
         set "selectedTitles[!nbGames!]=%%i"
-        set "selectedEndTitlesId[!nbGames!]=%%i"
-        set "selectedtitlesSrc[!nbGames!]=%%j"
+        set tid=%%j
+        set "selectedEndTitlesId[!nbGames!]=!tid:'=!"
+        set "selectedtitlesSrc[!nbGames!]=%%k"
         
         set /A "nbGames+=1"
     )

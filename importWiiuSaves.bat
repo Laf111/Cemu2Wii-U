@@ -308,17 +308,19 @@ REM : on Wii-U side are treated (even i they are not found in CEMU)
     echo =========================================================
 
     set "completeList="
-    for /F "delims=~; tokens=1-2" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
+    for /F "delims=~; tokens=1-3" %%i in ('type !gamesList! ^| find /V "endTitleId"') do (
 
-        set "endTitleId=%%i"
+        set "tid=%%j"
+        set "endTitleId=!tid:'=!"        
+        
         REM : if the game is also installed on your PC in !MLC01_FOLDER_PATH!
         type !localTid! | find /I "!endTitleId!" > NUL 2>&1 && (
 
             REM : get the title from !localTid!
             for /F "delims=~; tokens=2" %%n in ('type !localTid! ^| find /I "!endTitleId!"') do set "title=%%n"
             set "titles[!nbGames!]=!title!"
-            set "endTitlesId[!nbGames!]=%%i"
-            set "titlesSrc[!nbGames!]=%%j"
+            set "endTitlesId[!nbGames!]=!endTitleId!"
+            set "titlesSrc[!nbGames!]=%%k"
             echo !nbGames!	: !title!
 
             set "completeList=!nbGames! !completeList!"

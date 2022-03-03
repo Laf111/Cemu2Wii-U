@@ -262,10 +262,10 @@ REM    cls
     echo Games found on the Wii-U
     echo =========================================================
     REM : loop on games
-    for /F "delims=~; tokens=1-4" %%i in ('type !gamesList! ^| find /V "title"') do (
+    for /F "delims=~; tokens=1-3" %%i in ('type !gamesList! ^| find /V "title"') do (
 
-        set "second=%%j"
-        set "endTitleId=!second:'=!"
+        set "tid=%%j"
+        set "endTitleId=!tid:'=!"
 
         set "titles[!nbGames!]=%%i"
         set "endTitlesId[!nbGames!]=!endTitleId!"

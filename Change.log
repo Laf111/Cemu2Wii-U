@@ -121,10 +121,10 @@ HISTORY :
 10/08/2021 V1-2 : 
     > update "resources\WiiuSDcard.zip" with WiiuFtpServer V5
 
-06/01/2022 V2 : 
+03/03/2022 V2 : 
     > fix wrong comments, added missing ones
-TODO    > update WiiuFtpServer to V8 in .\resources\WiiuSDcard.rar
+    > fix errors after changing the wii-u screenshot file format
     > comments for WiiuFtpServer when NAND acces is requiered
     > replace check on mlc01 (fail if no game was already installed), use usr\save\00050010 instead
-    > flush config file when re-enter new paths
-    > fix list of recognized games from scan results
+    > flush config file when re-enter new paths    
+    > update WiiuFtpServer to V9 in .\resources\WiiuSDcard.rar
